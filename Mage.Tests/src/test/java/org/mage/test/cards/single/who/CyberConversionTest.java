@@ -5,7 +5,10 @@ import mage.constants.CardType;
 import mage.constants.EmptyNames;
 import mage.constants.PhaseStep;
 import mage.constants.SubType;
+import mage.constants.SuperType;
 import mage.constants.Zone;
+import mage.game.permanent.Permanent;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
@@ -24,14 +27,53 @@ public class CyberConversionTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.BEGIN_COMBAT);
         execute();
 
+        Permanent permanent = getPermanent(FACE_DOWN, playerB);
+        Assert.assertEquals("The face-down creature should have no name", "", permanent.getName());
+        Assert.assertTrue("The face-down creature should be colorless", permanent.getColor(currentGame).isColorless());
+        Assert.assertTrue("The face-down creature should have no mana cost", permanent.getManaCost().isEmpty());
+        Assert.assertTrue("The face-down creature should have no supertypes", permanent.getSuperType(currentGame).isEmpty());
         assertPermanentCount(playerB, FACE_DOWN, 1);
         assertPowerToughness(playerB, FACE_DOWN, 2, 2);
         assertType(FACE_DOWN, CardType.CREATURE, true);
         assertType(FACE_DOWN, CardType.ARTIFACT, true);
         assertSubtype(FACE_DOWN, SubType.CYBERMAN);
         assertNotSubtype(FACE_DOWN, SubType.ANGEL);
-        assertColor(playerB, FACE_DOWN, "WUBRG", false);
         assertAbility(playerB, FACE_DOWN, FlyingAbility.getInstance(), false);
+    }
+
+    @Test
+    public void testLegendaryCreatureLosesLegendary() {
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 2);
+        addCard(Zone.HAND, playerA, "Cyber Conversion");
+        addCard(Zone.BATTLEFIELD, playerB, "Naban, Dean of Iteration");
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cyber Conversion", "Naban, Dean of Iteration");
+
+        setStopAt(1, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        Permanent permanent = getPermanent(FACE_DOWN, playerB);
+        Assert.assertFalse(permanent.getSuperType(currentGame).contains(SuperType.LEGENDARY));
+        Assert.assertTrue(permanent.getSuperType(currentGame).isEmpty());
+        assertSubtype(FACE_DOWN, SubType.CYBERMAN);
+    }
+
+    @Test
+    public void testMultipleOriginalSubtypesAreRemoved() {
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 2);
+        addCard(Zone.HAND, playerA, "Cyber Conversion");
+        addCard(Zone.BATTLEFIELD, playerB, "Veteran Armorsmith");
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cyber Conversion", "Veteran Armorsmith");
+
+        setStopAt(1, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        Permanent permanent = getPermanent(FACE_DOWN, playerB);
+        assertNotSubtype(FACE_DOWN, SubType.HUMAN);
+        assertNotSubtype(FACE_DOWN, SubType.SOLDIER);
+        assertSubtype(FACE_DOWN, SubType.CYBERMAN);
+        Assert.assertEquals("Cyberman should be the only subtype", 1, permanent.getSubtype(currentGame).size());
     }
 
     @Test

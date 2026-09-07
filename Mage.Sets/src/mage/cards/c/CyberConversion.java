@@ -1,9 +1,10 @@
 package mage.cards.c;
 
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.OneShotEffect;
-import mage.abilities.effects.common.continuous.BecomesFaceDownCreatureAllEffect;
+import mage.abilities.effects.common.continuous.BecomesFaceDownCreatureEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
@@ -12,8 +13,6 @@ import mage.constants.Layer;
 import mage.constants.Outcome;
 import mage.constants.SubLayer;
 import mage.constants.SubType;
-import mage.filter.common.FilterCreaturePermanent;
-import mage.filter.predicate.permanent.PermanentIdPredicate;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.target.common.TargetCreaturePermanent;
@@ -63,9 +62,10 @@ class CyberConversionEffect extends OneShotEffect {
         if (permanent == null || permanent.isTransformable()) {
             return false;
         }
-        FilterCreaturePermanent filter = new FilterCreaturePermanent();
-        filter.add(new PermanentIdPredicate(permanent.getId()));
-        game.addEffect(new BecomesFaceDownCreatureAllEffect(filter), source);
+        MageObjectReference objectReference = new MageObjectReference(permanent, game);
+        game.addEffect(new BecomesFaceDownCreatureEffect(
+                null, objectReference, Duration.Custom, BecomesFaceDownCreatureEffect.FaceDownType.MANUAL
+        ), source);
         game.addEffect(new CyberConversionTypeEffect().setTargetPointer(new FixedTarget(permanent, game)), source);
         return true;
     }
@@ -74,7 +74,7 @@ class CyberConversionEffect extends OneShotEffect {
 class CyberConversionTypeEffect extends ContinuousEffectImpl {
 
     CyberConversionTypeEffect() {
-        super(Duration.Custom, Layer.TypeChangingEffects_4, SubLayer.NA, Outcome.Neutral);
+        super(Duration.Custom, Layer.CopyEffects_1, SubLayer.FaceDownEffects_1b, Outcome.Neutral);
     }
 
     private CyberConversionTypeEffect(final CyberConversionTypeEffect effect) {
@@ -93,7 +93,10 @@ class CyberConversionTypeEffect extends ContinuousEffectImpl {
             discard();
             return false;
         }
-        permanent.addCardType(game, CardType.ARTIFACT);
+        permanent.removeAllSuperTypes(game);
+        permanent.removeAllCardTypes(game);
+        permanent.removeAllSubTypes(game);
+        permanent.addCardType(game, CardType.ARTIFACT, CardType.CREATURE);
         permanent.addSubType(game, SubType.CYBERMAN);
         return true;
     }

@@ -271,6 +271,44 @@ Last Known Information (LKI) is needed when rules ask about characteristics imme
 
 Durations also encode whether source zone change invalidates an effect and whether controller is fixed. `Custom` requires the effect to implement expiration correctly. `OneUse` is not a synonym for one-shot: it is for a continuing effect consumed once. Avoid accidentally using `WhileOnBattlefield` for an effect created by a resolving instant, or `EndOfTurn` for “until your next turn.” Layered effects also need the correct `Layer`/`SubLayer`; copy a close analogue.
 
+### Face-down permanents: use the modern copy-layer implementation
+
+For a new effect that turns one permanent face down, prefer
+`BecomesFaceDownCreatureEffect`. Read that class and several current callers before
+writing card-local logic. `FaceDownType.MANUAL` is appropriate when a resolving
+spell or ability turns an existing battlefield permanent face down, rather than
+casting, manifesting, disguising, or cloaking it. Supply a
+`MageObjectReference` and a duration that tracks the same battlefield object.
+
+`BecomesFaceDownCreatureEffect` establishes the canonical face-down
+characteristics in the copy layer. While face down, the object must lose or hide
+its original name, supertypes, card types, subtypes, color, rules-text abilities,
+and mana cost, and receive the appropriate base 2/2 characteristics. It also
+preserves face-down-compatible infrastructure, including applicable ways to turn
+a morph card face up. Do not approximate this by setting power/toughness and then
+removing selected properties in `TypeChangingEffects_4`: doing so can leave
+printed characteristics visible, interacts incorrectly with later layers, and
+can break face-up mechanics.
+
+`BecomesFaceDownCreatureAllEffect` is a legacy implementation with explicit
+TODO/old behavior. It may still be required by existing multi-permanent cards,
+but it should not be selected or copied as the default pattern for a new
+single-target card.
+
+Some cards define special face-down characteristics beyond the canonical ones.
+For example, Cyber Conversion first applies the modern canonical face-down
+effect, then layers “Artifact Creature — Cyberman” on top in the face-down copy
+sublayer. That additional effect must check that the same object is still face
+down and expire if it turns face up or changes zones. It must not replace the
+canonical effect.
+
+Face-down tests must go beyond checking `isFaceDown` and 2/2. Verify the empty
+name and mana cost, colorlessness, removal of every old supertype and subtype,
+removal of printed abilities, exact new types/subtypes, and object identity after
+a zone change. When relevant, turn a morph permanent face up and verify both
+that its normal characteristics return and that special face-down
+characteristics disappear. Include a transformable permanent case.
+
 ## 12. Copy/clone pattern
 
 Game simulation, rollback, AI, and copied game states require independent card/ability/effect objects. The standard card pattern is:
