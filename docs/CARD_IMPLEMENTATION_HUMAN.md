@@ -107,6 +107,37 @@ Spell cards already have a spell ability. [`LightningBolt.java`](../Mage.Sets/sr
 
 ## 4. Large lookup table
 
+### What “turn face down” really means
+
+Turning a permanent face down is much more than changing its displayed power
+and toughness to 2/2. Its old identity is hidden while it is face down: its
+printed name, mana cost, colors, supertypes such as Legendary, card types,
+subtypes, and ordinary printed abilities must no longer describe the face-down
+object. A card that only becomes 2/2 but still says “Human Soldier,” “Legendary,”
+or shows its original ability has not been implemented correctly.
+
+XMage's modern `BecomesFaceDownCreatureEffect` performs this complete conversion
+in the engine's copy layer. In beginner-friendly terms, a “layer” is one stage in
+the rules' ordered process for calculating what a game object currently looks
+like. Face-down identity is established early, so later effects operate on the
+correct hidden object. Reusing this engine effect is safer than having each card
+manually erase a list of properties, where one forgotten property can leak the
+original card's identity or break morph.
+
+Cyber Conversion is a useful three-step example:
+
+1. Start with the normal face-up creature.
+2. Apply XMage's canonical face-down conversion, producing a nameless,
+   colorless 2/2 creature with its old characteristics hidden.
+3. Layer the card's special instruction on top, making that face-down object an
+   Artifact Creature — Cyberman only while it stays face down.
+
+If it turns face up, the canonical face-down conversion and the extra Artifact
+and Cyberman characteristics stop applying, so the original card returns. The
+older `BecomesFaceDownCreatureAllEffect` remains in the repository for legacy
+multi-object implementations, but it generally should not be copied for a new
+single-target card.
+
 Most effects below live in [`Mage/src/main/java/mage/abilities/effects/common`](../Mage/src/main/java/mage/abilities/effects/common). Always open the class before assuming which constructor is correct.
 
 | Code / class | Plain-English meaning | Typical use | Real example |

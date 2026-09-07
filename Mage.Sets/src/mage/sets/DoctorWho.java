@@ -187,10 +187,10 @@ public final class DoctorWho extends ExpansionSet {
         cards.add(new SetCardInfo("Cursed Mirror", 226, Rarity.RARE, mage.cards.c.CursedMirror.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Cursed Mirror", 474, Rarity.RARE, mage.cards.c.CursedMirror.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Cursed Mirror", 817, Rarity.RARE, mage.cards.c.CursedMirror.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cyber Conversion", 355, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cyber Conversion", 38, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cyber Conversion", 643, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cyber Conversion", 946, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cyber Conversion", 355, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cyber Conversion", 38, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cyber Conversion", 643, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cyber Conversion", 946, Rarity.RARE, mage.cards.c.CyberConversion.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Cyberman Patrol", 1141, Rarity.UNCOMMON, mage.cards.c.CybermanPatrol.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Cyberman Patrol", 174, Rarity.UNCOMMON, mage.cards.c.CybermanPatrol.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Cyberman Patrol", 550, Rarity.UNCOMMON, mage.cards.c.CybermanPatrol.class, NON_FULL_USE_VARIOUS));
