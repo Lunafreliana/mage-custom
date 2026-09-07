@@ -31,7 +31,7 @@ public class MissyTest extends CardTestPlayerBase {
         Assert.assertEquals("The Cyberman should have no name", "", permanent.getName());
         Assert.assertTrue("The Cyberman should be colorless", permanent.getColor(currentGame).isColorless());
         Assert.assertTrue("The Cyberman should have no mana cost", permanent.getManaCost().isEmpty());
-        assertTapped(permanent, true);
+        assertTapped(FACE_DOWN, true);
         assertPowerToughness(playerA, FACE_DOWN, 2, 2);
         assertType(FACE_DOWN, CardType.ARTIFACT, true);
         assertType(FACE_DOWN, CardType.CREATURE, true);
