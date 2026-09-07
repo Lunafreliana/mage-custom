@@ -2,11 +2,9 @@ name: Build and run tests (github)
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: [ "custom" ]
   pull_request:
-    branches: [ "master", "main" ]
-  schedule:
-    - cron: '0 1 * * *'
+    branches: [ "custom" ]
 
   # allow manual run
   workflow_dispatch: {}
@@ -25,16 +23,7 @@ jobs:
         include:
           - java: '17'
             distribution: 'temurin'
-            package: 'jdk' # good
-          #- java: '8'
-          #  distribution: 'zulu'
-          #  package: 'jdk+fx' # good, baseline for app's release
-          #- java: '21'
-          #  distribution: 'temurin'
-          #  package: 'jdk' # good
-          #- java: '26'
-          #  distribution: 'temurin'
-          #  package: 'jdk' # bad, javac 26 no longer accepts release 8
+            package: 'jdk'
     steps:
     - uses: actions/checkout@v6
     - name: Setup JDK ${{ matrix.java }}
