@@ -7,7 +7,6 @@ import mage.abilities.common.DiesCreatureTriggeredAbility;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.FaceVillainousChoiceOpponentsEffect;
 import mage.abilities.effects.common.continuous.BecomesCybermanEffect;
-import mage.abilities.effects.common.continuous.BecomesFaceDownCreatureEffect;
 import mage.abilities.triggers.BeginningOfEndStepTriggeredAbility;
 import mage.cards.Card;
 import mage.cards.CardImpl;
@@ -15,7 +14,6 @@ import mage.cards.CardSetInfo;
 import mage.choices.FaceVillainousChoice;
 import mage.choices.VillainousChoice;
 import mage.constants.CardType;
-import mage.constants.Duration;
 import mage.constants.Outcome;
 import mage.constants.SubType;
 import mage.constants.SuperType;
@@ -27,7 +25,6 @@ import mage.filter.predicate.mageobject.AnotherPredicate;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.players.Player;
-import mage.target.targetpointer.FixedTarget;
 
 import java.util.UUID;
 
@@ -102,10 +99,7 @@ class MissyReturnEffect extends OneShotEffect {
         MageObjectReference mor = new MageObjectReference(
                 card.getId(), card.getZoneChangeCounter(game) + 1, game
         );
-        game.addEffect(new BecomesFaceDownCreatureEffect(
-                null, mor, Duration.Custom, BecomesFaceDownCreatureEffect.FaceDownType.MANUAL
-        ), source);
-        game.addEffect(new BecomesCybermanEffect().setTargetPointer(new FixedTarget(mor)), source);
+        game.addEffect(new BecomesCybermanEffect(mor), source);
         return controller.moveCards(card, Zone.BATTLEFIELD, source, game, true, true, false, null);
     }
 }
