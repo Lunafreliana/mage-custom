@@ -33,6 +33,44 @@ jobs:
         working-directory: Mage.Client
         run: mvn -B package assembly:single -DskipTests
 
+      - name: Force custom server configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path("Mage.Server/release/config/config.xml")
+          text = path.read_text(encoding="utf-8")
+
+          match = re.search(r"<server\b.*?/>", text, flags=re.DOTALL)
+          if match is None:
+              raise SystemExit("Could not find <server ... /> in config.xml")
+
+          block = match.group(0)
+          values = {
+              "serverAddress": "megerk.de",
+              "port": "17171",
+              "secondaryBindPort": "17172",
+          }
+
+          for key, value in values.items():
+              pattern = rf'({re.escape(key)}=")[^"]*(")'
+              block, count = re.subn(pattern, rf"\g<1>{value}\g<2>", block, count=1)
+              if count != 1:
+                  raise SystemExit(f"Could not update {key} in <server>")
+
+          path.write_text(
+              text[:match.start()] + block + text[match.end():],
+              encoding="utf-8",
+          )
+
+          print("Forced server config values:")
+          for key, value in values.items():
+              print(f"  {key}={value}")
+          PY
+
       - name: Build server package
         working-directory: Mage.Server
         run: mvn -B package assembly:single -DskipTests
