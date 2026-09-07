@@ -2,17 +2,14 @@ package mage.cards.c;
 
 import mage.MageObjectReference;
 import mage.abilities.Ability;
-import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.continuous.BecomesFaceDownCreatureEffect;
+import mage.abilities.effects.common.continuous.BecomesCybermanEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Duration;
-import mage.constants.Layer;
 import mage.constants.Outcome;
-import mage.constants.SubLayer;
-import mage.constants.SubType;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.target.common.TargetCreaturePermanent;
@@ -66,38 +63,7 @@ class CyberConversionEffect extends OneShotEffect {
         game.addEffect(new BecomesFaceDownCreatureEffect(
                 null, objectReference, Duration.Custom, BecomesFaceDownCreatureEffect.FaceDownType.MANUAL
         ), source);
-        game.addEffect(new CyberConversionTypeEffect().setTargetPointer(new FixedTarget(permanent, game)), source);
-        return true;
-    }
-}
-
-class CyberConversionTypeEffect extends ContinuousEffectImpl {
-
-    CyberConversionTypeEffect() {
-        super(Duration.Custom, Layer.CopyEffects_1, SubLayer.FaceDownEffects_1b, Outcome.Neutral);
-    }
-
-    private CyberConversionTypeEffect(final CyberConversionTypeEffect effect) {
-        super(effect);
-    }
-
-    @Override
-    public CyberConversionTypeEffect copy() {
-        return new CyberConversionTypeEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        Permanent permanent = game.getPermanent(getTargetPointer().getFirst(game, source));
-        if (permanent == null || !permanent.isFaceDown(game)) {
-            discard();
-            return false;
-        }
-        permanent.removeAllSuperTypes(game);
-        permanent.removeAllCardTypes(game);
-        permanent.removeAllSubTypes(game);
-        permanent.addCardType(game, CardType.ARTIFACT, CardType.CREATURE);
-        permanent.addSubType(game, SubType.CYBERMAN);
+        game.addEffect(new BecomesCybermanEffect().setTargetPointer(new FixedTarget(permanent, game)), source);
         return true;
     }
 }

@@ -541,12 +541,12 @@ public final class DoctorWho extends ExpansionSet {
         cards.add(new SetCardInfo("Midnight Crusader Shuttle", 784, Rarity.UNCOMMON, mage.cards.m.MidnightCrusaderShuttle.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mind Stone", 244, Rarity.UNCOMMON, mage.cards.m.MindStone.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mind Stone", 835, Rarity.UNCOMMON, mage.cards.m.MindStone.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Missy", 1022, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Missy", 1137, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Missy", 431, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Missy", 546, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Missy", 613, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Missy", 8, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Missy", 1022, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Missy", 1137, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Missy", 431, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Missy", 546, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Missy", 613, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Missy", 8, Rarity.RARE, mage.cards.m.Missy.class, NON_FULL_USE_VARIOUS));
         //cards.add(new SetCardInfo("Mondassian Colony Ship", 590, Rarity.COMMON, mage.cards.m.MondassianColonyShip.class));
         cards.add(new SetCardInfo("Mountain", 1162, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mountain", 1163, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
