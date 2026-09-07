@@ -2,6 +2,59 @@
 
 This is a repository-specific implementation guide. Treat the checked-out source—not memory of another XMage version—as authoritative. Paths below are links into this checkout.
 
+## Rules Research / Oracle Is Not Enough
+
+**This workflow is mandatory for every future card implementation.** Oracle text identifies what a card says, but it is not always a complete specification of what the rules make those words do. Keywords, keyword actions, ability words, and rules-defined terms can compress several abilities, choices, events, timing restrictions, or object-tracking rules into a few words. Reminder text is explanatory shorthand, not the complete rules.
+
+Examples that require rules research include vanishing, suspend, time travel, morph, disguise, cloak, manifest, discover, proliferate, connive, cascade, ward, replacement effects, linked abilities, face-down permanents, copy effects, and the defined meanings of “dies” and “leaves the battlefield.” For example, **vanishing N** is not merely “put N counters on this”: the Comprehensive Rules define entering with time counters, an upkeep time-counter-removal trigger, and a sacrifice trigger when the last time counter is removed, with exact conditions and interactions. **Time travel** is a keyword action: the player identifies eligible suspended cards they own and permanents they control with time counters, may choose among them, chooses add or remove for each, and the selected counter changes occur together. Do not reconstruct either mechanic from its reminder text.
+
+### When online research is required
+
+Research the card and mechanic online before choosing an implementation whenever any of these is true:
+
+* the card has a keyword or keyword action whose complete behavior is not explicit in Oracle text;
+* the mechanic is unfamiliar, or any timing, choice, ownership, targeting, zone, or interaction detail is uncertain;
+* it involves face-down objects, copy effects, replacement effects, linked abilities, continuous effects/layers, zone changes, delayed triggers, Last Known Information, or unusual targeting;
+* existing XMage implementations look inconsistent, isolated, old, or adapted to obsolete wording;
+* the intended interaction cannot be established confidently from Oracle text alone.
+
+### Source priority
+
+Use sources in this order, recording the relevant rules numbers/rulings in implementation notes or the task record:
+
+1. **Current Magic Comprehensive Rules and official Wizards rules material.** Start at [Wizards: Rules](https://magic.wizards.com/en/rules) and follow its current Comprehensive Rules link; do not keep an old downloaded rules file as authority.
+2. **Current official Oracle text from [Gatherer](https://gatherer.wizards.com/).** Search the exact card and confirm wording, types, mana cost, and rulings shown there.
+3. **Official Wizards Release Notes for the card's set.** Search [Magic news](https://magic.wizards.com/en/news) for the exact set/product name plus “Release Notes,” and verify that the article is for the correct release.
+4. **Official Wizards card-specific rulings and mechanic explanations.** Check the card entry in the Release Notes and official mechanic articles as well as Gatherer's rulings.
+5. **Modern XMage implementations of the same mechanic.** Compare several callers and the engine implementation; code is evidence of engine behavior, not higher authority than the rules.
+6. **[Scryfall](https://scryfall.com/) as a convenient secondary reference** for current Oracle text and rulings. If it disagrees with an official source, or uncertainty remains, prefer Wizards' current rules material/Gatherer.
+
+**The official Release Notes for the specific set MUST be checked whenever they exist. This is not optional.** Release Notes commonly supply practical mechanic definitions, edge cases, interaction details, and card-specific rulings that are easy to miss when reading only Oracle text or an isolated Comprehensive Rules entry. This check is especially important for crossover sets, Commander products, supplemental products, and mechanically unusual releases.
+
+For a card from a known set:
+
+1. Identify its exact set/product and set code from `Mage.Sets/src/mage/sets` and current Oracle data.
+2. Find that set's official Wizards Release Notes; do not silently substitute notes for a similarly named product.
+3. Search within the notes for the exact card name.
+4. Search within the notes for every unfamiliar keyword, keyword action, and named mechanic on the card.
+5. Apply both the general mechanic discussion and any card-specific ruling while designing implementation and tests.
+
+Do **not** rely on printed text when Oracle differs, reminder text as though it were exhaustive rules, memory of a mechanic, a search-result summary, or an old XMage implementation merely because it exists. Record access dates when rules version matters.
+
+### Required pre-coding sequence for an unfamiliar or compressed mechanic
+
+1. Read the card's current Oracle text in Gatherer (use Scryfall only as a secondary convenience).
+2. List every keyword, keyword action, ability word, and rules-defined term in it. Ability words have no rules meaning themselves, but the full ability still must be modeled.
+3. Open the **current** Comprehensive Rules and read every relevant definition and cross-reference, not only the glossary entry.
+4. Identify the card's set and find and read that set's official Wizards Release Notes whenever they exist.
+5. Search those Release Notes for both the exact card name and every relevant keyword/action/mechanic.
+6. Check official card-specific rulings and mechanic explanations; distinguish explanatory rulings from rules text.
+7. Search XMage for modern cards using the same mechanic and for the shared ability/effect/watcher/condition implementation.
+8. Compare every rules requirement—events, zones, choices, timing, controller/owner, target status, simultaneous actions, linked data, copy behavior, and LKI—with what the current engine code actually provides.
+9. Only then select reusable infrastructure or justify new code and focused tests.
+
+If research uncovers an engine constraint or rules detail broadly useful to later implementations, update these guides (with the official source and rules version/date where appropriate) rather than forcing every future task to rediscover it. Online research supplements repository inspection; it never excuses guessing about the checked-out API.
+
 ## 1. Repository structure
 
 XMage is a multi-module Maven project.

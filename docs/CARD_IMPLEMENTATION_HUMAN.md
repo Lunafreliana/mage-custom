@@ -2,6 +2,39 @@
 
 This guide is for a reader with little or no Java experience. It is not a Java course. Its goal is to help you decide whether a Codex-created card looks sensible. All links point to real files in this repository; [`CARD_IMPLEMENTATION_LLM.md`](CARD_IMPLEMENTATION_LLM.md) is the more technical companion.
 
+## Card text is shorthand: rules research is mandatory
+
+The words printed on a Magic card—and even its current Oracle text—do not always state every step the game performs. Magic often uses a short keyword like a label for a much larger section of the rules. In programming terms, seeing **“Vanishing 3”** or **“Time travel”** is like seeing a call to an existing function: the short line calls behavior defined somewhere else. You cannot safely rewrite that function by guessing from its name.
+
+```text
+visible card text:
+    Time travel.
+
+conceptually:
+    executeTimeTravelRules(...)
+```
+
+The visible text is the label for a much larger rules procedure; it is not the procedure itself.
+
+For example, vanishing covers entering with time counters, removing a counter at upkeep, and the triggered sacrifice connected to removing the last one. Time travel has exact rules about eligible suspended cards and permanents, ownership versus control, optional choices, adding or removing a time counter for each chosen object, and making the changes together. Reminder text may summarize this, but it is not the full rule. Face-down cards, copies, replacement effects, linked abilities, “dies,” layers, and objects changing zones have similarly important rules that may be invisible in one sentence of card text.
+
+A sensible Codex workflow therefore looks like this:
+
+1. Confirm current Oracle text on official [Gatherer](https://gatherer.wizards.com/). Do not trust an old printed version when it differs.
+2. Circle every keyword, keyword action, ability word, and special rules term.
+3. Read the relevant entries and cross-references in the **current** Comprehensive Rules linked from [Wizards' rules page](https://magic.wizards.com/en/rules).
+4. Identify the exact set/product, then find its official Release Notes through [Wizards' Magic news](https://magic.wizards.com/en/news). When Release Notes exist, checking them is mandatory—not optional.
+5. Search those notes for both the card's exact name and every unfamiliar keyword or keyword action on it; also check official card-specific rulings.
+6. Compare several modern XMage cards and the shared engine class for that mechanic.
+7. Check that the proposed code covers every choice, event, zone, timing rule, controller/owner distinction, and interaction the official rules require.
+8. Only then implement it and write tests for the non-obvious behavior.
+
+Release Notes are useful because they often explain a new mechanic in practical language, collect interaction details and edge cases, and place card-specific rulings beside the general mechanic explanation. These details can be easier to overlook in the much larger Comprehensive Rules. Release Notes deserve extra attention for crossover releases, Commander products, supplemental sets, and unusual mechanics.
+
+This online research is required when a mechanic is unfamiliar or uncertain, when current XMage examples disagree or look old, and for face-down objects, copy/replacement/continuous effects, linked abilities, layers, zone changes, delayed triggers, Last Known Information, or unusual targets. [Scryfall](https://scryfall.com/) is useful as a secondary lookup for Oracle text and rulings, but Wizards' current Comprehensive Rules, Gatherer, and official Release Notes take priority if anything disagrees or remains unclear.
+
+**Review warning:** “The Oracle text only says two words” is not a reason for a two-line implementation. But “the mechanic is complicated” is also not a reason to rebuild it: Codex should first find the existing XMage keyword/engine implementation. Ask Codex which official rule numbers it checked and which modern XMage examples it compared. Memory, reminder text, and one old XMage card are not sufficient evidence.
+
 ## 1. Basic Java vocabulary, using XMage
 
 Consider this shortened code from [`LightningBolt.java`](../Mage.Sets/src/mage/cards/l/LightningBolt.java):
