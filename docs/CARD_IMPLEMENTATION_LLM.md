@@ -304,11 +304,12 @@ but it should not be selected or copied as the default pattern for a new
 single-target card.
 
 Some cards define special face-down characteristics beyond the canonical ones.
-For example, Cyber Conversion first applies the modern canonical face-down
-effect, then layers “Artifact Creature — Cyberman” on top in the face-down copy
-sublayer. That additional effect must check that the same object is still face
-down and expire if it turns face up or changes zones. It must not replace the
-canonical effect.
+For example, Cyber Conversion uses `BecomesCybermanEffect`, a specialization of
+the modern canonical face-down effect that applies “Artifact Creature —
+Cyberman” immediately after resetting the object's face-down characteristics.
+Keep such characteristics in the same effect so an independent canonical effect
+cannot overwrite them during a later layer recalculation. The effect must track
+the same object and expire if it turns face up or changes zones.
 
 Face-down tests must go beyond checking `isFaceDown` and 2/2. Verify the empty
 name and mana cost, colorlessness, removal of every old supertype and subtype,
