@@ -162,6 +162,14 @@ Effects live principally in `mage.abilities.effects.common`; continuous effects 
 
 Other high-frequency families worth searching before custom code: `CounterTargetEffect`, `RevealLibraryPutIntoHandEffect`, `LookLibraryAndPickControllerEffect`, `ScryEffect`, `SurveilEffect`, `ShuffleLibraryEffect`, `FightTargetsEffect`, `AttachEffect`, `PlayAdditionalLandsControllerEffect`, delayed-trigger creation effects, and `AsThoughEffect` subclasses.
 
+When a `CopyApplier` adds a compound keyword ability directly to a blueprint's
+ability collection, flatten its `getSubAbilities()` results into that collection
+and clear them from the parent ability. Card and token construction normally
+flattens those hidden component abilities automatically, but direct collection
+mutation does not; leaving them only nested can make the copied permanent display
+the keyword without its behavior, while retaining them both nested and flattened
+can register its triggers twice.
+
 **Duration is semantic.** Pass `Duration.EndOfTurn` only for “until end of turn”; battlefield static effects generally use `WhileOnBattlefield`; one-shot prevention/replacement shields often use `OneUse`; special cleanup logic may use `Custom`. Never select duration merely to make displayed text look right.
 
 ## 4. Ability system

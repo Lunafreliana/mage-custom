@@ -14,6 +14,8 @@ import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.util.functions.CopyApplier;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -52,10 +54,18 @@ class FleshDuplicateCopyApplier extends CopyApplier {
     @Override
     public boolean apply(Game game, MageObject blueprint, Ability source, UUID copyToObjectId) {
         if (!blueprint.getAbilities().containsClass(VanishingAbility.class)) {
-            blueprint.getAbilities().add(new VanishingAbility(3));
+            VanishingAbility ability = new VanishingAbility(3);
+            // CopyEffect registers nested abilities from the parent, but only
+            // copies abilities present in the blueprint's top-level collection.
+            // Flatten them here while avoiding duplicate trigger registration.
+            List<Ability> subAbilities = new ArrayList<>(ability.getSubAbilities());
+            ability.getSubAbilities().clear();
+            blueprint.getAbilities().add(ability);
+            blueprint.getAbilities().addAll(subAbilities);
         }
         return true;
     }
+
     @Override
     public String getText() {
         return ", except it has vanishing 3 if that creature doesn't have vanishing.";
