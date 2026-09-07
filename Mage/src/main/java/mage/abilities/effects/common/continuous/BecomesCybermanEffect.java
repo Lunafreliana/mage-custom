@@ -1,25 +1,23 @@
 package mage.abilities.effects.common.continuous;
 
+import mage.MageObjectReference;
 import mage.abilities.Ability;
-import mage.abilities.effects.ContinuousEffectImpl;
 import mage.constants.CardType;
 import mage.constants.Duration;
-import mage.constants.Layer;
 import mage.constants.Outcome;
-import mage.constants.SubLayer;
 import mage.constants.SubType;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 
 /**
- * Applies the additional copiable characteristics used by face-down Cybermen.
- * The canonical face-down characteristics must be applied separately with
- * {@link BecomesFaceDownCreatureEffect}.
+ * Applies both the canonical face-down characteristics and the additional
+ * copiable characteristics used by face-down Cybermen.
  */
-public class BecomesCybermanEffect extends ContinuousEffectImpl {
+public class BecomesCybermanEffect extends BecomesFaceDownCreatureEffect {
 
-    public BecomesCybermanEffect() {
-        super(Duration.Custom, Layer.CopyEffects_1, SubLayer.FaceDownEffects_1b, Outcome.Neutral);
+    public BecomesCybermanEffect(MageObjectReference objectReference) {
+        super(null, objectReference, Duration.Custom, FaceDownType.MANUAL);
+        this.outcome = Outcome.Neutral;
     }
 
     private BecomesCybermanEffect(final BecomesCybermanEffect effect) {
@@ -33,9 +31,11 @@ public class BecomesCybermanEffect extends ContinuousEffectImpl {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        Permanent permanent = game.getPermanent(getTargetPointer().getFirst(game, source));
+        if (!super.apply(game, source)) {
+            return false;
+        }
+        Permanent permanent = objectReference.getPermanent(game);
         if (permanent == null || !permanent.isFaceDown(game)) {
-            discard();
             return false;
         }
         permanent.removeAllSuperTypes(game);

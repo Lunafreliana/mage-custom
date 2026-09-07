@@ -3,17 +3,14 @@ package mage.cards.c;
 import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
-import mage.abilities.effects.common.continuous.BecomesFaceDownCreatureEffect;
 import mage.abilities.effects.common.continuous.BecomesCybermanEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
-import mage.constants.Duration;
 import mage.constants.Outcome;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.target.common.TargetCreaturePermanent;
-import mage.target.targetpointer.FixedTarget;
 
 import java.util.UUID;
 
@@ -60,10 +57,7 @@ class CyberConversionEffect extends OneShotEffect {
             return false;
         }
         MageObjectReference objectReference = new MageObjectReference(permanent, game);
-        game.addEffect(new BecomesFaceDownCreatureEffect(
-                null, objectReference, Duration.Custom, BecomesFaceDownCreatureEffect.FaceDownType.MANUAL
-        ), source);
-        game.addEffect(new BecomesCybermanEffect().setTargetPointer(new FixedTarget(permanent, game)), source);
+        game.addEffect(new BecomesCybermanEffect(objectReference), source);
         return true;
     }
 }
