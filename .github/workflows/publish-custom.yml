@@ -1,0 +1,109 @@
+name: Publish XMage Custom Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-xmage-custom
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout custom branch
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+
+      - name: Build XMage
+        run: mvn -B clean install -DskipTests
+
+      - name: Build client package
+        working-directory: Mage.Client
+        run: mvn -B package assembly:single -DskipTests
+
+      - name: Build server package
+        working-directory: Mage.Server
+        run: mvn -B package assembly:single -DskipTests
+
+      - name: Create mage-bundle.zip
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf bundle-temp mage-bundle.zip
+          mkdir -p bundle-temp/mage-client bundle-temp/mage-server
+          unzip -q Mage.Client/target/mage-client.zip -d bundle-temp/mage-client
+          unzip -q Mage.Server/target/mage-server.zip -d bundle-temp/mage-server
+          cd bundle-temp
+          zip -qr ../mage-bundle.zip mage-client mage-server
+          cd ..
+          ls -lh mage-bundle.zip
+
+      - name: Prepare release metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAMP="$(date -u +%Y%m%dT%H%M%S)"
+          BASE_VERSION="$(mvn -q -Dstyle.color=never -DforceStdout help:evaluate -Dexpression=project.version | tail -n 1 | tr -d '\r')"
+          XMAGE_VERSION="${BASE_VERSION}-dev (${STAMP})"
+          ASSET_URL="https://github.com/Lunafreliana/xmage-custom-builds/releases/download/${STAMP}/mage-bundle.zip"
+          echo "stamp=${STAMP}" >> "$GITHUB_OUTPUT"
+          echo "xmage_version=${XMAGE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "asset_url=${ASSET_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.XMAGE_PUBLISH_TOKEN }}
+          STAMP: ${{ steps.meta.outputs.stamp }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHORT_SHA="${GITHUB_SHA::7}"
+          gh release create "$STAMP" mage-bundle.zip \
+            --repo Lunafreliana/xmage-custom-builds \
+            --title "XMage Custom $STAMP" \
+            --notes "Automatic custom XMage build from Lunafreliana/mage-custom@$SHORT_SHA."
+
+      - name: Update launcher config.json
+        env:
+          GH_TOKEN: ${{ secrets.XMAGE_PUBLISH_TOKEN }}
+          XMAGE_VERSION: ${{ steps.meta.outputs.xmage_version }}
+          ASSET_URL: ${{ steps.meta.outputs.asset_url }}
+          STAMP: ${{ steps.meta.outputs.stamp }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh repo clone Lunafreliana/xmage-custom-builds publish-repo
+          cd publish-repo
+
+          jq --arg version "$XMAGE_VERSION" --arg url "$ASSET_URL" \
+            '.XMage.version = $version | .XMage.location = $url | .XMage.full = $url' \
+            config.json > config.json.tmp
+          mv config.json.tmp config.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config.json
+          git commit -m "Publish XMage custom build $STAMP"
+          git push
+
+      - name: Publish summary
+        shell: bash
+        run: |
+          echo "## XMage custom build published" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Version: ${{ steps.meta.outputs.xmage_version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Release: https://github.com/Lunafreliana/xmage-custom-builds/releases/tag/${{ steps.meta.outputs.stamp }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Launcher home stays: https://lunafreliana.github.io/xmage-custom-builds/" >> "$GITHUB_STEP_SUMMARY"
