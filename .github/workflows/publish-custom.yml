@@ -76,16 +76,22 @@ jobs:
             --title "XMage Custom $STAMP" \
             --notes "Automatic custom XMage build from Lunafreliana/mage-custom@$SHORT_SHA."
 
+      - name: Checkout launcher feed repository
+        uses: actions/checkout@v6
+        with:
+          repository: Lunafreliana/xmage-custom-builds
+          ref: main
+          path: publish-repo
+          token: ${{ secrets.XMAGE_PUBLISH_TOKEN }}
+
       - name: Update launcher config.json
         env:
-          GH_TOKEN: ${{ secrets.XMAGE_PUBLISH_TOKEN }}
           XMAGE_VERSION: ${{ steps.meta.outputs.xmage_version }}
           ASSET_URL: ${{ steps.meta.outputs.asset_url }}
           STAMP: ${{ steps.meta.outputs.stamp }}
         shell: bash
         run: |
           set -euo pipefail
-          gh repo clone Lunafreliana/xmage-custom-builds publish-repo
           cd publish-repo
 
           jq --arg version "$XMAGE_VERSION" --arg url "$ASSET_URL" \
