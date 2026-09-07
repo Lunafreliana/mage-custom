@@ -1,0 +1,118 @@
+name: Sync official XMage upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-official-xmage-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout custom branch
+        uses: actions/checkout@v6
+        with:
+          ref: custom
+          fetch-depth: 0
+
+      - name: Fetch official magefree upstream
+        shell: bash
+        run: |
+          set -euo pipefail
+          git remote add upstream https://github.com/magefree/mage.git
+          git fetch --prune upstream master
+
+      - name: Check whether custom already contains upstream
+        id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          UPSTREAM_SHA="$(git rev-parse upstream/master)"
+          echo "upstream_sha=$UPSTREAM_SHA" >> "$GITHUB_OUTPUT"
+
+          if git merge-base --is-ancestor "$UPSTREAM_SHA" HEAD; then
+            echo "needs_sync=false" >> "$GITHUB_OUTPUT"
+            echo "custom already contains official upstream $UPSTREAM_SHA"
+          else
+            echo "needs_sync=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Merge upstream into temporary sync branch
+        if: steps.check.outputs.needs_sync == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git switch -C automation/upstream-sync custom
+
+          if ! git merge --no-edit upstream/master; then
+            echo "::error::Official XMage cannot be merged cleanly into custom. No branch was pushed and no custom code was overwritten. Resolve the conflicts deliberately, preserving custom behavior where appropriate."
+            git status --short
+            exit 1
+          fi
+
+      - name: Push sync branch
+        if: steps.check.outputs.needs_sync == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push --force origin automation/upstream-sync
+
+      - name: Create or refresh upstream sync pull request
+        if: steps.check.outputs.needs_sync == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPSTREAM_SHA: ${{ steps.check.outputs.upstream_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHORT_SHA="${UPSTREAM_SHA::7}"
+          EXISTING_PR="$(gh pr list --repo "$GITHUB_REPOSITORY" --base custom --head automation/upstream-sync --state open --json number --jq '.[0].number // empty')"
+
+          BODY=$(cat <<EOF
+          This PR merges the current official \`magefree/mage\` \`master\` branch into \`custom\`.
+
+          Official upstream commit: \`${UPSTREAM_SHA}\`
+
+          The merge starts from the existing \`custom\` branch, so custom commits remain layered on top. If Git reports a real conflict, this workflow intentionally stops instead of silently choosing one side.
+
+          Merge this PR only after the normal GitHub Actions tests pass.
+          EOF
+          )
+
+          if [ -n "$EXISTING_PR" ]; then
+            gh pr edit "$EXISTING_PR" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "Sync official XMage upstream ($SHORT_SHA)" \
+              --body "$BODY"
+          else
+            gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base custom \
+              --head automation/upstream-sync \
+              --title "Sync official XMage upstream ($SHORT_SHA)" \
+              --body "$BODY"
+          fi
+
+      - name: Summary
+        shell: bash
+        run: |
+          if [ "${{ steps.check.outputs.needs_sync }}" = "true" ]; then
+            echo "## Official XMage upstream update found" >> "$GITHUB_STEP_SUMMARY"
+            echo "A sync PR was created or refreshed. Merge it after tests are green." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## Already up to date" >> "$GITHUB_STEP_SUMMARY"
+            echo "The custom branch already contains the current magefree/mage master." >> "$GITHUB_STEP_SUMMARY"
+          fi
