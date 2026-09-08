@@ -239,8 +239,8 @@ public final class DoctorWho extends ExpansionSet {
         cards.add(new SetCardInfo("Day of Destiny", 797, Rarity.RARE, mage.cards.d.DayOfDestiny.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Day of the Moon", 684, Rarity.RARE, mage.cards.d.DayOfTheMoon.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Day of the Moon", 79, Rarity.RARE, mage.cards.d.DayOfTheMoon.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Death in Heaven", 66, Rarity.RARE, mage.cards.d.DeathInHeaven.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Death in Heaven", 671, Rarity.RARE, mage.cards.d.DeathInHeaven.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Death in Heaven", 66, Rarity.RARE, mage.cards.d.DeathInHeaven.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Death in Heaven", 671, Rarity.RARE, mage.cards.d.DeathInHeaven.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Decaying Time Loop", 685, Rarity.UNCOMMON, mage.cards.d.DecayingTimeLoop.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Decaying Time Loop", 80, Rarity.UNCOMMON, mage.cards.d.DecayingTimeLoop.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Delete", 381, Rarity.RARE, mage.cards.d.Delete.class, NON_FULL_USE_VARIOUS));
@@ -614,8 +614,8 @@ public final class DoctorWho extends ExpansionSet {
         //cards.add(new SetCardInfo("Prime Minister's Cabinet Room", 596, Rarity.COMMON, mage.cards.p.PrimeMinistersCabinetRoom.class));
         cards.add(new SetCardInfo("Propaganda", 219, Rarity.UNCOMMON, mage.cards.p.Propaganda.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Propaganda", 810, Rarity.UNCOMMON, mage.cards.p.Propaganda.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Psychic Paper", 181, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Psychic Paper", 786, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Psychic Paper", 181, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Psychic Paper", 786, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Quantum Misalignment", 368, Rarity.RARE, mage.cards.q.QuantumMisalignment.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Quantum Misalignment", 52, Rarity.RARE, mage.cards.q.QuantumMisalignment.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Quantum Misalignment", 657, Rarity.RARE, mage.cards.q.QuantumMisalignment.class, NON_FULL_USE_VARIOUS));
@@ -997,10 +997,10 @@ public final class DoctorWho extends ExpansionSet {
         cards.add(new SetCardInfo("The Ninth Doctor", 432, Rarity.RARE, mage.cards.t.TheNinthDoctor.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Ninth Doctor", 560, Rarity.RARE, mage.cards.t.TheNinthDoctor.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Ninth Doctor", 753, Rarity.RARE, mage.cards.t.TheNinthDoctor.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The Pandorica", 25, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The Pandorica", 343, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The Pandorica", 630, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The Pandorica", 934, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The Pandorica", 25, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The Pandorica", 343, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The Pandorica", 630, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The Pandorica", 934, Rarity.RARE, mage.cards.t.ThePandorica.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Parting of the Ways", 696, Rarity.RARE, mage.cards.t.ThePartingOfTheWays.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Parting of the Ways", 91, Rarity.RARE, mage.cards.t.ThePartingOfTheWays.class, NON_FULL_USE_VARIOUS));
         //cards.add(new SetCardInfo("The Pyramid of Mars", 597, Rarity.COMMON, mage.cards.t.ThePyramidOfMars.class));

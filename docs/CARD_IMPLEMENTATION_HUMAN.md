@@ -108,7 +108,7 @@ public final class ManOWar extends CardImpl {
 * `extends CardImpl`: it inherits normal XMage card behavior.
 * `ManOWar(UUID ownerId, CardSetInfo setInfo)`: when XMage creates the card, it supplies its owner and printing/set information.
 * `super(...)`: asks `CardImpl` to initialize the common card parts. Here they say “creature” and mana cost `{2}{U}`.
-* `subtype.add(JELLYFISH)`: adds the creature subtype.
+* `subtype.add(JELLYFISH)`: adds the creature subtype. Subtypes are enum values rather than space-separated words: for example, the rules define **Time Lord** as one two-word creature type, represented by `SubType.TIME_LORD`.
 * `power`/`toughness`: sets the printed 2/2 numbers. `MageInt` is XMage's number wrapper.
 * `Ability ability = new ...`: creates the “when this enters” trigger and places the return-to-hand effect inside it.
 * `addTarget(...)`: says that trigger selects a creature permanent.

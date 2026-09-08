@@ -103,6 +103,7 @@ public final class LightningBolt extends CardImpl {
 * `CardSetInfo` carries printing metadata supplied by set registration.
 * `super(ownerId, setInfo, CardType[], manaCost)` initializes the card. Mana syntax uses braces (`{2}{U}`, `{X}{R}`, `{W/U}`).
 * `CardType` is the type line's major type. Add `SubType` through `this.subtype.add(...)`; current code also commonly uses `addSubType(...)`. Add `SuperType` through `supertype.add(...)`/`addSuperType(...)`; follow nearby current code.
+* Do not tokenize subtypes by spaces. Comprehensive Rules 205.3m defines **Time Lord** as the one two-word creature type, and XMage represents it with the single enum value `SubType.TIME_LORD`. Add or compare that value as one subtype; never model it as separate words.
 * Creatures assign `this.power` and `this.toughness` to `new MageInt(n)`, as [`ManOWar.java`](../Mage.Sets/src/mage/cards/m/ManOWar.java) does. Variable `*` values generally need characteristic-defining abilities, not an arbitrary fixed `MageInt`.
 * Planeswalkers set `this.setStartingLoyalty(n)` and add `LoyaltyAbility` instances. Verify the exact current pattern in a similar planeswalker.
 * Color is normally derived from mana cost/color indicators. Explicit color identity/indicator is used for colorless costs, back faces, or rules text; search `getColorIdentity().add(...)` and `getColor().set...` before copying a pattern.
