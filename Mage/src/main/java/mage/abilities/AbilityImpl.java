@@ -1296,7 +1296,7 @@ public abstract class AbilityImpl implements Ability {
                 if (modes.isMayChooseSameModeMoreThanOnce()) {
                     return true;
                 }
-                if (found >= modes.getMinModes()) {
+                if (found >= modes.getMinModes(game, ability)) {
                     return true;
                 }
             }

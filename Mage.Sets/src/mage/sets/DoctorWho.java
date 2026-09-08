@@ -267,10 +267,10 @@ public final class DoctorWho extends ExpansionSet {
         cards.add(new SetCardInfo("Donna Noble", 687, Rarity.RARE, mage.cards.d.DonnaNoble.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Donna Noble", 82, Rarity.RARE, mage.cards.d.DonnaNoble.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Donna Noble", 973, Rarity.RARE, mage.cards.d.DonnaNoble.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Doomsday Confluence", 372, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Doomsday Confluence", 67, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Doomsday Confluence", 672, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Doomsday Confluence", 963, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Doomsday Confluence", 372, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Doomsday Confluence", 67, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Doomsday Confluence", 672, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Doomsday Confluence", 963, Rarity.RARE, mage.cards.d.DoomsdayConfluence.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Dragonskull Summit", 1081, Rarity.RARE, mage.cards.d.DragonskullSummit.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Dragonskull Summit", 272, Rarity.RARE, mage.cards.d.DragonskullSummit.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Dragonskull Summit", 490, Rarity.RARE, mage.cards.d.DragonskullSummit.class, NON_FULL_USE_VARIOUS));
