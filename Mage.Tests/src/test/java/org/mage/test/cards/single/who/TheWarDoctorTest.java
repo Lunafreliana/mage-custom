@@ -36,7 +36,7 @@ public class TheWarDoctorTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 3);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Guardian of Faith");
-        setTarget(playerA, "Grizzly Bears^Grizzly Bears");
+        addTarget(playerA, "Grizzly Bears^Grizzly Bears");
 
         setStopAt(1, PhaseStep.BEGIN_COMBAT);
         execute();
@@ -51,7 +51,7 @@ public class TheWarDoctorTest extends CardTestPlayerBase {
         addCounters(1, PhaseStep.PRECOMBAT_MAIN, playerA, doctor, CounterType.TIME, 2);
 
         attack(1, playerA, doctor, playerB);
-        setTarget(playerA, "Grizzly Bears");
+        addTarget(playerA, "Grizzly Bears");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
