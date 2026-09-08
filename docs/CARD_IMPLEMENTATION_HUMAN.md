@@ -304,6 +304,8 @@ Some files are old and show legacy formatting or unusual patterns. “An existin
 * Strange hardcoded IDs, names, zones, player counts, or magic numbers.
 * Duplicated rules logic or manual loops copied into several places.
 * A custom Watcher for a common “this turn/first time” mechanic.
+* A “whenever one or more” ability that listens to each object's event separately;
+  simultaneous objects should be grouped into one batch so the ability triggers once.
 * Huge unrelated formatting/generated-file diffs.
 * Engine/core changes for a simple card without strong justification.
 * Filters/predicates whose names or descriptions do not clearly match Oracle restrictions.

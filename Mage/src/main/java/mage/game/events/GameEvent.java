@@ -505,7 +505,7 @@ public class GameEvent implements Serializable {
         TOOK_INITIATIVE,
         BECOMES_DAY_NIGHT,
         MEDITATED,
-        PHASE_OUT, PHASED_OUT,
+        PHASE_OUT, PHASED_OUT, PHASED_OUT_BATCH(true),
         PHASE_IN, PHASED_IN,
         TURN_FACE_UP, TURNED_FACE_UP,
         TURN_FACE_DOWN, TURNED_FACE_DOWN,
