@@ -35,6 +35,8 @@ public class PsychicPaperTest extends CardTestPlayerBase {
         activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Equip", "Memnite");
         setChoice(playerA, "Elite Vanguard");
         setChoice(playerA, "Doctor");
+        checkAbility("ward is granted to the newly equipped creature", 1, PhaseStep.END_TURN,
+                playerA, "Elite Vanguard", WardAbility.class, true);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.END_TURN);
@@ -47,6 +49,5 @@ public class PsychicPaperTest extends CardTestPlayerBase {
         assertPermanentCount(playerA, "Elite Vanguard", 1);
         assertSubtype("Elite Vanguard", SubType.DOCTOR);
         assertNotSubtype("Elite Vanguard", SubType.CONSTRUCT);
-        assertAbility(playerA, "Elite Vanguard", WardAbility.class, true);
     }
 }
