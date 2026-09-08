@@ -16,6 +16,23 @@ public class MissyTest extends CardTestPlayerBase {
     private static final String FACE_DOWN = EmptyNames.FACE_DOWN_CREATURE.getTestCommand();
 
     @Test
+    public void testTimeLordIsSingleSubtype() {
+        addCard(Zone.BATTLEFIELD, playerA, "Missy");
+
+        setStopAt(1, PhaseStep.UPKEEP);
+        execute();
+
+        Permanent missy = getPermanent("Missy", playerA);
+        Assert.assertEquals(
+                "Missy should have exactly two creature types", 2, missy.getSubtype(currentGame).size()
+        );
+        Assert.assertEquals(
+                "Time Lord should be one creature type", SubType.TIME_LORD, missy.getSubtype(currentGame).get(0)
+        );
+        Assert.assertEquals(SubType.ROGUE, missy.getSubtype(currentGame).get(1));
+    }
+
+    @Test
     public void testReturnsNonartifactCreatureAsTappedCyberman() {
         addCard(Zone.BATTLEFIELD, playerA, "Missy");
         addCard(Zone.BATTLEFIELD, playerB, "Serra Angel");
