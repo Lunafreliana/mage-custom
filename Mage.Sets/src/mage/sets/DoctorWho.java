@@ -201,10 +201,10 @@ public final class DoctorWho extends ExpansionSet {
         cards.add(new SetCardInfo("Cybermen Squadron", 176, Rarity.RARE, mage.cards.c.CybermenSquadron.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Cybermen Squadron", 457, Rarity.RARE, mage.cards.c.CybermenSquadron.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Cybermen Squadron", 781, Rarity.RARE, mage.cards.c.CybermenSquadron.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cybership", 1049, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cybership", 177, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cybership", 458, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Cybership", 782, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cybership", 1049, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cybership", 177, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cybership", 458, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Cybership", 782, Rarity.RARE, mage.cards.c.Cybership.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Dalek Drone", 371, Rarity.RARE, mage.cards.d.DalekDrone.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Dalek Drone", 64, Rarity.RARE, mage.cards.d.DalekDrone.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Dalek Drone", 669, Rarity.RARE, mage.cards.d.DalekDrone.class, NON_FULL_USE_VARIOUS));
