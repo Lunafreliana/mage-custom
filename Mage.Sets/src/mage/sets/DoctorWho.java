@@ -614,8 +614,8 @@ public final class DoctorWho extends ExpansionSet {
         //cards.add(new SetCardInfo("Prime Minister's Cabinet Room", 596, Rarity.COMMON, mage.cards.p.PrimeMinistersCabinetRoom.class));
         cards.add(new SetCardInfo("Propaganda", 219, Rarity.UNCOMMON, mage.cards.p.Propaganda.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Propaganda", 810, Rarity.UNCOMMON, mage.cards.p.Propaganda.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Psychic Paper", 181, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Psychic Paper", 786, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Psychic Paper", 181, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Psychic Paper", 786, Rarity.UNCOMMON, mage.cards.p.PsychicPaper.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Quantum Misalignment", 368, Rarity.RARE, mage.cards.q.QuantumMisalignment.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Quantum Misalignment", 52, Rarity.RARE, mage.cards.q.QuantumMisalignment.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Quantum Misalignment", 657, Rarity.RARE, mage.cards.q.QuantumMisalignment.class, NON_FULL_USE_VARIOUS));
