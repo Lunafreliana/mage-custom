@@ -21,7 +21,10 @@ public class ReedRichardsSmartestManTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Divination", 2);
         addCard(Zone.HAND, playerA, "Ornithopter", 2);
 
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Divination");
+        // Resolve the first sorcery before trying to cast the second one. Without
+        // this priority barrier, the second command runs while Divination is on
+        // the stack and is therefore illegal at sorcery speed.
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Divination", true);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Divination");
 
         setStopAt(2, PhaseStep.UPKEEP);
