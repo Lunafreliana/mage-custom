@@ -45,7 +45,7 @@ public class TheWarDoctorTest extends CardTestPlayerBase {
     }
 
     @Test
-    public void testWarDoctorDoesNotCountItselfPhasingOut() {
+    public void testWarDoctorDoesNotTriggerWhenItPhasesOut() {
         addCard(Zone.BATTLEFIELD, playerA, doctor);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         addCard(Zone.HAND, playerA, "Guardian of Faith");
@@ -57,7 +57,9 @@ public class TheWarDoctorTest extends CardTestPlayerBase {
         setStopAt(3, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
-        assertCounterCount(playerA, doctor, CounterType.TIME, 1);
+        // A phased-out permanent is treated as though it doesn't exist, so its ability can't
+        // trigger for the Bear that phased out simultaneously. The Doctor itself is not "other."
+        assertCounterCount(playerA, doctor, CounterType.TIME, 0);
     }
 
     @Test
