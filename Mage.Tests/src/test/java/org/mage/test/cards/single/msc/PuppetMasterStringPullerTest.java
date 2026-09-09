@@ -20,7 +20,6 @@ public class PuppetMasterStringPullerTest extends CardTestMultiPlayerBaseWithRan
         addCard(Zone.BATTLEFIELD, playerD, lion);
 
         attack(1, playerA, bears, playerD);
-        addTarget(playerA, lion);
         block(1, playerD, lion, bears); // The block is illegal and is ignored.
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -44,9 +43,6 @@ public class PuppetMasterStringPullerTest extends CardTestMultiPlayerBaseWithRan
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Jeering Homunculus");
         setChoice(playerA, "Yes");
         addTarget(playerA, lion);
-
-        attack(2, playerD, bears, playerC);
-        attack(2, playerD, lion, playerC);
 
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
         execute();
