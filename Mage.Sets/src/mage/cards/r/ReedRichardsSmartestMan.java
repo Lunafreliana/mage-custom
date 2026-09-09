@@ -107,16 +107,6 @@ class ReedRichardsSmartestManWatcher extends Watcher {
         super(WatcherScope.CARD);
     }
 
-    private ReedRichardsSmartestManWatcher(final ReedRichardsSmartestManWatcher watcher) {
-        super(watcher);
-        this.used = watcher.used;
-    }
-
-    @Override
-    public ReedRichardsSmartestManWatcher copy() {
-        return new ReedRichardsSmartestManWatcher(this);
-    }
-
     @Override
     public void watch(GameEvent event, Game game) {
         // Usage is set by the replacement effect before it creates new draw events.
