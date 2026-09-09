@@ -47,6 +47,6 @@ public class PsychicPaperTest extends CardTestPlayerBase {
         assertPermanentCount(playerA, "Elite Vanguard", 1);
         assertSubtype("Elite Vanguard", SubType.DOCTOR);
         assertNotSubtype("Elite Vanguard", SubType.CONSTRUCT);
-        assertAbility(playerA, "Elite Vanguard", WardAbility.class, true);
+        assertAbilityCount(playerA, "Elite Vanguard", WardAbility.class, 1);
     }
 }
