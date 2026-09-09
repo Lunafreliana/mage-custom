@@ -15,6 +15,8 @@ public class KlawMasterOfSoundTest extends CardTestPlayerBase {
 
     @Test
     public void testExilesAndPlaysLand() {
+        skipInitShuffling();
+
         addCard(Zone.BATTLEFIELD, playerA, "Klaw, Master of Sound");
         addCard(Zone.LIBRARY, playerB, "Plains");
 
@@ -32,6 +34,8 @@ public class KlawMasterOfSoundTest extends CardTestPlayerBase {
 
     @Test
     public void testAnyManaTypeCanCastExiledSpell() {
+        skipInitShuffling();
+
         addCard(Zone.BATTLEFIELD, playerA, "Klaw, Master of Sound");
         addCard(Zone.BATTLEFIELD, playerA, "Swamp", 2);
         addCard(Zone.LIBRARY, playerB, "Savannah Lions");
