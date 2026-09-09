@@ -44,4 +44,22 @@ public class ReedRichardsSmartestManTest extends CardTestPlayerBase {
         // The turn-based draw is unchanged, then Howling Mine's draw becomes four.
         assertHandCount(playerA, 5);
     }
+
+    @Test
+    public void testReplacementResetsOnNextTurn() {
+        removeAllCardsFromLibrary(playerA);
+        addCard(Zone.LIBRARY, playerA, "Island", 20);
+        addCard(Zone.BATTLEFIELD, playerA, reed);
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 6);
+        addCard(Zone.HAND, playerA, "Divination", 2);
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Divination");
+        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Divination");
+
+        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        // Opening 2 + two draw steps - 2 spells + five cards per Divination.
+        assertHandCount(playerA, 12);
+    }
 }

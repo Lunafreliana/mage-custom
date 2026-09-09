@@ -14,11 +14,11 @@ import mage.constants.Outcome;
 import mage.constants.PhaseStep;
 import mage.constants.SubType;
 import mage.constants.SuperType;
+import mage.constants.WatcherScope;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.players.Player;
-import mage.watchers.common.CardsDrawnDuringDrawStepWatcher;
-import mage.watchers.common.CardsDrawnThisTurnWatcher;
+import mage.watchers.Watcher;
 
 import java.util.UUID;
 
@@ -47,10 +47,8 @@ public final class ReedRichardsSmartestMan extends CardImpl {
         )));
 
         // The first time you would draw a card each turn except the first card you draw during each of your draw steps, you draw four cards instead.
-        this.addAbility(
-                new SimpleStaticAbility(new ReedRichardsSmartestManReplacementEffect()),
-                new CardsDrawnDuringDrawStepWatcher()
-        );
+        this.addAbility(new SimpleStaticAbility(new ReedRichardsSmartestManReplacementEffect()),
+                new ReedRichardsSmartestManWatcher());
     }
 
     private ReedRichardsSmartestMan(final ReedRichardsSmartestMan card) {
@@ -91,36 +89,90 @@ class ReedRichardsSmartestManReplacementEffect extends ReplacementEffectImpl {
             return false;
         }
 
-        CardsDrawnDuringDrawStepWatcher drawStepWatcher
-                = game.getState().getWatcher(CardsDrawnDuringDrawStepWatcher.class);
-        int cardsDrawnDuringDrawStep = drawStepWatcher == null
-                ? 0
-                : drawStepWatcher.getAmountCardsDrawn(event.getPlayerId());
+        ReedRichardsSmartestManWatcher watcher = game.getState().getWatcher(
+                ReedRichardsSmartestManWatcher.class, source.getSourceId()
+        );
+        if (watcher == null || watcher.isUsed()) {
+            return false;
+        }
 
         // The first draw of each of the player's draw steps is exempt even if an
         // earlier draw this turn has already used this replacement effect.
         if (game.isActivePlayer(event.getPlayerId())
                 && game.getPhase().getStep().getType() == PhaseStep.DRAW
-                && cardsDrawnDuringDrawStep == 0) {
+                && !watcher.hasDrawnDuringDrawStep()) {
             return false;
         }
-
-        CardsDrawnThisTurnWatcher turnWatcher
-                = game.getState().getWatcher(CardsDrawnThisTurnWatcher.class);
-        int cardsDrawnThisTurn = turnWatcher == null
-                ? 0
-                : turnWatcher.getCardsDrawnThisTurn(event.getPlayerId());
-
-        // Of the cards already drawn this turn, at most one was the exempt draw.
-        return cardsDrawnThisTurn - Math.min(cardsDrawnDuringDrawStep, 1) == 0;
+        return true;
     }
 
     @Override
     public boolean replaceEvent(GameEvent event, Ability source, Game game) {
+        ReedRichardsSmartestManWatcher watcher = game.getState().getWatcher(
+                ReedRichardsSmartestManWatcher.class, source.getSourceId()
+        );
+        if (watcher != null) {
+            // Mark this before drawing so the replacement draws cannot make this
+            // effect available again through nested replacement events.
+            watcher.setUsed();
+        }
         Player player = game.getPlayer(event.getPlayerId());
         if (player != null) {
             player.drawCards(4, source, game, event);
         }
         return true;
+    }
+}
+
+class ReedRichardsSmartestManWatcher extends Watcher {
+
+    private boolean used;
+    private boolean drawnDuringDrawStep;
+
+    ReedRichardsSmartestManWatcher() {
+        super(WatcherScope.CARD);
+    }
+
+    private ReedRichardsSmartestManWatcher(final ReedRichardsSmartestManWatcher watcher) {
+        super(watcher);
+        this.used = watcher.used;
+        this.drawnDuringDrawStep = watcher.drawnDuringDrawStep;
+    }
+
+    @Override
+    public ReedRichardsSmartestManWatcher copy() {
+        return new ReedRichardsSmartestManWatcher(this);
+    }
+
+    @Override
+    public void watch(GameEvent event, Game game) {
+        if (event.getType() == GameEvent.EventType.DRAW_STEP_PRE) {
+            drawnDuringDrawStep = false;
+            return;
+        }
+        if (event.getType() == GameEvent.EventType.DREW_CARD
+                && game.isActivePlayer(event.getPlayerId())
+                && game.getPhase().getStep().getType() == PhaseStep.DRAW) {
+            drawnDuringDrawStep = true;
+        }
+    }
+
+    boolean hasDrawnDuringDrawStep() {
+        return drawnDuringDrawStep;
+    }
+
+    boolean isUsed() {
+        return used;
+    }
+
+    void setUsed() {
+        used = true;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        used = false;
+        drawnDuringDrawStep = false;
     }
 }
