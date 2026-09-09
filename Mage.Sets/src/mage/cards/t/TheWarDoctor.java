@@ -52,7 +52,8 @@ public final class TheWarDoctor extends CardImpl {
 
         // Whenever The War Doctor attacks, it deals damage equal to the number of time counters
         // on it to any target. If a creature dealt damage this way would die this turn, exile it instead.
-        Ability ability = new AttacksTriggeredAbility(new TheWarDoctorDamageEffect(), false);
+        TriggeredAbility ability = new AttacksTriggeredAbility(new TheWarDoctorDamageEffect(), false);
+        ability.setLeavesTheBattlefieldTrigger(true);
         ability.addTarget(new TargetAnyTarget());
         this.addAbility(ability);
     }
