@@ -48,6 +48,8 @@ public class CybershipTest extends CardTestPlayerBase {
             Assert.assertTrue("A Cyberman should have no mana cost", permanent.getManaCost().isEmpty());
             Assert.assertTrue("A Cyberman should have no supertypes", permanent.getSuperType(currentGame).isEmpty());
             Assert.assertEquals("Cyberman should be the only subtype", 1, permanent.getSubtype(currentGame).size());
+            Assert.assertFalse("A Cyberman should not have flying",
+                    permanent.hasAbility(FlyingAbility.getInstance(), currentGame));
         }
         Assert.assertEquals("Both cards should be face-down Cybermen", 2, cybermenChecked);
         assertPowerToughness(playerA, FACE_DOWN, 2, 2, Filter.ComparisonScope.All);
@@ -55,7 +57,6 @@ public class CybershipTest extends CardTestPlayerBase {
         assertType(FACE_DOWN, CardType.CREATURE, true);
         assertSubtype(FACE_DOWN, SubType.CYBERMAN);
         assertNotSubtype(FACE_DOWN, SubType.ANGEL);
-        assertAbility(playerA, FACE_DOWN, FlyingAbility.getInstance(), false);
     }
 
     @Test
