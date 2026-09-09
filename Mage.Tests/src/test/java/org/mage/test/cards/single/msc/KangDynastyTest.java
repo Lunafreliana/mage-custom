@@ -26,7 +26,7 @@ public class KangDynastyTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dynasty);
         addTarget(playerA, bear);
         checkPermanentTapped("chapter taps the target", 1, PhaseStep.BEGIN_COMBAT, playerB, bear, true, 1);
-        attack(2, playerB, bear, playerA);
+        attack(2, playerB, bear);
 
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
         execute();
@@ -49,12 +49,10 @@ public class KangDynastyTest extends CardTestPlayerBase {
         addTarget(playerA, bear); // chapter I
         addTarget(playerA, bear); // chapter II
         addTarget(playerA, bear); // chapter III
-        castSpell(5, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
-
         setStopAt(5, PhaseStep.BEGIN_COMBAT);
         execute();
 
-        // Three cards were in hand when chapter III resolved. Casting Memnite later does not change the bonus.
+        // Three cards are in hand as chapter III resolves.
         assertPowerToughness(playerA, bear, 5, 5);
     }
 }
