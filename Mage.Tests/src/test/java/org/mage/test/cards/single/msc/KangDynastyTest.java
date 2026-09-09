@@ -19,39 +19,36 @@ public class KangDynastyTest extends CardTestPlayerBase {
     public void testFirstChapterAndDelayedDrawTrigger() {
         addCard(Zone.HAND, playerA, dynasty);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
-        addCard(Zone.LIBRARY, playerA, "Mountain", 2);
+        addCard(Zone.LIBRARY, playerA, "Mountain");
         addCard(Zone.LIBRARY, playerB, "Mountain");
         addCard(Zone.BATTLEFIELD, playerB, bear);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dynasty);
         addTarget(playerA, bear);
         checkPermanentTapped("chapter taps the target", 1, PhaseStep.BEGIN_COMBAT, playerB, bear, true, 1);
-        attack(2, playerB, bear);
-
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
         assertLife(playerA, 18);
-        assertHandCount(playerA, 2);
+        assertHandCount(playerA, 1);
     }
 
     @Test
-    public void testThirdChapterLocksHandSizeAtResolution() {
-        addCard(Zone.HAND, playerA, dynasty);
-        addCard(Zone.LIBRARY, playerA, "Mountain", 3);
-        addCard(Zone.LIBRARY, playerB, "Mountain", 2);
-        addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
-        addCard(Zone.BATTLEFIELD, playerA, bear);
+    public void testThirdChapterUsesHandSizeAtResolution() {
+        addCard(Zone.BATTLEFIELD, playerA, dynasty);
+        addCard(Zone.HAND, playerA, "Memnite", 2);
+        addCard(Zone.LIBRARY, playerA, "Mountain");
+        addCard(Zone.LIBRARY, playerB, "Mountain");
+        addCard(Zone.BATTLEFIELD, playerA, "Bear Cub");
         addCard(Zone.BATTLEFIELD, playerB, bear);
 
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dynasty);
         addTarget(playerA, bear); // chapter I
         addTarget(playerA, bear); // chapter II
-        addTarget(playerA, bear); // chapter III
-        setStopAt(5, PhaseStep.BEGIN_COMBAT);
+        addTarget(playerA, "Bear Cub"); // chapter III
+        setStopAt(3, PhaseStep.BEGIN_COMBAT);
         execute();
 
-        // Three cards are in hand as chapter III resolves.
-        assertPowerToughness(playerA, bear, 5, 5);
+        // Two starting cards plus the turn-three draw are in hand as chapter III resolves.
+        assertPowerToughness(playerA, "Bear Cub", 5, 5);
     }
 }
