@@ -41,6 +41,8 @@ public class CybershipTest extends CardTestPlayerBase {
                 continue;
             }
             cybermenChecked++;
+            Assert.assertEquals("The damaged player should still own the card", playerB.getId(), permanent.getOwnerId());
+            Assert.assertEquals("Cybership's controller should control the Cyberman", playerA.getId(), permanent.getControllerId());
             Assert.assertEquals("A Cyberman should have no name", "", permanent.getName());
             Assert.assertTrue("A Cyberman should be colorless", permanent.getColor(currentGame).isColorless());
             Assert.assertTrue("A Cyberman should have no mana cost", permanent.getManaCost().isEmpty());
