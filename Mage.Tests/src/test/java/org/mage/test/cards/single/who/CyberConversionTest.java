@@ -8,6 +8,8 @@ import mage.constants.SubType;
 import mage.constants.SuperType;
 import mage.constants.Zone;
 import mage.game.permanent.Permanent;
+import mage.game.permanent.PermanentCard;
+import mage.view.CardView;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -39,6 +41,16 @@ public class CyberConversionTest extends CardTestPlayerBase {
         assertSubtype(FACE_DOWN, SubType.CYBERMAN);
         assertNotSubtype(FACE_DOWN, SubType.ANGEL);
         assertAbility(playerB, FACE_DOWN, FlyingAbility.getInstance(), false);
+
+        CardView view = new CardView((PermanentCard) permanent, currentGame, false, false);
+        Assert.assertTrue("The view should show the dynamically added artifact type",
+                view.getCardTypes().contains(CardType.ARTIFACT));
+        Assert.assertTrue("The view should show the face-down creature type",
+                view.getCardTypes().contains(CardType.CREATURE));
+        Assert.assertTrue("The view should show the dynamically added Cyberman subtype",
+                view.getSubTypes().contains(SubType.CYBERMAN));
+        Assert.assertFalse("The view should not show the original Angel subtype",
+                view.getSubTypes().contains(SubType.ANGEL));
     }
 
     @Test

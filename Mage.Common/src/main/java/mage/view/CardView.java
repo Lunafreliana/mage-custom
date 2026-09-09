@@ -370,10 +370,10 @@ public class CardView extends SimpleCardView {
                     || card instanceof Permanent) {
                 this.power = Integer.toString(card.getPower().getValue());
                 this.toughness = Integer.toString(card.getToughness().getValue());
-                this.cardTypes = new ArrayList<>(card.getCardType());
-                this.color = card.getColor(null).copy();
-                this.superTypes = new ArrayList<>(card.getSuperType());
-                this.subTypes = card.getSubtype().copy();
+                this.cardTypes = new ArrayList<>(card.getCardType(game));
+                this.color = card.getColor(game).copy();
+                this.superTypes = new ArrayList<>(card.getSuperType(game));
+                this.subTypes = card.getSubtype(game).copy();
                 this.rules = new ArrayList<>(card.getRules());
             }
 
