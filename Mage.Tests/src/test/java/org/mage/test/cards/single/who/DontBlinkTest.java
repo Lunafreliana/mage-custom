@@ -20,6 +20,7 @@ public class DontBlinkTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Ephemerate");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dontBlink);
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Ephemerate", "Grizzly Bears");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -39,6 +40,7 @@ public class DontBlinkTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Stomp", "Hill Giant");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dontBlink);
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Bonecrusher Giant");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -55,11 +57,29 @@ public class DontBlinkTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Grizzly Bears");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dontBlink);
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
         assertPermanentCount(playerA, "Grizzly Bears", 1);
+    }
+
+    @Test
+    public void effectExpiresAtEndOfTurn() {
+        addCard(Zone.BATTLEFIELD, playerA, "Tundra", 3);
+        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
+        addCard(Zone.HAND, playerA, dontBlink);
+        addCard(Zone.HAND, playerA, "Ephemerate");
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dontBlink);
+        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Ephemerate", "Grizzly Bears");
+
+        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertPermanentCount(playerA, "Grizzly Bears", 1);
+        assertLibraryCount(playerA, "Grizzly Bears", 0);
     }
 }

@@ -14,6 +14,7 @@ import mage.constants.Zone;
 import mage.game.Game;
 import mage.game.events.EntersTheBattlefieldEvent;
 import mage.game.events.GameEvent;
+import mage.game.permanent.Permanent;
 import mage.game.stack.Spell;
 import mage.players.Player;
 
@@ -65,7 +66,8 @@ class DontBlinkEffect extends ReplacementEffectImpl {
     @Override
     public boolean replaceEvent(GameEvent event, Ability source, Game game) {
         EntersTheBattlefieldEvent entersEvent = (EntersTheBattlefieldEvent) event;
-        Card card = game.getCard(event.getTargetId());
+        Permanent permanent = entersEvent.getTarget();
+        Card card = permanent == null ? null : permanent.getMainCard();
         Player owner = card == null ? null : game.getPlayer(card.getOwnerId());
         if (owner == null
                 || !owner.moveCardToLibraryWithInfo(card, source, game, entersEvent.getFromZone(), true, true)) {
