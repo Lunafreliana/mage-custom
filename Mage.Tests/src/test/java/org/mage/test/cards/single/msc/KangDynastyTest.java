@@ -23,7 +23,7 @@ public class KangDynastyTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, bear);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dynasty);
-        setTarget(1, PhaseStep.PRECOMBAT_MAIN, playerA, bear);
+        addTarget(playerA, bear);
         checkPermanentTapped("chapter taps the target", 1, PhaseStep.BEGIN_COMBAT, playerB, bear, true, 1);
         attack(2, playerB, bear, playerA);
 
@@ -44,9 +44,9 @@ public class KangDynastyTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, bear);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dynasty);
-        setTarget(1, PhaseStep.PRECOMBAT_MAIN, playerA, bear); // chapter I
-        setTarget(3, PhaseStep.PRECOMBAT_MAIN, playerA, bear); // chapter II
-        setTarget(5, PhaseStep.PRECOMBAT_MAIN, playerA, bear); // chapter III
+        addTarget(playerA, bear); // chapter I
+        addTarget(playerA, bear); // chapter II
+        addTarget(playerA, bear); // chapter III
         castSpell(5, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
 
         setStopAt(5, PhaseStep.BEGIN_COMBAT);
