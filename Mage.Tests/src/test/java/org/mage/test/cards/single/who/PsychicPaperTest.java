@@ -31,11 +31,13 @@ public class PsychicPaperTest extends CardTestPlayerBase {
         checkAbility("ward is granted", 1, PhaseStep.BEGIN_COMBAT, playerA,
                 "Grizzly Bears", WardAbility.class, true);
         castSpell(1, PhaseStep.BEGIN_COMBAT, playerB, "Shock", "Grizzly Bears");
-        setChoice(playerB, "No"); // Don't pay the ward cost.
+        setChoice(playerB, false); // Do not pay the ward cost.
         attack(1, playerA, "Grizzly Bears", playerB);
         activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Equip", "Memnite");
         setChoice(playerA, "Elite Vanguard");
         setChoice(playerA, "Doctor");
+        checkAbility("ward is granted to the newly equipped creature", 1, PhaseStep.END_TURN,
+                playerA, "Elite Vanguard", WardAbility.class, true);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.END_TURN);
@@ -48,6 +50,5 @@ public class PsychicPaperTest extends CardTestPlayerBase {
         assertPermanentCount(playerA, "Elite Vanguard", 1);
         assertSubtype("Elite Vanguard", SubType.DOCTOR);
         assertNotSubtype("Elite Vanguard", SubType.CONSTRUCT);
-        assertAbilityCount(playerA, "Elite Vanguard", WardAbility.class, 1);
     }
 }
