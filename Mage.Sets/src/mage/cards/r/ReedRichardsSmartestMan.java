@@ -3,22 +3,20 @@ package mage.cards.r;
 import mage.MageInt;
 import mage.abilities.Ability;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.effects.ReplacementEffectImpl;
 import mage.abilities.effects.common.continuous.MaximumHandSizeControllerEffect;
+import mage.abilities.effects.common.replacement.DrawExceptFirstDrawReplacementEffect;
 import mage.abilities.keyword.ReachAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.PhaseStep;
 import mage.constants.SubType;
 import mage.constants.SuperType;
 import mage.constants.WatcherScope;
 import mage.game.Game;
 import mage.game.events.GameEvent;
-import mage.players.Player;
 import mage.watchers.Watcher;
+import mage.watchers.common.CardsDrawnDuringDrawStepWatcher;
 
 import java.util.UUID;
 
@@ -47,8 +45,9 @@ public final class ReedRichardsSmartestMan extends CardImpl {
         )));
 
         // The first time you would draw a card each turn except the first card you draw during each of your draw steps, you draw four cards instead.
-        this.addAbility(new SimpleStaticAbility(new ReedRichardsSmartestManReplacementEffect()),
-                new ReedRichardsSmartestManWatcher());
+        Ability ability = new SimpleStaticAbility(new ReedRichardsSmartestManReplacementEffect());
+        ability.addWatcher(new CardsDrawnDuringDrawStepWatcher());
+        this.addAbility(ability, new ReedRichardsSmartestManWatcher());
     }
 
     private ReedRichardsSmartestMan(final ReedRichardsSmartestMan card) {
@@ -61,10 +60,10 @@ public final class ReedRichardsSmartestMan extends CardImpl {
     }
 }
 
-class ReedRichardsSmartestManReplacementEffect extends ReplacementEffectImpl {
+class ReedRichardsSmartestManReplacementEffect extends DrawExceptFirstDrawReplacementEffect {
 
     ReedRichardsSmartestManReplacementEffect() {
-        super(Duration.WhileOnBattlefield, Outcome.DrawCard);
+        super(4);
         staticText = "The first time you would draw a card each turn except the first card you draw "
                 + "during each of your draw steps, you draw four cards instead";
     }
@@ -79,31 +78,11 @@ class ReedRichardsSmartestManReplacementEffect extends ReplacementEffectImpl {
     }
 
     @Override
-    public boolean checksEventType(GameEvent event, Game game) {
-        return event.getType() == GameEvent.EventType.DRAW_CARD;
-    }
-
-    @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        if (!source.isControlledBy(event.getPlayerId())) {
-            return false;
-        }
-
         ReedRichardsSmartestManWatcher watcher = game.getState().getWatcher(
                 ReedRichardsSmartestManWatcher.class, source.getSourceId()
         );
-        if (watcher == null || watcher.isUsed()) {
-            return false;
-        }
-
-        // The first draw of each of the player's draw steps is exempt even if an
-        // earlier draw this turn has already used this replacement effect.
-        if (game.isActivePlayer(event.getPlayerId())
-                && game.getPhase().getStep().getType() == PhaseStep.DRAW
-                && !watcher.hasDrawnDuringDrawStep()) {
-            return false;
-        }
-        return true;
+        return watcher != null && !watcher.isUsed() && super.applies(event, source, game);
     }
 
     @Override
@@ -116,18 +95,13 @@ class ReedRichardsSmartestManReplacementEffect extends ReplacementEffectImpl {
             // effect available again through nested replacement events.
             watcher.setUsed();
         }
-        Player player = game.getPlayer(event.getPlayerId());
-        if (player != null) {
-            player.drawCards(4, source, game, event);
-        }
-        return true;
+        return super.replaceEvent(event, source, game);
     }
 }
 
 class ReedRichardsSmartestManWatcher extends Watcher {
 
     private boolean used;
-    private boolean drawnDuringDrawStep;
 
     ReedRichardsSmartestManWatcher() {
         super(WatcherScope.CARD);
@@ -136,7 +110,6 @@ class ReedRichardsSmartestManWatcher extends Watcher {
     private ReedRichardsSmartestManWatcher(final ReedRichardsSmartestManWatcher watcher) {
         super(watcher);
         this.used = watcher.used;
-        this.drawnDuringDrawStep = watcher.drawnDuringDrawStep;
     }
 
     @Override
@@ -146,19 +119,7 @@ class ReedRichardsSmartestManWatcher extends Watcher {
 
     @Override
     public void watch(GameEvent event, Game game) {
-        if (event.getType() == GameEvent.EventType.DRAW_STEP_PRE) {
-            drawnDuringDrawStep = false;
-            return;
-        }
-        if (event.getType() == GameEvent.EventType.DREW_CARD
-                && game.isActivePlayer(event.getPlayerId())
-                && game.getPhase().getStep().getType() == PhaseStep.DRAW) {
-            drawnDuringDrawStep = true;
-        }
-    }
-
-    boolean hasDrawnDuringDrawStep() {
-        return drawnDuringDrawStep;
+        // Usage is set by the replacement effect before it creates new draw events.
     }
 
     boolean isUsed() {
@@ -173,6 +134,5 @@ class ReedRichardsSmartestManWatcher extends Watcher {
     public void reset() {
         super.reset();
         used = false;
-        drawnDuringDrawStep = false;
     }
 }
