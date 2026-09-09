@@ -20,6 +20,7 @@ public class KangDynastyTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, dynasty);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
         addCard(Zone.LIBRARY, playerA, "Mountain");
+        addCard(Zone.LIBRARY, playerB, "Mountain");
         addCard(Zone.BATTLEFIELD, playerB, bear);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dynasty);
@@ -39,6 +40,7 @@ public class KangDynastyTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, dynasty);
         addCard(Zone.HAND, playerA, "Memnite");
         addCard(Zone.LIBRARY, playerA, "Mountain", 2);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
         addCard(Zone.BATTLEFIELD, playerA, bear);
         addCard(Zone.BATTLEFIELD, playerB, bear);
