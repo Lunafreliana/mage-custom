@@ -355,6 +355,7 @@ public final class MarvelSuperHeroesCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Jarvis, Earth's Mightiest Butler", 34, Rarity.RARE, mage.cards.j.JarvisEarthsMightiestButler.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Jocasta, Automaton Avenger", 108, Rarity.RARE, mage.cards.j.JocastaAutomatonAvenger.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Jocasta, Automaton Avenger", 439, Rarity.RARE, mage.cards.j.JocastaAutomatonAvenger.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Kang Dynasty", 35, Rarity.RARE, mage.cards.k.KangDynasty.class));
         cards.add(new SetCardInfo("Kang Prime", 406, Rarity.RARE, mage.cards.k.KangPrime.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Kang Prime", 85, Rarity.RARE, mage.cards.k.KangPrime.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Karolina Dean, Runaway", 694, Rarity.UNCOMMON, mage.cards.k.KarolinaDeanRunaway.class));
@@ -367,6 +368,7 @@ public final class MarvelSuperHeroesCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Kindred Dominance", 156, Rarity.RARE, mage.cards.k.KindredDominance.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Kindred Dominance", 351, Rarity.RARE, mage.cards.k.KindredDominance.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Kingpin, Wilson Fisk", 661, Rarity.RARE, mage.cards.k.KingpinWilsonFisk.class));
+        cards.add(new SetCardInfo("Klaw, Master of Sound", 46, Rarity.RARE, mage.cards.k.KlawMasterOfSound.class));
         cards.add(new SetCardInfo("Lady Spider, Maybelle Reilly", 695, Rarity.UNCOMMON, mage.cards.l.LadySpiderMaybelleReilly.class));
         cards.add(new SetCardInfo("Lethal Scheme", 157, Rarity.RARE, mage.cards.l.LethalScheme.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Lethal Scheme", 353, Rarity.RARE, mage.cards.l.LethalScheme.class, NON_FULL_USE_VARIOUS));
@@ -493,6 +495,8 @@ public final class MarvelSuperHeroesCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Promise of Loyalty", 142, Rarity.RARE, mage.cards.p.PromiseOfLoyalty.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Promise of Loyalty", 319, Rarity.RARE, mage.cards.p.PromiseOfLoyalty.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Propaganda", 151, Rarity.UNCOMMON, mage.cards.p.Propaganda.class));
+        cards.add(new SetCardInfo("Puppet Master, String Puller", 370, Rarity.RARE, mage.cards.p.PuppetMasterStringPuller.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Puppet Master, String Puller", 59, Rarity.RARE, mage.cards.p.PuppetMasterStringPuller.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Prowler, Clawed Thief", 186, Rarity.UNCOMMON, mage.cards.p.ProwlerClawedThief.class));
         cards.add(new SetCardInfo("Pumpkin Bombardment", 822, Rarity.COMMON, mage.cards.p.PumpkinBombardment.class));
         cards.add(new SetCardInfo("Quantum Entanglement", 607, Rarity.RARE, mage.cards.q.QuantumEntanglement.class));
@@ -515,6 +519,7 @@ public final class MarvelSuperHeroesCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Reconnaissance Mission", 153, Rarity.UNCOMMON, mage.cards.r.ReconnaissanceMission.class));
         cards.add(new SetCardInfo("Recurring Insight", 154, Rarity.RARE, mage.cards.r.RecurringInsight.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Recurring Insight", 341, Rarity.RARE, mage.cards.r.RecurringInsight.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Reed Richards, Smartest Man", 636, Rarity.RARE, mage.cards.r.ReedRichardsSmartestMan.class));
         cards.add(new SetCardInfo("Red Ghost, Intangible Genius", 413, Rarity.RARE, mage.cards.r.RedGhostIntangibleGenius.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Red Ghost, Intangible Genius", 92, Rarity.RARE, mage.cards.r.RedGhostIntangibleGenius.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Rejuvenating Springs", 260, Rarity.RARE, mage.cards.r.RejuvenatingSprings.class, NON_FULL_USE_VARIOUS));
