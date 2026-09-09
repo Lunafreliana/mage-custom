@@ -19,7 +19,7 @@ public class KangDynastyTest extends CardTestPlayerBase {
     public void testFirstChapterAndDelayedDrawTrigger() {
         addCard(Zone.HAND, playerA, dynasty);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
-        addCard(Zone.LIBRARY, playerA, "Mountain");
+        addCard(Zone.LIBRARY, playerA, "Mountain", 2);
         addCard(Zone.LIBRARY, playerB, "Mountain");
         addCard(Zone.BATTLEFIELD, playerB, bear);
 
@@ -32,14 +32,13 @@ public class KangDynastyTest extends CardTestPlayerBase {
         execute();
 
         assertLife(playerA, 18);
-        assertHandCount(playerA, 1);
+        assertHandCount(playerA, 2);
     }
 
     @Test
     public void testThirdChapterLocksHandSizeAtResolution() {
         addCard(Zone.HAND, playerA, dynasty);
-        addCard(Zone.HAND, playerA, "Memnite");
-        addCard(Zone.LIBRARY, playerA, "Mountain", 2);
+        addCard(Zone.LIBRARY, playerA, "Mountain", 3);
         addCard(Zone.LIBRARY, playerB, "Mountain", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
         addCard(Zone.BATTLEFIELD, playerA, bear);
