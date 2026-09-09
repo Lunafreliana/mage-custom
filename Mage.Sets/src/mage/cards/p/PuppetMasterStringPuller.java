@@ -19,7 +19,7 @@ import mage.filter.predicate.permanent.GoadedPredicate;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.permanent.token.TreasureToken;
-import mage.target.common.TargetCreaturePermanent;
+import mage.target.TargetPermanent;
 
 import java.util.UUID;
 
@@ -48,7 +48,7 @@ public final class PuppetMasterStringPuller extends CardImpl {
         // Whenever you attack, goad target creature an opponent controls. It can't block this turn.
         Ability ability = new AttacksWithCreaturesTriggeredAbility(new GoadTargetEffect(), 1);
         ability.addEffect(new CantBlockTargetEffect(Duration.EndOfTurn));
-        ability.addTarget(new TargetCreaturePermanent(StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURE));
+        ability.addTarget(new TargetPermanent(StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURE));
         this.addAbility(ability);
 
         // Whenever one or more goaded creatures deal combat damage to one of your opponents, create a Treasure token.
