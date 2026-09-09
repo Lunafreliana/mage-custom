@@ -1,19 +1,21 @@
 package mage.cards.t;
 
 import mage.MageInt;
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.BatchTriggeredAbility;
 import mage.abilities.TriggeredAbility;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.AttacksTriggeredAbility;
 import mage.abilities.dynamicvalue.common.CountersSourceCount;
-import mage.abilities.effects.common.DamageTargetEffect;
+import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.counter.AddCountersSourceEffect;
-import mage.abilities.effects.common.replacement.DealtDamageToCreatureBySourceDies;
+import mage.abilities.effects.common.replacement.DiesReplacementEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Duration;
+import mage.constants.Outcome;
 import mage.constants.SubType;
 import mage.constants.SuperType;
 import mage.constants.Zone;
@@ -23,8 +25,9 @@ import mage.game.events.GameEvent;
 import mage.game.events.PhasedOutBatchEvent;
 import mage.game.events.ZoneChangeBatchEvent;
 import mage.game.events.ZoneChangeEvent;
+import mage.game.permanent.Permanent;
+import mage.players.Player;
 import mage.target.common.TargetAnyTarget;
-import mage.watchers.common.DamagedByWatcher;
 
 import java.util.UUID;
 
@@ -49,12 +52,8 @@ public final class TheWarDoctor extends CardImpl {
 
         // Whenever The War Doctor attacks, it deals damage equal to the number of time counters
         // on it to any target. If a creature dealt damage this way would die this turn, exile it instead.
-        Ability ability = new AttacksTriggeredAbility(new DamageTargetEffect(
-                new CountersSourceCount(CounterType.TIME)
-        ).setText("it deals damage equal to the number of time counters on it to any target"), false);
-        ability.addEffect(new DealtDamageToCreatureBySourceDies(this, Duration.EndOfTurn));
+        Ability ability = new AttacksTriggeredAbility(new TheWarDoctorDamageEffect(), false);
         ability.addTarget(new TargetAnyTarget());
-        ability.addWatcher(new DamagedByWatcher(false));
         this.addAbility(ability);
     }
 
@@ -91,7 +90,13 @@ class TheWarDoctorPhaseOutTriggeredAbility extends TriggeredAbilityImpl implemen
 
     @Override
     public boolean checkTrigger(GameEvent event, Game game) {
-        return !getFilteredEvents((PhasedOutBatchEvent) event, game).isEmpty();
+        int count = getFilteredEvents((PhasedOutBatchEvent) event, game).size();
+        if (count == 0) {
+            return false;
+        }
+        getEffects().clear();
+        addEffect(new AddCountersSourceEffect(CounterType.TIME.createInstance(count)));
+        return true;
     }
 
     @Override
@@ -124,11 +129,54 @@ class TheWarDoctorExileTriggeredAbility extends TriggeredAbilityImpl implements 
 
     @Override
     public boolean checkTrigger(GameEvent event, Game game) {
-        return !getFilteredEvents((ZoneChangeBatchEvent) event, game).isEmpty();
+        int count = getFilteredEvents((ZoneChangeBatchEvent) event, game).size();
+        if (count == 0) {
+            return false;
+        }
+        getEffects().clear();
+        addEffect(new AddCountersSourceEffect(CounterType.TIME.createInstance(count)));
+        return true;
     }
 
     @Override
     public TriggeredAbility copy() {
         return new TheWarDoctorExileTriggeredAbility(this);
+    }
+}
+
+class TheWarDoctorDamageEffect extends OneShotEffect {
+
+    private static final CountersSourceCount AMOUNT = new CountersSourceCount(CounterType.TIME);
+
+    TheWarDoctorDamageEffect() {
+        super(Outcome.Damage);
+        staticText = "it deals damage equal to the number of time counters on it to any target. "
+                + "If a creature dealt damage this way would die this turn, exile it instead";
+    }
+
+    private TheWarDoctorDamageEffect(final TheWarDoctorDamageEffect effect) {
+        super(effect);
+    }
+
+    @Override
+    public TheWarDoctorDamageEffect copy() {
+        return new TheWarDoctorDamageEffect(this);
+    }
+
+    @Override
+    public boolean apply(Game game, Ability source) {
+        int damage = AMOUNT.calculate(game, source, this);
+        Permanent permanent = game.getPermanent(getTargetPointer().getFirst(game, source));
+        if (permanent != null) {
+            int damageDealt = permanent.damage(damage, source.getSourceId(), source, game, false, true);
+            if (damageDealt > 0 && permanent.isCreature(game)) {
+                game.addEffect(new DiesReplacementEffect(
+                        new MageObjectReference(permanent, game), Duration.EndOfTurn
+                ), source);
+            }
+            return true;
+        }
+        Player player = game.getPlayer(getTargetPointer().getFirst(game, source));
+        return player != null && player.damage(damage, source.getSourceId(), source, game) > 0;
     }
 }

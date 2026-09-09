@@ -31,6 +31,7 @@ public class PsychicPaperTest extends CardTestPlayerBase {
         checkAbility("ward is granted", 1, PhaseStep.BEGIN_COMBAT, playerA,
                 "Grizzly Bears", WardAbility.class, true);
         castSpell(1, PhaseStep.BEGIN_COMBAT, playerB, "Shock", "Grizzly Bears");
+        setChoice(playerB, false); // Do not pay the ward cost.
         attack(1, playerA, "Grizzly Bears", playerB);
         activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Equip", "Memnite");
         setChoice(playerA, "Elite Vanguard");
