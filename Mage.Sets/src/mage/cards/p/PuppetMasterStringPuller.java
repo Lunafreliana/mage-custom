@@ -47,7 +47,8 @@ public final class PuppetMasterStringPuller extends CardImpl {
 
         // Whenever you attack, goad target creature an opponent controls. It can't block this turn.
         Ability ability = new AttacksWithCreaturesTriggeredAbility(new GoadTargetEffect(), 1);
-        ability.addEffect(new CantBlockTargetEffect(Duration.EndOfTurn));
+        ability.addEffect(new CantBlockTargetEffect(Duration.EndOfTurn)
+                .setText("It can't block this turn"));
         ability.addTarget(new TargetPermanent(StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURE));
         this.addAbility(ability);
 
