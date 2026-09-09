@@ -42,14 +42,11 @@ public class KangDynastyTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, bear);
 
         addTarget(playerA, bear); // chapter I
+        addTarget(playerA, bear); // chapter II
+        addTarget(playerA, "Bear Cub"); // chapter III
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
 
         addCounters(1, PhaseStep.POSTCOMBAT_MAIN, playerA, dynasty, CounterType.LORE, 1);
-        addTarget(playerA, bear); // chapter II
-        waitStackResolved(1, PhaseStep.POSTCOMBAT_MAIN);
-
-        addCounters(1, PhaseStep.POSTCOMBAT_MAIN, playerA, dynasty, CounterType.LORE, 1);
-        addTarget(playerA, "Bear Cub"); // chapter III
         waitStackResolved(1, PhaseStep.POSTCOMBAT_MAIN);
 
         setStopAt(1, PhaseStep.END_TURN);
