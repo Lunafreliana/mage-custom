@@ -43,17 +43,21 @@ public final class TheMoment extends CardImpl {
         ));
 
         // {2}, {T}: Untap target creature you control. It phases out until The Moment leaves the battlefield.
-        Ability ability = new SimpleActivatedAbility(new UntapTargetEffect(), new ManaCostsImpl<>("{2}"));
-        ability.addCost(new TapSourceCost());
-        ability.addEffect(new TheMomentPhaseOutEffect());
-        ability.addTarget(new TargetControlledCreaturePermanent());
-        this.addAbility(ability);
+        SimpleActivatedAbility phaseOutAbility = new SimpleActivatedAbility(
+                new UntapTargetEffect(), new ManaCostsImpl<>("{2}")
+        );
+        phaseOutAbility.addCost(new TapSourceCost());
+        phaseOutAbility.addEffect(new TheMomentPhaseOutEffect());
+        phaseOutAbility.addTarget(new TargetControlledCreaturePermanent());
+        this.addAbility(phaseOutAbility);
 
         // {3}, {T}: Destroy each nonland permanent with mana value less than or equal to the number of time counters on The Moment. Then sacrifice The Moment. Activate only as a sorcery.
-        ability = new SimpleActivatedAbility(new TheMomentDestroyEffect(), new ManaCostsImpl<>("{3}"));
-        ability.addCost(new TapSourceCost());
-        ability.setTiming(TimingRule.SORCERY);
-        this.addAbility(ability);
+        SimpleActivatedAbility destroyAbility = new SimpleActivatedAbility(
+                new TheMomentDestroyEffect(), new ManaCostsImpl<>("{3}")
+        );
+        destroyAbility.addCost(new TapSourceCost());
+        destroyAbility.setTiming(TimingRule.SORCERY);
+        this.addAbility(destroyAbility);
     }
 
     private TheMoment(final TheMoment card) {
