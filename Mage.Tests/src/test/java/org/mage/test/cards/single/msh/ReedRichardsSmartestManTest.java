@@ -19,6 +19,7 @@ public class ReedRichardsSmartestManTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, reed);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 6);
         addCard(Zone.HAND, playerA, "Divination", 2);
+        addCard(Zone.HAND, playerA, "Ornithopter", 2);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Divination");
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Divination");
@@ -26,9 +27,9 @@ public class ReedRichardsSmartestManTest extends CardTestPlayerBase {
         setStopAt(2, PhaseStep.UPKEEP);
         execute();
 
-        // Opening 2 + normal draw step - 2 spells + (4 + 1) + (1 + 1).
-        // Reed's maximum-hand-size ability also keeps all eight through cleanup.
-        assertHandCount(playerA, 8);
+        // Opening 4 - 2 spells + (4 + 1) + (1 + 1). Player A skips the
+        // first turn's draw step, and Reed keeps all nine cards through cleanup.
+        assertHandCount(playerA, 9);
     }
 
     @Test
@@ -38,7 +39,8 @@ public class ReedRichardsSmartestManTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, reed);
         addCard(Zone.BATTLEFIELD, playerA, "Howling Mine");
 
-        setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
+        // Player A skips the draw step on turn 1, so use their next turn.
+        setStopAt(3, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
         // The turn-based draw is unchanged, then Howling Mine's draw becomes four.
@@ -59,7 +61,8 @@ public class ReedRichardsSmartestManTest extends CardTestPlayerBase {
         setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        // Opening 2 + two draw steps - 2 spells + five cards per Divination.
-        assertHandCount(playerA, 12);
+        // Opening 2 + the turn 3 draw step - 2 spells + five cards per Divination.
+        // Player A skips the draw step on turn 1.
+        assertHandCount(playerA, 11);
     }
 }
