@@ -18,6 +18,8 @@ public class CybershipTest extends CardTestPlayerBase {
 
     @Test
     public void testCombatDamagePutsTopTwoCardsOntoBattlefieldAsCybermen() {
+        removeAllCardsFromLibrary(playerB);
+
         addCard(Zone.BATTLEFIELD, playerA, "Cybership");
         addCard(Zone.BATTLEFIELD, playerA, "Serra Angel");
         addCard(Zone.LIBRARY, playerB, "Mountain");
@@ -56,6 +58,9 @@ public class CybershipTest extends CardTestPlayerBase {
 
     @Test
     public void testUsesDamagedPlayersLibraryAndHandlesFewerThanTwoCards() {
+        removeAllCardsFromLibrary(playerA);
+        removeAllCardsFromLibrary(playerB);
+
         addCard(Zone.BATTLEFIELD, playerA, "Cybership");
         addCard(Zone.BATTLEFIELD, playerA, "Serra Angel");
         addCard(Zone.LIBRARY, playerA, "Mountain");
