@@ -103,6 +103,7 @@ public final class LightningBolt extends CardImpl {
 * `CardSetInfo` carries printing metadata supplied by set registration.
 * `super(ownerId, setInfo, CardType[], manaCost)` initializes the card. Mana syntax uses braces (`{2}{U}`, `{X}{R}`, `{W/U}`).
 * `CardType` is the type line's major type. Add `SubType` through `this.subtype.add(...)`; current code also commonly uses `addSubType(...)`. Add `SuperType` through `supertype.add(...)`/`addSuperType(...)`; follow nearby current code.
+* Do not tokenize subtypes by spaces. Comprehensive Rules 205.3m defines **Time Lord** as the one two-word creature type, and XMage represents it with the single enum value `SubType.TIME_LORD`. Add or compare that value as one subtype; never model it as separate words.
 * Creatures assign `this.power` and `this.toughness` to `new MageInt(n)`, as [`ManOWar.java`](../Mage.Sets/src/mage/cards/m/ManOWar.java) does. Variable `*` values generally need characteristic-defining abilities, not an arbitrary fixed `MageInt`.
 * Planeswalkers set `this.setStartingLoyalty(n)` and add `LoyaltyAbility` instances. Verify the exact current pattern in a similar planeswalker.
 * Color is normally derived from mana cost/color indicators. Explicit color identity/indicator is used for colorless costs, back faces, or rules text; search `getColorIdentity().add(...)` and `getColor().set...` before copying a pattern.
@@ -264,6 +265,18 @@ A `Watcher` is copied game memory updated from events: cards drawn/cast, permane
 Cards add a watcher to an ability/card only where registration is required; many common abilities/conditions arrange it themselves. Search usages, not just the watcher definition. Tests in [`Mage.Tests/.../cards/watchers`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers) demonstrate expected reset/copy behavior. [`TempleOfPowerTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers/TempleOfPowerTest.java) and [`ZuberasTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers/ZuberasTest.java) are focused examples.
 
 A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, copy constructor, and `copy()`. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
+
+### “One or more” simultaneous-event triggers
+
+Do not implement “whenever one or more” by listening to each individual event. If
+several objects are affected simultaneously, that produces too many triggers. Use
+`BatchTriggeredAbility` with the corresponding `BatchEvent` (for example,
+`ZoneChangeBatchEvent`, `TappedBatchEvent`, or `PhasedOutBatchEvent`) and filter its
+constituent events in `checkEvent`. If the engine does not yet batch the relevant
+event, add reusable batch infrastructure rather than deduplicating events in a
+card-local watcher; deduplication by turn or source is not equivalent to
+simultaneity. Test multiple qualifying objects in one action and separate actions
+independently.
 
 ## 10. Game state, zones, and identity
 
