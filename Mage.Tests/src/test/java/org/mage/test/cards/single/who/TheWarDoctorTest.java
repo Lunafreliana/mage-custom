@@ -14,7 +14,7 @@ public class TheWarDoctorTest extends CardTestPlayerBase {
     private static final String doctor = "The War Doctor";
 
     @Test
-    public void testMultipleCardsExiledTogetherGiveOneCounter() {
+    public void testMultipleCardsExiledTogetherAreAllCounted() {
         addCard(Zone.BATTLEFIELD, playerA, doctor);
         addCard(Zone.BATTLEFIELD, playerA, "Tormod's Crypt");
         addCard(Zone.GRAVEYARD, playerB, "Grizzly Bears", 2);
@@ -29,7 +29,7 @@ public class TheWarDoctorTest extends CardTestPlayerBase {
     }
 
     @Test
-    public void testMultiplePermanentsPhasingOutTogetherGiveOneCounter() {
+    public void testMultiplePermanentsPhasingOutTogetherAreAllCounted() {
         addCard(Zone.BATTLEFIELD, playerA, doctor);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears", 2);
         addCard(Zone.HAND, playerA, "Guardian of Faith");
