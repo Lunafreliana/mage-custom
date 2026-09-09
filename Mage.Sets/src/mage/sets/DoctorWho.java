@@ -1073,12 +1073,12 @@ public final class DoctorWho extends ExpansionSet {
         cards.add(new SetCardInfo("The Valeyard", 165, Rarity.RARE, mage.cards.t.TheValeyard.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Valeyard", 450, Rarity.RARE, mage.cards.t.TheValeyard.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Valeyard", 770, Rarity.RARE, mage.cards.t.TheValeyard.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The War Doctor", 1043, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The War Doctor", 1139, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The War Doctor", 167, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The War Doctor", 452, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The War Doctor", 548, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("The War Doctor", 772, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The War Doctor", 1043, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The War Doctor", 1139, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The War Doctor", 167, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The War Doctor", 452, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The War Doctor", 548, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("The War Doctor", 772, Rarity.RARE, mage.cards.t.TheWarDoctor.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The War Games", 30, Rarity.RARE, mage.cards.t.TheWarGames.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The War Games", 635, Rarity.RARE, mage.cards.t.TheWarGames.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Wedding of River Song", 31, Rarity.RARE, mage.cards.t.TheWeddingOfRiverSong.class, NON_FULL_USE_VARIOUS));

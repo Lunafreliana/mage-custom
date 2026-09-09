@@ -266,6 +266,18 @@ Cards add a watcher to an ability/card only where registration is required; many
 
 A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, copy constructor, and `copy()`. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
 
+### “One or more” simultaneous-event triggers
+
+Do not implement “whenever one or more” by listening to each individual event. If
+several objects are affected simultaneously, that produces too many triggers. Use
+`BatchTriggeredAbility` with the corresponding `BatchEvent` (for example,
+`ZoneChangeBatchEvent`, `TappedBatchEvent`, or `PhasedOutBatchEvent`) and filter its
+constituent events in `checkEvent`. If the engine does not yet batch the relevant
+event, add reusable batch infrastructure rather than deduplicating events in a
+card-local watcher; deduplication by turn or source is not equivalent to
+simultaneity. Test multiple qualifying objects in one action and separate actions
+independently.
+
 ## 10. Game state, zones, and identity
 
 [`Zone.java`](../Mage/src/main/java/mage/constants/Zone.java) currently defines `HAND`, `GRAVEYARD`, `LIBRARY`, `BATTLEFIELD`, `STACK`, `EXILED`, `ALL`, `OUTSIDE`, and `COMMAND`. `BATTLEFIELD`, `GRAVEYARD`, `STACK`, `EXILED`, and `COMMAND` are public; hand/library are hidden. `ALL` is a matcher, not a physical destination. `OUTSIDE` supports objects outside the game.
