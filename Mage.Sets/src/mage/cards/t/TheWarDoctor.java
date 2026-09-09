@@ -72,6 +72,7 @@ class TheWarDoctorPhaseOutTriggeredAbility extends TriggeredAbilityImpl implemen
     TheWarDoctorPhaseOutTriggeredAbility() {
         super(Zone.BATTLEFIELD, new AddCountersSourceEffect(CounterType.TIME.createInstance()), false);
         setTriggerPhrase("Whenever one or more other permanents phase out, ");
+        setWorksPhasedOut(true);
     }
 
     private TheWarDoctorPhaseOutTriggeredAbility(final TheWarDoctorPhaseOutTriggeredAbility ability) {

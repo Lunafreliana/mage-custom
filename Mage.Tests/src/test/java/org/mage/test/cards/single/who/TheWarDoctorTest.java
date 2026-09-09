@@ -113,19 +113,23 @@ public class TheWarDoctorTest extends CardTestPlayerBase {
     @Test
     public void testPreventedTriggerDamageDoesNotCreateReplacement() {
         addCard(Zone.BATTLEFIELD, playerA, doctor);
-        addCard(Zone.BATTLEFIELD, playerB, "Silver Knight");
+        addCard(Zone.BATTLEFIELD, playerB, "Centaur Courser");
+        addCard(Zone.HAND, playerB, "Healing Salve");
         addCard(Zone.HAND, playerB, "Murder");
         addCard(Zone.BATTLEFIELD, playerB, "Swamp", 3);
+        addCard(Zone.BATTLEFIELD, playerB, "Plains");
         addCounters(1, PhaseStep.PRECOMBAT_MAIN, playerA, doctor, CounterType.TIME, 2);
 
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerB, "Healing Salve", "Centaur Courser");
+        setModeChoice(playerB, "2");
         attack(1, playerA, doctor, playerB);
-        addTarget(playerA, "Silver Knight");
-        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerB, "Murder", "Silver Knight");
+        addTarget(playerA, "Centaur Courser");
+        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerB, "Murder", "Centaur Courser");
 
         setStopAt(1, PhaseStep.END_TURN);
         execute();
 
-        assertGraveyardCount(playerB, "Silver Knight", 1);
-        assertExileCount(playerB, "Silver Knight", 0);
+        assertGraveyardCount(playerB, "Centaur Courser", 1);
+        assertExileCount(playerB, "Centaur Courser", 0);
     }
 }
