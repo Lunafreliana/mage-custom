@@ -29,6 +29,14 @@ import java.util.UUID;
  */
 public final class RiverSongsDiary extends CardImpl {
 
+    static UUID getImprintExileZoneId(Game game, Ability source) {
+        return CardUtil.getExileZoneId(
+                game,
+                source.getSourceId(),
+                CardUtil.getActualSourceObjectZoneChangeCounter(game, source)
+        );
+    }
+
     public RiverSongsDiary(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{3}");
 
@@ -121,7 +129,7 @@ class RiverSongsDiaryExileEffect extends ReplacementEffectImpl {
         }
         owner.moveCardsToExile(
                 spell, source, game, false,
-                CardUtil.getExileZoneId(game, source),
+                RiverSongsDiary.getImprintExileZoneId(game, source),
                 CardUtil.getSourceName(game, source)
         );
         return true;
@@ -147,7 +155,7 @@ enum RiverSongsDiaryCondition implements Condition {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        ExileZone exileZone = game.getExile().getExileZone(CardUtil.getExileZoneId(game, source));
+        ExileZone exileZone = game.getExile().getExileZone(RiverSongsDiary.getImprintExileZoneId(game, source));
         return exileZone != null && exileZone.size() >= 4;
     }
 
@@ -176,7 +184,7 @@ class RiverSongsDiaryCastEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         Player controller = game.getPlayer(source.getControllerId());
-        ExileZone exileZone = game.getExile().getExileZone(CardUtil.getExileZoneId(game, source));
+        ExileZone exileZone = game.getExile().getExileZone(RiverSongsDiary.getImprintExileZoneId(game, source));
         if (controller == null || exileZone == null || exileZone.isEmpty()) {
             return false;
         }
