@@ -18,7 +18,7 @@ public class RiverSongsDiaryTest extends CardTestPlayerBase {
     @Test
     public void exilesResolvedSpellsCastFromHandButNotCounteredSpells() {
         addCard(Zone.BATTLEFIELD, playerA, "River Song's Diary");
-        addCard(Zone.BATTLEFIELD, playerA, "Island", 2);
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 3);
         addCard(Zone.HAND, playerA, "Opt");
         addCard(Zone.HAND, playerA, "Counterspell");
 
