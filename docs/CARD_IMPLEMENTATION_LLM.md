@@ -291,6 +291,16 @@ independently.
 
 Zone changes are events and generally produce a new game object identity/state. Use the engine move/exile/return effects and zone-change counters; do not keep a `Permanent`/`Card` reference and assume it represents the object after it moves. A blinked permanent is new. A card moved graveyard-to-battlefield is not the graveyard object for continuous tracking.
 
+When multiple abilities of one permanent share a source-specific exile zone, derive
+that zone from the same actual source-object zone-change counter everywhere. A
+battlefield ability that has not yet triggered can still have
+`getStackMomentSourceZCC() == 0`, while an already-triggered ability from the same
+permanent has captured the nonzero counter. Use
+`CardUtil.getActualSourceObjectZoneChangeCounter(game, source)` with the explicit
+`getExileZoneId(game, sourceId, zcc)` overload when the zone must be queried both
+before and after an ability goes on the stack. Test the exact source-specific zone,
+not only the aggregate public exile count.
+
 Last Known Information (LKI) is needed when rules ask about characteristics immediately before an object left (power of a dead creature, controller of a departed permanent). Use event data, `getLastKnownInformation`, or a proven analogous implementation. Querying the current battlefield after the object left returns null or the wrong incarnation. `sourceId` identifies the ability source, not its target; `controllerId` and owner ID answer different questions.
 
 ## 11. Duration
