@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import mage.abilities.condition.Condition;
 import mage.abilities.costs.OptionalAdditionalModeSourceCosts;
+import mage.abilities.dynamicvalue.DynamicValue;
 import mage.abilities.effects.Effect;
 import mage.cards.Card;
 import mage.constants.Outcome;
@@ -43,6 +44,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> 
 
     private int minModes;
     private int maxModes;
+    private DynamicValue modesToChoose;
     private int maxPawPrints;
     private Filter maxModesFilter; // calculates the max number of available modes
     private Condition moreCondition; // allows multiple modes choose (example: choose one... if condition, you may choose both)
@@ -80,6 +82,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> 
 
         this.minModes = modes.minModes;
         this.maxModes = modes.maxModes;
+        this.modesToChoose = modes.modesToChoose == null ? null : modes.modesToChoose.copy();
         this.maxPawPrints = modes.maxPawPrints;
         this.maxModesFilter = modes.maxModesFilter; // can't change so no copy needed
         this.moreCondition = modes.moreCondition;
@@ -234,8 +237,22 @@ public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> 
         return this.minModes;
     }
 
+    public int getMinModes(Game game, Ability source) {
+        return modesToChoose == null || game == null || source == null
+                ? minModes
+                : Math.max(0, modesToChoose.calculate(game, source, null));
+    }
+
     public void setMaxModes(int maxModes) {
         this.maxModes = maxModes;
+    }
+
+    /**
+     * Sets an exact number of modes that is determined while the ability is
+     * being announced (for example, "Choose X" on an X spell).
+     */
+    public void setModesToChoose(DynamicValue modesToChoose) {
+        this.modesToChoose = modesToChoose;
     }
 
     public Filter getMaxModesFilter() {
@@ -259,7 +276,9 @@ public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> 
      * @return
      */
     public int getMaxModes(Game game, Ability source) {
-        int realMaxModes = this.maxModes;
+        int realMaxModes = modesToChoose == null || game == null || source == null
+                ? this.maxModes
+                : Math.max(0, modesToChoose.calculate(game, source, null));
         if (game == null || source == null) {
             return realMaxModes;
         }
@@ -338,7 +357,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> 
         if (isLimitUsageByOnce()) {
             setOnceSelectedModes(source, game);
         }
-        return this.selectedModes.size() >= this.getMinModes()
+        return this.selectedModes.size() >= this.getMinModes(game, source)
                 || (this.selectedModes.size() == 0 && mayChooseNone);
     }
 
@@ -404,7 +423,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> 
             }
 
             // UX: check if all modes can be activated automatically
-            if (this.size() == this.getMinModes() && !isMayChooseSameModeMoreThanOnce()) {
+            if (this.size() == this.getMinModes(game, source) && !isMayChooseSameModeMoreThanOnce()) {
                 Set<UUID> onceSelectedModes = null;
                 if (isLimitUsageByOnce()) {
                     onceSelectedModes = getAlreadySelectedModes(source, game, true);
@@ -619,7 +638,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> 
         }
 
         // limit by max allowed by game engine
-        if (this.getSelectedModes().size() >= MAX_MODES_TO_SELECT) {
+        if (modesToChoose == null && this.getSelectedModes().size() >= MAX_MODES_TO_SELECT) {
             logger.warn("reach max modes limit for " + source + " in " + game);
             return availableModes;
         }

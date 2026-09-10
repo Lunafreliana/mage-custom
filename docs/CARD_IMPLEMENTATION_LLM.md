@@ -121,6 +121,13 @@ A spell's built-in `SpellAbility` is extended through `getSpellAbility()`. Perma
 
 Optional instructions use existing `OptionalEffect`, `OptionalAdditionalCost`, optional triggers, or `Choice` APIs according to the exact wording. “If you do” often requires `DoIfCostPaid`/`DoIfClashWon`-style sequencing, not two independent effects. Modal spells add `Mode` objects to the spell ability and each mode owns its effects/targets. Search current cards with the same “choose one/two” wording because minimum/maximum modes and repeated modes differ.
 
+For modal spells that say “Choose X,” use
+`getModes().setModesToChoose(GetXValue.instance)`. The dynamic mode count is
+evaluated after X is announced and is used as both the minimum and maximum;
+also set explicit display text with `setChooseText("choose X")`. Do not use a
+fixed maximum or aggregate repeated modes into one effect, because the selected
+mode sequence is copiable information and each occurrence resolves separately.
+
 Every card ends with a private copy constructor calling `super(card)` and a covariant `copy()`. Copy every mutable/custom field explicitly if `super(card)` cannot do so.
 
 ## 3. Practical effect reference
