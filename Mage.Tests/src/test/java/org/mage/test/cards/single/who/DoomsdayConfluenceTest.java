@@ -28,7 +28,7 @@ public class DoomsdayConfluenceTest extends CardTestPlayerBase {
         setModeChoice(playerA, "1");
         setChoice(playerA, "Grizzly Bears");
         setChoice(playerB, "Grizzly Bears");
-        setChoice(playerB, "Island");
+        addTarget(playerB, "Island");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.BEGIN_COMBAT);
