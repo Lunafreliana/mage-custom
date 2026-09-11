@@ -22,10 +22,6 @@ git fetch https://github.com/magefree/mage.git \
 
 Do not merge or cherry-pick this PR. It is an unfinished architecture reference only.
 
-Absolutely — here is a repo-friendly English version of the text you pasted:
-
----
-
 I have now actually gone through **#11316 as an architecture proposal**, rather than just giving it a quick look. The most important conclusion first:
 
 **I would absolutely not cherry-pick PR #11316. I would reuse its core ideas and rebuild the implementation properly.** The PR has been an open draft since 2023, consists of only two commits, changes 35 files, and was explicitly posted by its author as an unfinished attempt.
