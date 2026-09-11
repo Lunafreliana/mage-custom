@@ -94,7 +94,13 @@ The following classes expose distinct migration risks:
 * `PanopticonPlane`: defines a bespoke `PanopticonTriggeredAbility` for `PLANESWALKED`, examines `getCurrentPlane()`, and targets the active player. It demonstrates the need for a source-bound “planeswalk to this” trigger and correct planar control.
 * `AcademyAtTolariaWestPlane`: implements active-player end-step behavior and packages `DiscardHandControllerEffect` into its roll effect. It demonstrates ambiguity between the active player and a stale source controller.
 * `EdgeOfMalacolPlane`: includes the repeated roll/cost boilerplate and manually changes an ability's controller to `game.getActivePlayerId()` while applying an effect, then restores it. This is a direct planar-controller workaround that the central model must eliminate.
-* `TazeemPlane`: uses `IsStillOnPlaneCondition`, delayed effects, and another temporary active-player/source-controller assignment. It demonstrates why delayed effects and source identity must survive migration, not merely why boilerplate should be deleted.
+* `TazeemPlane`: uses a custom restriction with `getCurrentPlane()` and counts
+  lands through a source-controller filter. It demonstrates why applicability
+  and dynamic values must use the central controller/runtime rather than a
+  singleton current-plane lookup.
+* `AgyremPlane`: creates next-end-step delayed triggered abilities for cards that
+  died. It demonstrates why delayed effects and source identity must survive
+  migration, not merely why roll boilerplate should be deleted.
 
 Migration must inspect each plane's functional behavior rather than mechanically replacing imports. Existing implementations are useful evidence, not a rules authority.
 
@@ -527,6 +533,117 @@ Audit and migrate all existing `mage.game.command.planes` classes away from:
 * manual active-player/controller hacks.
 
 Add/update focused tests for every non-mechanical conversion, especially Panopticon, Academy at Tolaria West, Edge of Malacol, and Tazeem. Do not add compatibility adapters for the old per-plane roll model.
+
+#### Phase 3 execution specification
+
+Phase 3 is a bounded content migration over the 21 classes currently registered in
+`mage.game.command.planes`; it is not another rules-core or planar-deck phase.
+`FieldsOfSummerPlane` is the Phase 1 pilot and already uses
+`ChaosEnsuesTriggeredAbility`. The other 20 classes still contain the complete
+legacy roll wrapper (activated ability, zero-mana cost, watcher, `mayActivate(ANY)`,
+and cost-increasing static ability). The migration must leave **no** plane-owned
+way to roll the planar die. The game-level special action and card-generated
+`RollPlanarDieEffect` are the only roll producers after this phase.
+
+For each of the 20 legacy classes, perform this sequence deliberately rather than
+as a repository-wide textual replacement:
+
+1. Recheck the current Oracle text and the official release notes/card rulings.
+   Treat the old implementation and upstream PR #11316 only as implementation
+   leads, especially where the old comment paraphrases rather than quotes Oracle.
+2. Preserve the non-chaos abilities unless the controller migration exposes an
+   actual correctness defect. Replace only the roll wrapper with one
+   `ChaosEnsuesTriggeredAbility` holding the printed chaos effects and targets in
+   their resolution order.
+3. Change effects phrased with "you" to ordinary source-controller effects or
+   filters. Phase 2 makes the source controller authoritative; do not query the
+   active player and do not temporarily mutate an ability's controller.
+4. Attach targets to the new triggered ability. Do not retain parallel
+   `List<Effect>`/`List<Target>` structures, null target placeholders, or duplicate
+   target instances merely to satisfy the removed `RollPlanarDieEffect` API.
+   Confirm that every effect uses the intended target pointer.
+5. Delete the obsolete imports and all per-plane instances of
+   `ActivateIfConditionActivatedAbility`, `MainPhaseStackEmptyCondition`,
+   `GenericManaCost`, `RollPlanarDieEffect`, `PlanarRollWatcher`, and
+   `PlanarDieRollCostIncreasingEffect`.
+6. Add a focused deterministic chaos test before moving to the next audited
+   group. Assert that the trigger is put on the stack exactly once, that its
+   controller is the planar controller captured when it triggers, that targets
+   belong to the trigger, and that the printed result occurs only on resolution.
+
+Use the following inventory as the required checklist. “Straight” means that the
+existing chaos effect can probably be moved under the semantic trigger, not that
+the class may be changed without Oracle/rulings review.
+
+| Migration group | Planes | Required attention beyond wrapper removal |
+|---|---|---|
+| Pilot/already semantic | Fields of Summer | Retain as a regression fixture; its non-chaos `getCurrentPlane()` guard remains Phase 5 singleton debt, not a reason to restore the old roll path. |
+| Straight, no chaos target | Academy at Tolaria West; Agyrem; Edge of Malacol; Hedron Fields of Agadeem; Panopticon; Tazeem; The Dark Barony; The Eon Fog; The Great Forest; Trail of the Mage-Rings; Truga Jungle; Turri Island; Undercity Reaches | Replace null-target wrapper plumbing with the semantic trigger. Verify every "you" effect uses the planar controller. Several classes also have special risks listed below. |
+| Targeted chaos | Akoum; Astral Arena; Bant; Feeding Grounds; Lethe Lake; Naya; The Zephyr Maze | Put the target on `ChaosEnsuesTriggeredAbility`, preserve effect order and target-pointer sharing, and test target selection/legality at trigger stacking and resolution. |
+
+The four mandatory deep audits are:
+
+* **Panopticon:** first implement and test
+  `PlaneswalkToSourceTriggeredAbility`. It must match the exact object ID carried
+  by the planeswalk-to event, not scan `getCurrentPlane()` or compare a plane name.
+  Define the current `PLANESWALK`/`PLANESWALKED` payload contract before relying on
+  it, and keep the API compatible with Phase 4's ordered deck and Phase 5's
+  multiple face-up cards. Replace the bespoke `PanopticonTriggeredAbility` only
+  after positive, wrong-plane, and trigger-controller tests pass.
+* **Academy at Tolaria West:** its end-step intervening-if and its chaos trigger
+  both mean the planar controller by "you." Verify an empty-hand check both when
+  the end-step ability would trigger and when it resolves. The chaos discard must
+  affect the controller of the chaos ability, not whichever player happens to be
+  active later.
+* **Edge of Malacol:** remove the temporary `source.setControllerId(...)` dance.
+  Its untap replacement must use the centrally resolved planar controller for
+  "a creature you control" and must not leak controller changes if an event is
+  rejected or processing exits early. Test the replacement during the planar
+  controller's untap step, a noncontroller's untap step, and after control passes.
+* **Tazeem:** migrate the chaos draw to a source-controller land count and verify
+  that the value is calculated at resolution. Replace its custom singleton-based
+  blocking restriction only with an engine-native effect whose lifetime and
+  source identity are equivalent. Do not use `getCurrentPlane()` as an
+  applicability shortcut in new code.
+
+In addition, Agyrem requires an explicit delayed-trigger regression: a creature
+that dies while Agyrem is face up must still return at the next end step as
+instructed even if the game planeswalks away before then, with the correct owner,
+destination, and object identity.
+
+Also audit all remaining `getCurrentPlane()` callers in these classes. Phase 3
+must remove callers used to identify a planeswalk-to source or to emulate the
+planar controller. Other singleton applicability guards may remain only when
+their removal genuinely depends on Phase 5's face-up collection/runtime work;
+record each such caller as explicit Phase 5 debt rather than silently carrying it
+forward.
+
+Land Phase 3 in small reviewable groups. A recommended order is:
+
+1. add/test `PlaneswalkToSourceTriggeredAbility` and migrate Panopticon;
+2. migrate simple untargeted chaos abilities;
+3. migrate targeted and multi-effect chaos abilities;
+4. migrate Academy at Tolaria West, Edge of Malacol, and Tazeem with their
+   controller/condition tests;
+5. run the complete Planechase and general dice regression sets, then audit the
+   repository-wide callers of both legacy cost classes.
+
+Phase 3 is complete only when all of the following are true:
+
+* all 21 planes declare semantic chaos abilities and none owns a planar-roll
+  activated ability;
+* a repository search finds no legacy roll-wrapper/cost/watcher reference under
+  `mage.game.command.planes`;
+* Panopticon uses a tested object-identity planeswalk-to trigger;
+* no plane mutates an ability controller to impersonate the active player;
+* every migrated plane has focused behavioral coverage, with explicit coverage
+  for target timing, controller snapshots, exact-once chaos, and delayed/duration
+  identity where applicable;
+* `PlanarDieRollCostIncreasingEffect` is deleted if its caller audit is empty;
+  `PlanarRollWatcher` is deleted only if its separate non-Planechase and test
+  caller audit is empty; and
+* random/`seenPlanes` traversal, the nine-sided probability, planar-deck state,
+  phenomena, and multiple-face-up support remain out of scope for this phase.
 
 ### Phase 4 — Real Shared Planar Deck
 
