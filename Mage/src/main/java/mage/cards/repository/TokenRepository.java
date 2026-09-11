@@ -191,6 +191,18 @@ public enum TokenRepository {
                         }
                     }
 
+                    if (typeAndSet[0].equals("PHENOMENON")) {
+                        tokenType = TokenType.PHENOMENON;
+                        if (!tokenName.startsWith("Phenomenon - ")) {
+                            errorsList.add("Tokens database: phenomenon's name must start with [Phenomenon - ...] word: " + line);
+                            continue;
+                        }
+                        if (!tokenClassName.endsWith("Phenomenon")) {
+                            errorsList.add("Tokens database: phenomenon's class name must ends with [...Phenomenon] word: " + line);
+                            continue;
+                        }
+                    }
+
                     if (typeAndSet[0].equals("DUNGEON")) {
                         tokenType = TokenType.DUNGEON;
                         if (!tokenClassName.endsWith("Dungeon")) {

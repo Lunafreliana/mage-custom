@@ -67,6 +67,8 @@ public class TokenInfo {
                 return "mage.game.command.emblems." + simpleName;
             case PLANE:
                 return "mage.game.command.planes." + simpleName;
+            case PHENOMENON:
+                return "mage.game.command.phenomena." + simpleName;
             case DUNGEON:
                 return "mage.game.command.dungeons." + simpleName;
             case XMAGE:

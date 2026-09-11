@@ -487,6 +487,8 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
 
     boolean addPlane(Plane plane, UUID toPlayerId);
 
+    boolean addPhenomenon(Phenomenon phenomenon, UUID toPlayerId);
+
     boolean planeswalk(UUID playerId);
 
     void addCommander(Commander commander);

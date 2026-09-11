@@ -703,6 +703,28 @@ therefore compare the event target with their own source ID.
 
 Implement phenomenon runtime content, encounter triggers, beginning-of-game skip/no-trigger logic, triggered-ability source tracking, and the 704.6f/312.7 state-based action. Add deterministic ordered-deck tests for resolution, countering/removal from stack, setup, multiple face-up cards, and controller/departure behavior before adding broad phenomenon content.
 
+#### Phase 6 implementation
+
+`Phenomenon` implements the common `PlanarCard` contract with phenomenon card
+type, no subtype, explicit face state, stable deck/owner metadata, command-zone
+abilities, and object-change counting when turned face down. Mutual Epiphany is
+the pilot runtime content and uses the reusable source-bound
+`EncounterPhenomenonTriggeredAbility`.
+
+At setup, `GameImpl` turns each leading phenomenon face up and then bottoms it,
+but suppresses ability registration and encounter events until it finds the starting plane. During play,
+turning a phenomenon face up emits `ENCOUNTERED_PHENOMENON` for that exact
+object. The Planechase state-based-action check examines both waiting triggers
+and noncopy stack abilities with the phenomenon as source; only after its
+trigger leaves both locations does rule 704.6f invoke the shared planeswalk
+operation. This deliberately handles resolution, countering, and other stack
+removal identically rather than attaching planeswalking to the encounter
+effect.
+
+The temporary `GameOptions.sharedPlanarPhenomena` construction seam puts
+phenomena before configured planes so deterministic setup/traversal can be
+tested without prematurely defining Phase 7's mixed planar-deck protocol.
+
 ### Phase 7 — Content and UI
 
 Add missing Planechase content, including applicable MOC/WHO planes and phenomena, only after their mechanics have focused tests. Add shared planar-deck selection/editor/validation and appropriate server protocol and game views. Later evaluate individual planar decks, Two-Headed Giant specifics, and Grand Melee/multiple-controller UI. An auto-generated legal shared deck may be offered as a convenience, but it must use the real deck model rather than emulate the legacy random-plane mode.

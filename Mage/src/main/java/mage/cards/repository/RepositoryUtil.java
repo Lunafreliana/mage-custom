@@ -39,6 +39,7 @@ public final class RepositoryUtil {
         logger.info(" - tokens: " + TokenRepository.instance.getByType(TokenType.TOKEN).size());
         logger.info(" - emblems: " + TokenRepository.instance.getByType(TokenType.EMBLEM).size());
         logger.info(" - planes: " + TokenRepository.instance.getByType(TokenType.PLANE).size());
+        logger.info(" - phenomena: " + TokenRepository.instance.getByType(TokenType.PHENOMENON).size());
         logger.info(" - dungeons: " + TokenRepository.instance.getByType(TokenType.DUNGEON).size());
 
         if (DebugUtil.DATABASE_SHOW_CACHE_AND_MEMORY_STATS_ON_STARTUP) {
