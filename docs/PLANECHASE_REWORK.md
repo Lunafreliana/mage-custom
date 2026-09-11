@@ -738,9 +738,52 @@ The temporary `GameOptions.sharedPlanarPhenomena` construction seam puts
 phenomena before configured planes so deterministic setup/traversal can be
 tested without prematurely defining Phase 7's mixed planar-deck protocol.
 
-### Phase 7 — Content and UI
+### Phase 7 — Content Infrastructure and Four-Player Commander UI
 
-Add missing Planechase content, including applicable MOC/WHO planes and phenomena, only after their mechanics have focused tests. Add shared planar-deck selection/editor/validation and appropriate server protocol and game views. Later evaluate individual planar decks, Two-Headed Giant specifics, and Grand Melee/multiple-controller UI. An auto-generated legal shared deck may be offered as a convenience, but it must use the real deck model rather than emulate the legacy random-plane mode.
+Prepare the content pipeline for adding new planes and phenomena, but do not use
+this phase to implement the full Planechase card pool. Define the registry and
+metadata boundaries needed to discover planar-card implementations, construct
+them by stable identity, distinguish planes from phenomena, expose names and
+image/set metadata, and validate a mixed shared planar-deck list. The design must
+allow later cards to be registered without expanding a central switch or
+reworking the client/server protocol. A minimal fixture or pilot entry may be
+added to prove the pipeline, but broad MOC, WHO, or other set completion belongs
+entirely to Phase 8.
+
+Implement the first supported UI flow specifically for a four-player,
+free-for-all Commander game using one shared planar deck. Add shared planar-deck
+selection/editor/validation, the required match/server protocol, and game views
+for the face-up planar cards and the public information about the shared deck.
+The editor must validate the communal-deck rules, including minimum size,
+English-name uniqueness, and the phenomenon cap, before the game starts. An
+auto-generated legal shared deck may be offered as a convenience, but it must
+use registered implementations and the real ordered-deck model rather than
+emulate the legacy random-plane mode.
+
+Keep this first UI slice deliberately narrow. Do not present individual planar
+decks, teams, Two-Headed Giant, Grand Melee, or multiple-planar-controller UI as
+supported. Preserve protocol and state extension points for those modes, and
+evaluate them only after the four-player free-for-all Commander flow is usable
+and tested. Four players is the initial product focus, not a new Planechase deck
+legality rule baked into the engine.
+
+### Phase 8 — Incremental Plane and Phenomenon Implementation
+
+Implement additional planar cards one plane or phenomenon at a time, selecting
+the cards needed by the supported product experience rather than committing in
+advance to every printed card. Each card must follow
+`docs/CARD_IMPLEMENTATION_LLM.md`: verify current Oracle text, Comprehensive
+Rules, official release notes and rulings where available, and modern XMage
+mechanic implementations before coding it.
+
+Each planar card lands with focused behavioral tests for its own rules text and
+with registration/metadata coverage that proves it can be selected by the Phase
+7 editor and constructed through the shared-deck protocol. Add cards in small,
+reviewable patches; mechanically similar cards may share reusable, tested
+infrastructure, but must not be batch-converted without individual rules review.
+Prioritize the planes and phenomena chosen for the four-player free-for-all
+Commander experience. Applicable MOC and WHO content is evaluated card by card
+in this phase rather than treated as a Phase 7 completeness requirement.
 
 ### Separate follow-up — Planar die probability correction
 
@@ -790,7 +833,14 @@ Extend `Mage.Tests/src/test/java/org/mage/test/cards/rolldice/RollDiceTest.java`
 * **Phase 4:** known order, shuffle determinism, top/bottom cycling, all face-up cards bottom correctly, shared ownership, no premature repeats caused by random selection, rollback/reconnect/no hidden-order leak.
 * **Phase 5:** zero/one/multiple face-up planes; collection API; walk-away-from-all; different deck associations; events carry exact IDs.
 * **Phase 6:** start-game phenomenon skips with no trigger; encounter trigger stacks; SBA waits while its source trigger remains on stack; SBA occurs after resolve/counter/removal; next card traversal; multiple phenomena; departure.
-* **Phase 7:** deck legality (size, uniqueness, phenomenon cap), client/server round-trip, invalid input, generated-default deck, and visibility.
+* **Phase 7:** registry discovery/construction and mixed-type metadata; communal
+  deck legality (size, uniqueness, phenomenon cap); four-player free-for-all
+  Commander client/server round-trip; invalid input; generated-default deck;
+  face-up/shared-deck visibility; and clear rejection or hiding of unsupported
+  individual-deck, team, Two-Headed Giant, and Grand Melee options.
+* **Phase 8:** for every selected plane or phenomenon, focused rules-behavior,
+  controller/source identity, registry/metadata, editor selection, protocol
+  construction, and deterministic shared-deck integration coverage.
 
 ## 17. Explicit non-goals
 
