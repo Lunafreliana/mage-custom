@@ -31,13 +31,18 @@ public class RollPlanarDieSpecialAction extends SpecialAction {
         return "planechaseSpecialRolls|" + getControllerId();
     }
 
+    private String turnKey() {
+        return "planechaseSpecialRollsTurn|" + getControllerId();
+    }
+
     private int usesThisTurn(Game game) {
-        Object value = game.getState().getValue(countKey());
-        if (!(value instanceof int[])) {
+        Object turn = game.getState().getValue(turnKey());
+        Object count = game.getState().getValue(countKey());
+        if (!(turn instanceof Integer) || !(count instanceof Integer)
+                || (Integer) turn != game.getTurnNum()) {
             return 0;
         }
-        int[] state = (int[]) value;
-        return state[0] == game.getTurnNum() ? state[1] : 0;
+        return (Integer) count;
     }
 
     @Override
@@ -65,7 +70,9 @@ public class RollPlanarDieSpecialAction extends SpecialAction {
         if (!super.activate(game, allowedIdentifiers, noMana)) {
             return false;
         }
-        game.getState().setValue(countKey(), new int[]{game.getTurnNum(), usesThisTurn(game) + 1});
+        int nextCount = usesThisTurn(game) + 1;
+        game.getState().setValue(turnKey(), game.getTurnNum());
+        game.getState().setValue(countKey(), nextCount);
         return true;
     }
 
