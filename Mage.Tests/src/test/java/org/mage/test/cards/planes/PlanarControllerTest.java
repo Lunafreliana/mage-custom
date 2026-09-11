@@ -51,6 +51,9 @@ public class PlanarControllerTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerB, causeChaos, null, CardType.SORCERY);
 
         castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Cause Chaos");
+        // Fields of Summer first offers 2 life to the player who cast the spell.
+        setChoice(playerB, false);
+        // Then its optional chaos ability is controlled by the planar controller.
         setChoice(playerB, true);
 
         setStrictChooseMode(true);
