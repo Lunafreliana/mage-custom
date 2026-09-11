@@ -245,6 +245,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         // roll planar die and trigger Farideh
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
+        setChoice(playerA, "Plane - Hedron Fields of Agadeem"); // order the plane and Farideh triggers
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
 
         checkAbility("must be fly after", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Farideh, Devil's Chosen", FlyingAbility.class, true);
@@ -275,6 +276,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         // roll planar die and trigger event with 0 result
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
+        setChoice(playerA, "Plane - Hedron Fields of Agadeem"); // order the plane and Hammer Jammer triggers
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         checkGraveyardCount("hammer must die", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Hammer Jammer", 1);
 
