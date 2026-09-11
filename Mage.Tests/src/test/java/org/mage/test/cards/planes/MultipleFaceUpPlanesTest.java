@@ -2,6 +2,7 @@ package org.mage.test.cards.planes;
 
 import mage.constants.Planes;
 import mage.game.command.Plane;
+import mage.game.command.planes.AgyremPlane;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -15,7 +16,7 @@ public class MultipleFaceUpPlanesTest extends CardTestPlayerBase {
     @Test
     public void testPlaneswalkBottomsEveryFaceUpPlane() {
         addPlane(playerA, Planes.PLANE_FIELDS_OF_SUMMER);
-        addPlane(playerA, Planes.PLANE_AGYREM);
+        Assert.assertTrue(currentGame.addPlane(new AgyremPlane(), playerA.getId()));
         List<UUID> walkedAwayIds = currentGame.getState().getFaceUpPlanes().stream()
                 .map(Plane::getId)
                 .collect(Collectors.toList());
