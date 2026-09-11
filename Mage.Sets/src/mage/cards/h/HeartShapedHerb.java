@@ -44,7 +44,7 @@ public final class HeartShapedHerb extends CardImpl {
                 new HeartShapedHerbReturnEffect(), new ManaCostsImpl<>("{2}")
         );
         ability.addCost(new TapSourceCost());
-        ability.addCost(new SacrificeSourceCost());
+        ability.addCost(new SacrificeSourceCost().setText("sacrifice this artifact"));
         this.addAbility(ability);
     }
 
