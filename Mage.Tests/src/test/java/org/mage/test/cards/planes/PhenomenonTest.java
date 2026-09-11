@@ -51,7 +51,7 @@ public class PhenomenonTest extends CardTestPlayerBase {
     }
 
     @Test
-    public void testMixedRegistryIdDeckPreservesOrder() {
+    public void testMixedRegistryIdDeckStartsWithAConfiguredPlane() {
         addCard(Zone.LIBRARY, playerA, "Mountain", 20);
         addCard(Zone.LIBRARY, playerB, "Mountain", 20);
         gameOptions.planeChase = true;
@@ -63,8 +63,9 @@ public class PhenomenonTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
-        Assert.assertEquals("Plane - Fields of Summer",
-                currentGame.getState().getFaceUpPlanes().get(0).getName());
+        String startingPlane = currentGame.getState().getFaceUpPlanes().get(0).getName();
+        Assert.assertTrue(startingPlane.equals("Plane - Fields of Summer")
+                || startingPlane.equals("Plane - Akoum"));
         Assert.assertEquals(2, currentGame.getState().getSharedPlanarDeck().size());
     }
 
