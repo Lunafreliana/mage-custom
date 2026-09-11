@@ -4,7 +4,7 @@
 
 This document is the canonical architecture and migration plan for Planechase in this fork. Future Planechase engine, card, test, server, and client changes must start here and keep this document current when an implementation decision changes.
 
-The goals are to correct the rules core without breaking the existing playable subset, then incrementally add a real planar deck, multiple face-up planar cards, phenomena, content, and UI. The first implementation patch must remain deliberately small. It must not combine rules-core repair with every later data-model and content change.
+The goals are to correct the rules core, then incrementally add a real planar deck, multiple face-up planar cards, phenomena, content, and UI. **Preserving playability of the current Planechase implementation during that migration is not a requirement.** Correct boundaries and a clean end state take priority over compatibility with the existing simulation. It is acceptable to disable or temporarily leave Planechase incomplete between phases, provided ordinary non-Planechase games remain unaffected and each phase is explicit about what is not yet available. The first implementation patch must remain deliberately small; it must not combine rules-core repair with every later data-model and content change.
 
 This plan is based on:
 
@@ -12,7 +12,7 @@ This plan is based on:
 * the official **Magic: The Gathering Comprehensive Rules effective August 7, 2026**, obtained from the current [Wizards rules page](https://magic.wizards.com/en/rules) (research performed September 11, 2026), especially rules 103.7, 108.3a, 116.2i, 311, 312, 408.3, 701.31, 704.6f, and 901;
 * upstream XMage [PR #11316](https://github.com/magefree/mage/pull/11316), inspected only as an unfinished design reference. It must not be cherry-picked, merged, or presumed correct.
 
-Where this document says **must**, it describes either a rules requirement or a repository architecture decision. Where it says **compatibility**, it describes temporary scaffolding rather than the target model.
+Where this document says **must**, it describes either a rules requirement or a repository architecture decision. Any temporary scaffolding is an implementation convenience, not a promise that legacy Planechase remains playable.
 
 ## 2. Current XMage architecture
 
@@ -350,7 +350,7 @@ Implement a reusable `ChaosEnsuesTriggeredAbility` for the inherent chaos abilit
 * use normal triggered-ability stacking and targeting;
 * preserve source object identity through copying/rollback/face-down new-object transitions.
 
-During migration, a compatibility adapter may let an unmigrated plane's old roll wrapper respond to the semantic event. There must never be both an adapter and a new chaos trigger active for the same plane, or chaos will trigger twice. Phase 1 tests need at least one pilot plane or test fixture without requiring all 21 classes to migrate.
+Do not build a compatibility adapter that makes unmigrated plane roll wrappers respond to the new event. Such a bridge would preserve the coupling this rework is intended to remove and create a duplicate-trigger hazard. Phase 1 should use a purpose-built test fixture or one fully migrated pilot plane; other planes may remain unavailable or unsupported until Phase 3.
 
 ## 9. Planeswalking flow
 
@@ -358,7 +358,7 @@ During migration, a compatibility adapter may let an unmigrated plane's old roll
 
 A planeswalker die result must create a source-less `PlaneswalkingTriggeredAbility` controlled by the roller (901.8). That object goes through the normal triggered-ability queue and stack. Players receive priority and may respond before resolution (901.9c). On resolution it invokes the common planeswalk operation for the proper planar controller/deck context.
 
-If compatibility state cannot yet navigate a real deck in Phase 1, resolution may temporarily delegate to the existing random `PlaneswalkEffect`. That is explicitly temporary; the trigger/response boundary must already be correct.
+Because Phase 1 intentionally does not implement the real deck, its resolution-level test may use a narrow test seam or the existing `PlaneswalkEffect` solely to prove that resolving the inherent trigger invokes the planeswalk operation. This is not a requirement to keep the old random Planechase mode playable, and new code must not expose random selection as the target architecture.
 
 Rule 901.10a says an inherent planeswalking ability on the stack ceases to exist if a plane leaves the game. This departure behavior must be included in the Phase 4/5 audit when real ownership and multiple face-up objects exist; decide whether Phase 1 can test it meaningfully under the compatibility model.
 
@@ -385,7 +385,7 @@ Do not choose a random implementation class during this operation.
 
 Planar controller is a rules-engine concept, not a field assigned once when `addPlane` runs. Phase 2 must define one authoritative resolver/API used by:
 
-* `Plane.getControllerId`/abilities during compatibility;
+* `Plane.getControllerId` and planar-card abilities while the command-object model remains;
 * event and triggered-ability creation;
 * source-controller effects and targets;
 * planeswalk permission and deck choice;
@@ -430,7 +430,7 @@ A possible implementation is `Deque<UUID>`, but serialization libraries, determi
 * Copies, rollback snapshots, restarts, reconnects, spectators, game logs, and network views preserve appropriate state without leaking hidden order.
 * Bottoming several face-up cards must define the rules-compliant ordering/choice behavior after checking all applicable rules and card rulings during implementation; do not silently use hash/command iteration order.
 
-`Plane.createRandomPlane()` and `seenPlanes` may remain only behind a migration adapter through Phase 3. Phase 4 removes them from gameplay selection. Reflection/`Planes` may remain temporarily as factories for implemented content, but must not define deck order.
+`Plane.createRandomPlane()` and `seenPlanes` may remain as dead or isolated legacy code until Phase 4 removes them, but new Planechase paths must not call them merely to preserve old-mode playability. Reflection/`Planes` may remain temporarily as factories for implemented content, but must not define deck order.
 
 ## 12. Multiple face-up planar cards
 
@@ -442,7 +442,7 @@ Collection<Plane> getFaceUpPlanes()
 Collection<Phenomenon> getFaceUpPhenomena()
 ```
 
-The names and mutability may differ, but callers must not receive a mutable internal collection. New rules code iterates the collection. `GameState.getCurrentPlane()` may temporarily remain, marked compatibility/deprecated, and should fail clearly or define restricted-mode behavior if more than one is present; it must not silently select the first in new code.
+The names and mutability may differ, but callers must not receive a mutable internal collection. New rules code iterates the collection. `GameState.getCurrentPlane()` may remain only as deprecated legacy API until its callers are migrated. It should fail clearly if more than one plane is present and must not silently select the first in new code.
 
 Face-up status cannot be inferred merely from presence in `Command`, because face-down deck members are also command-zone cards. Store explicit runtime state or derive it from the invariant that face-up IDs are absent from deck order. The design must support multiple independent deck/controller contexts for Grand Melee even if that variant is not enabled immediately.
 
@@ -461,27 +461,27 @@ Phenomena are excluded from Phase 1 but must fit the common planar-card runtime.
 
 Do not model the follow-up as a delayed trigger or unconditional tail effect of the encounter ability. It is a state-based action and must still occur when the original ability leaves the stack without resolving.
 
-## 14. Compatibility and migration strategy
+## 14. Migration and feature-gating strategy
 
-1. Preserve the existing Planechase checkbox and 21-plane experience while foundations change.
-2. Add rules primitives and pilot tests before mass edits.
-3. Provide a narrowly scoped bridge for old plane roll/chaos implementations. Document the bridge's removal phase and prevent duplicate actions/triggers.
+1. Prefer a correctness-first cutover. Do not spend implementation effort preserving the current random-plane simulation or its per-plane roll abilities.
+2. Add rules primitives and purpose-built tests before mass edits.
+3. Do not introduce dual old/new roll or chaos paths. If a plane has not migrated, mark it unsupported or keep Planechase feature-gated rather than adapting its obsolete wrapper.
 4. Establish central planar control before converting active-player hacks to ordinary source-controller effects.
 5. Migrate planes in small audited groups, with focused tests for special triggers/delayed behavior. Do not regex-convert all classes.
-6. Keep old random/seen selection behind the planeswalk operation until ordered-deck Phase 4, then delete it from gameplay paths.
-7. Add collection APIs before enabling multiple face-up state; retain singleton helpers only for compatibility.
-8. Extend network/view/options structures only when their phase needs them; version/serialization compatibility must be reviewed.
-9. Keep docs and tests in each phase. Each phase must leave the branch functional and reviewable.
+6. New paths must stop calling random/seen selection. Legacy methods can remain temporarily unreachable until the ordered-deck phase deletes them.
+7. Add collection APIs before enabling multiple face-up state; singleton helpers are deprecated migration debt, not supported architecture.
+8. Extend network/view/options structures only when their phase needs them; serialization compatibility must still be reviewed for ordinary games and persisted/networked state.
+9. Each phase must be internally testable and reviewable, but need not expose a playable Planechase mode. If an intermediate phase cannot provide rules-coherent Planechase, disable the option or fail clearly until its enabling phase.
 
 Removal gates:
 
 | Legacy component | Remove when |
 |---|---|
-| per-plane roll activated abilities | every existing plane uses the game special action and semantic chaos trigger (Phase 3) |
+| per-plane roll activated abilities | remove or make unreachable when Phase 1 installs the special action; delete remaining definitions during Phase 3 |
 | `PlanarDieRollCostIncreasingEffect` for Planechase | no migrated plane/action caller needs it and dice callers are audited (Phase 3) |
 | `PlanarRollWatcher` as Planechase cost truth | Phase 1 action counter passes effect-roll separation tests; remove class only after all non-Planechase/test callers are audited |
-| `seenPlanes` and random selection | ordered shared deck passes traversal/copy/rollback tests (Phase 4) |
-| `getCurrentPlane()` in rules code | collection APIs are adopted and multiple-face-up tests pass (Phase 5) |
+| `seenPlanes` and random selection | stop calling from new paths immediately; delete when the ordered shared deck passes traversal/copy/rollback tests (Phase 4) |
+| `getCurrentPlane()` in rules code | prohibit in new rules code immediately; delete/deprecate after collection APIs are adopted (Phase 5) |
 | controller mutation hacks | central planar controller and affected plane tests pass (Phases 2-3) |
 
 ## 15. Implementation phases
@@ -497,8 +497,9 @@ Implement:
 * effect-generated planar rolls that share resolution but not action count;
 * `ChaosEnsuesEffect`, semantic `CHAOS_ENSUES`, and reusable `ChaosEnsuesTriggeredAbility`;
 * the source-less inherent planeswalking triggered ability;
-* planeswalker-result behavior that uses the stack, then invokes compatibility `PlaneswalkEffect` on resolution;
-* focused deterministic engine tests and one migration fixture/pilot plane.
+* planeswalker-result behavior that uses the stack, then invokes the isolated planeswalk operation/test seam on resolution;
+* focused deterministic engine tests and a purpose-built fixture or one fully migrated pilot plane;
+* feature gating that prevents users from entering a knowingly incoherent mixture of old and new Planechase rules, if Phase 1 cannot provide a coherent playable mode.
 
 Do **not** implement the real planar deck, phenomena, central controller overhaul, mass plane migration, or die probability change.
 
@@ -517,7 +518,7 @@ Audit and migrate all existing `mage.game.command.planes` classes away from:
 * bespoke current-plane/name triggers where `PlaneswalkToSourceTriggeredAbility` applies;
 * manual active-player/controller hacks.
 
-Add/update focused tests for every non-mechanical conversion, especially Panopticon, Academy at Tolaria West, Edge of Malacol, and Tazeem. Remove compatibility adapters only after the full inventory is clean.
+Add/update focused tests for every non-mechanical conversion, especially Panopticon, Academy at Tolaria West, Edge of Malacol, and Tazeem. Do not add compatibility adapters for the old per-plane roll model.
 
 ### Phase 4 — Real Shared Planar Deck
 
@@ -535,7 +536,7 @@ Implement phenomenon runtime content, encounter triggers, beginning-of-game skip
 
 ### Phase 7 — Content and UI
 
-Add missing Planechase content, including applicable MOC/WHO planes and phenomena, only after their mechanics have focused tests. Add shared planar-deck selection/editor/validation and appropriate server protocol and game views. Later evaluate individual planar decks, Two-Headed Giant specifics, and Grand Melee/multiple-controller UI. Keep the simple auto-generated shared deck as a compatibility/default option where useful.
+Add missing Planechase content, including applicable MOC/WHO planes and phenomena, only after their mechanics have focused tests. Add shared planar-deck selection/editor/validation and appropriate server protocol and game views. Later evaluate individual planar decks, Two-Headed Giant specifics, and Grand Melee/multiple-controller UI. An auto-generated legal shared deck may be offered as a convenience, but it must use the real deck model rather than emulate the legacy random-plane mode.
 
 ### Separate follow-up — Planar die probability correction
 
@@ -612,7 +613,7 @@ These do not block adoption of the architecture, but the responsible phase must 
 3. **Special-action installation:** one persistent action per player versus dynamically generated actions; confirm AI/action discovery, reconnects, player departure, controller availability, and duplicate prevention.
 4. **Trigger pipeline:** the cleanest XMage representation of a rule-created source-less triggered ability and how to test/counter it without fabricating a source ID.
 5. **Event contract:** retain/refine `PLANESWALK` and `PLANESWALKED`, or replace them. Define replacement semantics, batching, IDs, and ordering before implementing `PlaneswalkToSourceTriggeredAbility`.
-6. **Compatibility bridge:** how unmigrated plane chaos effects listen to the semantic event without also exposing an obsolete voluntary roll or triggering twice.
+6. **Feature gate:** which phase can first expose a rules-coherent Planechase option, and how earlier phases clearly disable unsupported legacy planes rather than bridging old and new chaos/roll paths.
 7. **Shared ownership:** where to implement 108.3a/901.15b so owner queries are correct without destructively changing stable deck association needed for bottom placement.
 8. **Bottom order:** when several face-up planar cards are put on deck bottoms simultaneously, identify all controlling rules/choice requirements and a deterministic UI/test representation.
 9. **Face-down new objects:** how command-object IDs/zone-change counters should represent 311.6/312.6 without premature `CardImpl` conversion.
