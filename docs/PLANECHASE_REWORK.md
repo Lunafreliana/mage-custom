@@ -1,5 +1,7 @@
 # Planechase Rework
 
+NO matter what you do never download Maven dependancies. Outsource testing to GitHub
+
 ## 1. Purpose and authority
 
 This document is the canonical architecture and migration plan for Planechase in this fork. Future Planechase engine, card, test, server, and client changes must start here and keep this document current when an implementation decision changes.
