@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestCommander3PlayersFFA;
 
+import java.util.Collections;
+
 /**
  * Multiplayer departure coverage for the shared planar controller.
  */
@@ -15,6 +17,7 @@ public class PlanarControllerPlayerLeftTest extends CardTestCommander3PlayersFFA
     @Test
     public void testActivePlayerDepartureTransfersPlaneWithoutReplacingIt() {
         gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
 
         concede(1, PhaseStep.PRECOMBAT_MAIN, playerA);
         setStopAt(1, PhaseStep.BEGIN_COMBAT);

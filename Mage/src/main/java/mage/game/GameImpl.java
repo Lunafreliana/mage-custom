@@ -46,7 +46,6 @@ import mage.filter.predicate.permanent.LegendRuleAppliesPredicate;
 import mage.game.combat.Combat;
 import mage.game.combat.CombatGroup;
 import mage.game.command.*;
-import mage.game.command.planes.FieldsOfSummerPlane;
 import mage.game.command.emblems.EmblemOfCard;
 import mage.game.command.emblems.RadiationEmblem;
 import mage.game.command.emblems.TheRingEmblem;
@@ -1441,12 +1440,9 @@ public abstract class GameImpl implements Game {
 
         // 20180408 - 901.5
         if (gameOptions.planeChase) {
-            // Phase 1 enables only the migrated pilot plane. Mixing legacy
-            // plane-owned rolls with the rules special action would expose two
-            // incompatible Planechase engines.
-            Plane plane = new FieldsOfSummerPlane();
             state.setPlanarControllerId(startingPlayerId);
-            addPlane(plane, startingPlayerId);
+            initializeSharedPlanarDeck();
+            turnTopPlaneFaceUp(startingPlayerId);
             state.setPlaneChase(this, gameOptions.planeChase);
             for (Player player : getPlayers().values()) {
                 RollPlanarDieSpecialAction action = new RollPlanarDieSpecialAction();
@@ -1480,6 +1476,43 @@ public abstract class GameImpl implements Game {
         }
 
         initGameDefaultHelperEmblems();
+    }
+
+    private void initializeSharedPlanarDeck() {
+        Collection<Planes> configuredPlanes = gameOptions.sharedPlanarDeck.isEmpty()
+                ? Arrays.asList(Planes.values())
+                : gameOptions.sharedPlanarDeck;
+        List<Plane> planes = configuredPlanes.stream()
+                .map(Plane::createPlane)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        planes.forEach(this::initializePlanarObject);
+        state.getSharedPlanarDeck().setPlanes(planes, gameOptions.sharedPlanarDeck.isEmpty());
+    }
+
+    private void initializePlanarObject(Plane plane) {
+        plane.setSourceObjectAndInitImage();
+        plane.setControllerId(state.getPlanarControllerId());
+        plane.assignNewId();
+        plane.getAbilities().newId();
+        for (Ability ability : plane.getAbilities()) {
+            ability.setSourceId(plane.getId());
+        }
+    }
+
+    private boolean turnTopPlaneFaceUp(UUID planeswalkingPlayerId) {
+        Plane plane = state.getSharedPlanarDeck().draw();
+        if (plane == null) {
+            return false;
+        }
+        plane.setControllerId(state.getPlanarControllerId());
+        state.addCommandObject(plane);
+        informPlayers("You have planeswalked to " + plane.getLogName());
+        GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK, plane.getId(), (Ability) null, plane.getId(), 0, true);
+        if (!replaceEvent(event)) {
+            fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED, plane.getId(), (Ability) null, plane.getId(), 0, true));
+        }
+        return true;
     }
 
     public void initGameDefaultWatchers() {
@@ -2087,30 +2120,33 @@ public abstract class GameImpl implements Game {
             }
         }
         Plane newPlane = plane.copy();
-        newPlane.setSourceObjectAndInitImage();
         UUID controllerId = state.getPlanarControllerId();
         if (controllerId == null) {
             controllerId = toPlayerId;
             state.setPlanarControllerId(controllerId);
         }
-        newPlane.setControllerId(controllerId);
-        newPlane.assignNewId();
-        newPlane.getAbilities().newId();
-        for (Ability ability : newPlane.getAbilities()) {
-            ability.setSourceId(newPlane.getId());
+        initializePlanarObject(newPlane);
+        state.getSharedPlanarDeck().putOnBottom(newPlane);
+        return turnTopPlaneFaceUp(toPlayerId);
+    }
+
+    @Override
+    public boolean planeswalk(UUID playerId) {
+        Plane currentPlane = state.getCurrentPlane();
+        if (currentPlane == null || !Objects.equals(playerId, state.getPlanarControllerId())) {
+            return false;
         }
-        state.addCommandObject(newPlane);
-
-        informPlayers("You have planeswalked to " + newPlane.getLogName());
-
-        // Fire off the planeswalked event
-        GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK, newPlane.getId(), (Ability) null, newPlane.getId(), 0, true);
-        if (!replaceEvent(event)) {
-            GameEvent ge = new GameEvent(GameEvent.EventType.PLANESWALKED, newPlane.getId(), (Ability) null, newPlane.getId(), 0, true);
-            fireEvent(ge);
+        for (Ability ability : currentPlane.getAbilities()) {
+            for (Effect effect : ability.getEffects()) {
+                if (effect instanceof ContinuousEffect) {
+                    ((ContinuousEffect) effect).discard();
+                }
+            }
         }
-
-        return true;
+        state.removeTriggersOfSourceId(currentPlane.getId());
+        state.getCommand().remove(currentPlane);
+        state.getSharedPlanarDeck().putOnBottom(currentPlane);
+        return turnTopPlaneFaceUp(playerId);
     }
 
     @Override

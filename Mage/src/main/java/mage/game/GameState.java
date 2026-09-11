@@ -19,6 +19,7 @@ import mage.game.command.Command;
 import mage.game.command.CommandObject;
 import mage.game.command.Emblem;
 import mage.game.command.Plane;
+import mage.game.command.SharedPlanarDeck;
 import mage.game.events.*;
 import mage.game.permanent.Battlefield;
 import mage.game.permanent.Permanent;
@@ -85,7 +86,7 @@ public class GameState implements Serializable, Copyable<GameState> {
     private Command command;
     private boolean isPlaneChase;
     private UUID planarControllerId;
-    private List<String> seenPlanes = new ArrayList<>();
+    private SharedPlanarDeck sharedPlanarDeck = new SharedPlanarDeck();
     private List<Designation> designations = new ArrayList<>();
     private List<Emblem> helperEmblems = new ArrayList<>(); // fake emblems for inner usage like better UX
     private Exile exile;
@@ -159,7 +160,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.command = state.command.copy();
         this.isPlaneChase = state.isPlaneChase;
         this.planarControllerId = state.planarControllerId;
-        this.seenPlanes.addAll(state.seenPlanes);
+        this.sharedPlanarDeck = state.sharedPlanarDeck.copy();
         this.designations.addAll(state.designations);
         this.helperEmblems = CardUtil.deepCopyObject(state.helperEmblems);
         this.exile = state.exile.copy();
@@ -210,7 +211,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         command.clear();
         designations.clear();
         helperEmblems.clear();
-        seenPlanes.clear();
+        sharedPlanarDeck.clear();
         isPlaneChase = false;
         planarControllerId = null;
         revealed.clear();
@@ -251,7 +252,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.command = state.command;
         this.isPlaneChase = state.isPlaneChase;
         this.planarControllerId = state.planarControllerId;
-        this.seenPlanes = state.seenPlanes;
+        this.sharedPlanarDeck = state.sharedPlanarDeck;
         this.designations = state.designations;
         this.helperEmblems = state.helperEmblems;
         this.exile = state.exile;
@@ -539,8 +540,8 @@ public class GameState implements Serializable, Copyable<GameState> {
         return null;
     }
 
-    public List<String> getSeenPlanes() {
-        return seenPlanes;
+    public SharedPlanarDeck getSharedPlanarDeck() {
+        return sharedPlanarDeck;
     }
 
     public boolean isPlaneChase() {
@@ -1315,16 +1316,6 @@ public class GameState implements Serializable, Copyable<GameState> {
             ability.setControllerId(controllerId);
             addAbility(ability, designation.getId(), null);
         }
-    }
-
-    public void addSeenPlane(Plane plane, Game game, UUID controllerId) {
-        if (plane != null) {
-            getSeenPlanes().add(plane.getName());
-        }
-    }
-
-    public void resetSeenPlanes() {
-        getSeenPlanes().clear();
     }
 
     public void setPlaneChase(Game game, boolean isPlaneChase) {
