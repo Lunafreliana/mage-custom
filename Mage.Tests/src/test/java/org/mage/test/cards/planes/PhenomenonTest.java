@@ -4,6 +4,7 @@ import mage.constants.CardType;
 import mage.constants.PhaseStep;
 import mage.constants.Phenomena;
 import mage.constants.Planes;
+import mage.constants.Zone;
 import mage.game.command.Phenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.stack.StackObject;
@@ -47,6 +48,8 @@ public class PhenomenonTest extends CardTestPlayerBase {
 
     @Test
     public void testEncounterTriggerDelaysSbaUntilResolution() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 10);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 10);
         addPlane(playerA, Planes.PLANE_FIELDS_OF_SUMMER);
         Assert.assertTrue(currentGame.addPhenomenon(new MutualEpiphanyPhenomenon(), playerA.getId()));
 
