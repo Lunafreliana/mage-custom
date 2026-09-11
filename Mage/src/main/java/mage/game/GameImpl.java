@@ -23,6 +23,7 @@ import mage.abilities.hint.common.DayNightHint;
 import mage.abilities.keyword.*;
 import mage.abilities.mana.DelayedTriggeredManaAbility;
 import mage.abilities.mana.TriggeredManaAbility;
+import mage.abilities.special.RollPlanarDieSpecialAction;
 import mage.cards.*;
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckCardInfo;
@@ -45,6 +46,7 @@ import mage.filter.predicate.permanent.LegendRuleAppliesPredicate;
 import mage.game.combat.Combat;
 import mage.game.combat.CombatGroup;
 import mage.game.command.*;
+import mage.game.command.planes.FieldsOfSummerPlane;
 import mage.game.command.emblems.EmblemOfCard;
 import mage.game.command.emblems.RadiationEmblem;
 import mage.game.command.emblems.TheRingEmblem;
@@ -1417,10 +1419,18 @@ public abstract class GameImpl implements Game {
 
         // 20180408 - 901.5
         if (gameOptions.planeChase) {
-            Plane plane = Plane.createRandomPlane();
+            // Phase 1 enables only the migrated pilot plane. Mixing legacy
+            // plane-owned rolls with the rules special action would expose two
+            // incompatible Planechase engines.
+            Plane plane = new FieldsOfSummerPlane();
             plane.setControllerId(startingPlayerId);
             addPlane(plane, startingPlayerId);
             state.setPlaneChase(this, gameOptions.planeChase);
+            for (Player player : getPlayers().values()) {
+                RollPlanarDieSpecialAction action = new RollPlanarDieSpecialAction();
+                action.setControllerId(player.getId());
+                state.getSpecialActions().add(action);
+            }
         }
 
         if (!gameOptions.perPlayerEmblemCards.isEmpty()) {

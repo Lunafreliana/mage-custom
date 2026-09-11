@@ -1,6 +1,5 @@
 package mage.abilities.effects.common;
 
-import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.Mode;
 import mage.abilities.effects.ContinuousEffect;
@@ -37,8 +36,8 @@ public class RollPlanarDieEffect extends OneShotEffect {
 
     protected RollPlanarDieEffect(final RollPlanarDieEffect effect) {
         super(effect);
-        this.chaosEffects = effect.chaosEffects.stream().collect(Collectors.toList());
-        this.chaosTargets = effect.chaosTargets.stream().collect(Collectors.toList());
+        this.chaosEffects = effect.chaosEffects == null ? null : effect.chaosEffects.stream().collect(Collectors.toList());
+        this.chaosTargets = effect.chaosTargets == null ? null : effect.chaosTargets.stream().collect(Collectors.toList());
     }
 
     public void addChaosEffects(List<Effect> chaosEffects) {
@@ -56,9 +55,11 @@ public class RollPlanarDieEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         Player controller = game.getPlayer(source.getControllerId());
-        MageObject mageObject = game.getObject(source);
-        if (controller != null && mageObject != null) {
+        if (controller != null) {
             PlanarDieRollResult planarRoll = controller.rollPlanarDie(outcome, source, game);
+            if (chaosEffects == null && chaosTargets == null) {
+                return PlanechasePlanarDieResultResolver.resolve(planarRoll, controller.getId(), source, game);
+            }
             if (planarRoll == PlanarDieRollResult.CHAOS_ROLL && chaosEffects != null && chaosTargets != null) {
                 for (int i = 0; i < chaosTargets.size(); i++) {
                     Target target = chaosTargets.get(i);
@@ -93,7 +94,7 @@ public class RollPlanarDieEffect extends OneShotEffect {
                     }
                 }
             } else if (planarRoll == PlanarDieRollResult.PLANAR_ROLL) {
-                return new PlaneswalkEffect(false).apply(game, source);
+                return PlanechasePlanarDieResultResolver.resolve(planarRoll, controller.getId(), source, game);
             }
             return true;
         }
@@ -104,6 +105,9 @@ public class RollPlanarDieEffect extends OneShotEffect {
     public String getText(Mode mode) {
         if (!staticText.isEmpty()) {
             return staticText;
+        }
+        if (chaosEffects == null) {
+            return "roll the planar die";
         }
         StringBuilder sb = new StringBuilder("Roll the planar die. If you roll CHAOS, ");
         for (int i = 0; i < chaosEffects.size(); i++) {

@@ -1,28 +1,18 @@
 package mage.game.command.planes;
 
 import mage.abilities.Ability;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
-import mage.abilities.common.SimpleStaticAbility;
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.SpellCastAllTriggeredAbility;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.effects.Effect;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.GainLifeEffect;
 import mage.abilities.effects.common.GainLifeTargetEffect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.constants.*;
 import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.game.command.Plane;
 import mage.players.Player;
-import mage.target.Target;
 import mage.target.targetpointer.FixedTarget;
-import mage.watchers.common.PlanarRollWatcher;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author spjspj
@@ -37,20 +27,8 @@ public class FieldsOfSummerPlane extends Plane {
         SpellCastAllTriggeredAbility ability = new SpellCastAllTriggeredAbility(Zone.COMMAND, new FieldsOfSummerEffect(), StaticFilters.FILTER_SPELL_A, false, SetTargetPointer.PLAYER);
         this.getAbilities().add(ability);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, you may gain 10 life
-        Effect chaosEffect = new GainLifeEffect(10);
-        Target chaosTarget = null;
-
-        List<Effect> chaosEffects = new ArrayList<>();
-        chaosEffects.add(chaosEffect);
-        List<Target> chaosTargets = new ArrayList<>();
-        chaosTargets.add(chaosTarget);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
-        this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
+        // Whenever chaos ensues, you may gain 10 life.
+        this.getAbilities().add(new ChaosEnsuesTriggeredAbility(new GainLifeEffect(10), true));
     }
 
     private FieldsOfSummerPlane(final FieldsOfSummerPlane plane) {
