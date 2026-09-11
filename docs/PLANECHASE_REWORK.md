@@ -399,6 +399,14 @@ Design the API to accept planar-card/deck context even if Phase 2 has only one s
 
 Required controller tests include turn change, extra turn, active-player departure, trigger controller captured correctly, “you” effects, and no stale original-creator controller. Team/Grand Melee tests may be deferred with explicit unsupported-mode guards.
 
+### 10.1 Phase 2 implementation
+
+The shared Planechase mode stores its authoritative planar controller in `GameState`. `Game.getPlanarControllerId(UUID)` accepts planar-card context even though the current shared mode resolves every such query to the same player; this parameter is the extension point for later individual-deck and Grand Melee contexts. `Game.setPlanarControllerId(UUID)` is the only engine operation that changes that value and synchronizes the current command-object `Plane` and its abilities so existing source-controller queries remain correct during the migration.
+
+The controller is set before the initial plane is added, updated immediately after the active-player field changes and before turn-begin processing, and copied/restored with the rest of `GameState`. This covers normal turns and extra turns without relying on plane-local active-player mutations. If the planar controller leaves, control transfers to the active player or, when the active player is leaving, the next in-game player before departure processing removes objects that player controls. The shared plane is retained rather than discarded and randomly replaced.
+
+While the single shared-deck option remains the only enabled Planechase model, owner queries for a `Plane` resolve through the same planar-controller API as required by rules 108.3a and 901.15b. Multiple simultaneous planar-controller contexts, Two-Headed Giant's primary-player semantics, and Grand Melee remain unsupported until their game modes can supply a context-aware resolver; callers must not infer that the stored shared UUID is a universal model for those variants.
+
 ## 11. Planar deck representation
 
 ### 11.1 No `Zone.PLANAR_DECK`
