@@ -2,6 +2,10 @@ package org.mage.test.cards.planes;
 
 import java.util.UUID;
 import mage.abilities.Ability;
+import mage.abilities.SpellAbility;
+import mage.abilities.costs.mana.ManaCostsImpl;
+import mage.abilities.effects.common.ChaosEnsuesEffect;
+import mage.constants.CardType;
 import mage.constants.PhaseStep;
 import mage.constants.Zone;
 import mage.game.GameState;
@@ -42,9 +46,11 @@ public class PlanarControllerTest extends CardTestPlayerBase {
     @Test
     public void testChaosAbilityUsesCurrentPlanarController() {
         gameOptions.planeChase = true;
+        SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
+        causeChaos.addEffect(new ChaosEnsuesEffect());
+        addCustomCardWithSpell(playerB, causeChaos, null, CardType.SORCERY);
 
-        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Roll the planar die");
-        setDieRollResult(playerB, 1);
+        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Cause Chaos");
         setChoice(playerB, true);
 
         setStrictChooseMode(true);
