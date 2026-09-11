@@ -14,7 +14,7 @@ public class ChaosEnsuesEffect extends OneShotEffect {
     private final UUID planarCardId;
 
     public ChaosEnsuesEffect() {
-        this(null);
+        this((UUID) null);
     }
 
     public ChaosEnsuesEffect(UUID planarCardId) {

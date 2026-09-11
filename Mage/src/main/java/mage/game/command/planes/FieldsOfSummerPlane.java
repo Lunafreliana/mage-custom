@@ -3,6 +3,7 @@ package mage.game.command.planes;
 import mage.abilities.Ability;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.SpellCastAllTriggeredAbility;
+import mage.abilities.effects.Effect;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.GainLifeEffect;
 import mage.abilities.effects.common.GainLifeTargetEffect;

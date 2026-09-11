@@ -19,6 +19,13 @@ public class PlaneswalkingTriggeredAbility extends TriggeredAbilityImpl {
     }
 
     @Override
+    public boolean checkEventType(GameEvent event, Game game) {
+        // This source-less ability is created after a planar result rather than
+        // registered as an event listener.
+        return false;
+    }
+
+    @Override
     public boolean checkTrigger(GameEvent event, Game game) {
         return false;
     }

@@ -19,9 +19,13 @@ public class ChaosEnsuesTriggeredAbility extends TriggeredAbilityImpl {
     }
 
     @Override
+    public boolean checkEventType(GameEvent event, Game game) {
+        return event.getType() == GameEvent.EventType.CHAOS_ENSUES;
+    }
+
+    @Override
     public boolean checkTrigger(GameEvent event, Game game) {
-        return event.getType() == GameEvent.EventType.CHAOS_ENSUES
-                && (event.getTargetId() == null || event.getTargetId().equals(getSourceId()));
+        return event.getTargetId() == null || event.getTargetId().equals(getSourceId());
     }
 
     @Override
