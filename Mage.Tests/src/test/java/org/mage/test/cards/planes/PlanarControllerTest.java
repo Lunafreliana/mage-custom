@@ -80,8 +80,8 @@ public class PlanarControllerTest extends CardTestPlayerBase {
 
         GameState copiedState = currentGame.getState().copy();
         Assert.assertEquals(playerB.getId(), copiedState.getPlanarControllerId());
-        Plane copiedPlane = copiedState.getCurrentPlane();
-        Assert.assertNotNull(copiedPlane);
+        Assert.assertEquals(1, copiedState.getFaceUpPlanes().size());
+        Plane copiedPlane = copiedState.getFaceUpPlanes().get(0);
         Assert.assertEquals(playerB.getId(), copiedPlane.getControllerId());
         long copiedPlaneTriggers = copiedState.getTriggers().values().stream()
                 .filter(ability -> copiedPlane.getId().equals(ability.getSourceId()))
@@ -91,8 +91,8 @@ public class PlanarControllerTest extends CardTestPlayerBase {
     }
 
     private void assertPlanarController(UUID expectedControllerId) {
-        Plane plane = currentGame.getState().getCurrentPlane();
-        Assert.assertNotNull("Planechase must have a face-up plane", plane);
+        Assert.assertEquals("Planechase must have one face-up plane", 1, currentGame.getState().getFaceUpPlanes().size());
+        Plane plane = currentGame.getState().getFaceUpPlanes().get(0);
         Assert.assertEquals(expectedControllerId, currentGame.getPlanarControllerId(plane.getId()));
         Assert.assertEquals(expectedControllerId, currentGame.getControllerId(plane.getId()));
         Assert.assertEquals(expectedControllerId, currentGame.getOwnerId(plane));

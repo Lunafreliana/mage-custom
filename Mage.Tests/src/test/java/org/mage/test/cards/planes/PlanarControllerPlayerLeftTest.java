@@ -23,8 +23,9 @@ public class PlanarControllerPlayerLeftTest extends CardTestCommander3PlayersFFA
         setStopAt(1, PhaseStep.BEGIN_COMBAT);
         execute();
 
-        Plane plane = currentGame.getState().getCurrentPlane();
-        Assert.assertNotNull("The shared plane must remain after its controller leaves", plane);
+        Assert.assertEquals("The shared plane must remain after its controller leaves", 1,
+                currentGame.getState().getFaceUpPlanes().size());
+        Plane plane = currentGame.getState().getFaceUpPlanes().get(0);
         Assert.assertEquals(Planes.PLANE_FIELDS_OF_SUMMER, plane.getPlaneType());
         // The three-player fixture's turn order after player A is player C.
         Assert.assertEquals(playerC.getId(), currentGame.getPlanarControllerId(plane.getId()));

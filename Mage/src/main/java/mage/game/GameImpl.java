@@ -655,7 +655,7 @@ public abstract class GameImpl implements Game {
 
     @Override
     public UUID getOwnerId(MageObject object) {
-        if (object instanceof Plane) {
+        if (object instanceof PlanarCard) {
             return getPlanarControllerId(object.getId());
         }
         if (object instanceof Spell) {
@@ -689,7 +689,7 @@ public abstract class GameImpl implements Game {
                 return ((StackObject) object).getControllerId();
             } else if (object instanceof Permanent) {
                 return ((Permanent) object).getControllerId();
-            } else if (object instanceof Plane) {
+            } else if (object instanceof PlanarCard) {
                 return getPlanarControllerId(objectId);
             } else if (object instanceof CommandObject) {
                 return ((CommandObject) object).getControllerId();
@@ -1442,7 +1442,7 @@ public abstract class GameImpl implements Game {
         if (gameOptions.planeChase) {
             state.setPlanarControllerId(startingPlayerId);
             initializeSharedPlanarDeck();
-            turnTopPlaneFaceUp(startingPlayerId);
+            turnTopPlanarCardFaceUp(startingPlayerId);
             state.setPlaneChase(this, gameOptions.planeChase);
             for (Player player : getPlayers().values()) {
                 RollPlanarDieSpecialAction action = new RollPlanarDieSpecialAction();
@@ -1490,7 +1490,7 @@ public abstract class GameImpl implements Game {
         state.getSharedPlanarDeck().setPlanes(planes, gameOptions.sharedPlanarDeck.isEmpty());
     }
 
-    private void initializePlanarObject(Plane plane) {
+    private void initializePlanarObject(PlanarCard plane) {
         plane.setSourceObjectAndInitImage();
         plane.setControllerId(state.getPlanarControllerId());
         plane.assignNewId();
@@ -1500,17 +1500,18 @@ public abstract class GameImpl implements Game {
         }
     }
 
-    private boolean turnTopPlaneFaceUp(UUID planeswalkingPlayerId) {
-        Plane plane = state.getSharedPlanarDeck().draw();
+    private boolean turnTopPlanarCardFaceUp(UUID planeswalkingPlayerId) {
+        PlanarCard plane = state.getSharedPlanarDeck().draw();
         if (plane == null) {
             return false;
         }
         plane.setControllerId(state.getPlanarControllerId());
+        plane.setFaceUp(true);
         state.addCommandObject(plane);
         informPlayers("You have planeswalked to " + plane.getLogName());
-        GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK, plane.getId(), (Ability) null, plane.getId(), 0, true);
+        GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK, plane.getId(), (Ability) null, planeswalkingPlayerId, 0, true);
         if (!replaceEvent(event)) {
-            fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED, plane.getId(), (Ability) null, plane.getId(), 0, true));
+            fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED, plane.getId(), (Ability) null, planeswalkingPlayerId, 0, true));
         }
         return true;
     }
@@ -2104,21 +2105,11 @@ public abstract class GameImpl implements Game {
 
     /**
      * @param plane
-     * @param toPlayerId controller and owner of the plane (may only be one
-     *                   per game..)
+     * @param toPlayerId controller and shared-deck owner of the plane
      * @return boolean - whether the plane was added successfully or not
      */
     @Override
     public boolean addPlane(Plane plane, UUID toPlayerId) {
-        // Implementing planechase as if it were 901.15. Single Planar Deck Option
-        // Here, can enforce the world plane restriction (the Grand Melee format may have some impact on this implementation)
-
-        // Enforce 'world' rule for planes
-        for (CommandObject cobject : state.getCommand()) {
-            if (cobject instanceof Plane) {
-                return false;
-            }
-        }
         Plane newPlane = plane.copy();
         UUID controllerId = state.getPlanarControllerId();
         if (controllerId == null) {
@@ -2126,27 +2117,30 @@ public abstract class GameImpl implements Game {
             state.setPlanarControllerId(controllerId);
         }
         initializePlanarObject(newPlane);
+        newPlane.setPlanarDeckOwnerId(toPlayerId);
         state.getSharedPlanarDeck().putOnBottom(newPlane);
-        return turnTopPlaneFaceUp(toPlayerId);
+        return turnTopPlanarCardFaceUp(toPlayerId);
     }
 
     @Override
     public boolean planeswalk(UUID playerId) {
-        Plane currentPlane = state.getCurrentPlane();
-        if (currentPlane == null || !Objects.equals(playerId, state.getPlanarControllerId())) {
+        List<PlanarCard> faceUpPlanarCards = new ArrayList<>(state.getFaceUpPlanarCards());
+        if (faceUpPlanarCards.isEmpty() || !Objects.equals(playerId, state.getPlanarControllerId())) {
             return false;
         }
-        for (Ability ability : currentPlane.getAbilities()) {
-            for (Effect effect : ability.getEffects()) {
-                if (effect instanceof ContinuousEffect) {
-                    ((ContinuousEffect) effect).discard();
+        for (PlanarCard plane : faceUpPlanarCards) {
+            for (Ability ability : plane.getAbilities()) {
+                for (Effect effect : ability.getEffects()) {
+                    if (effect instanceof ContinuousEffect) {
+                        ((ContinuousEffect) effect).discard();
+                    }
                 }
             }
+            state.removeTriggersOfSourceId(plane.getId());
+            state.getCommand().remove(plane);
+            state.getSharedPlanarDeck().putOnBottom(plane);
         }
-        state.removeTriggersOfSourceId(currentPlane.getId());
-        state.getCommand().remove(currentPlane);
-        state.getSharedPlanarDeck().putOnBottom(currentPlane);
-        return turnTopPlaneFaceUp(playerId);
+        return turnTopPlanarCardFaceUp(playerId);
     }
 
     @Override

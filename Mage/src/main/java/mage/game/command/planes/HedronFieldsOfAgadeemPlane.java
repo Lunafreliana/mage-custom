@@ -96,11 +96,7 @@ class HedronFieldsOfAgadeemRestrictionEffect extends RestrictionEffect {
 
     @Override
     public boolean applies(Permanent permanent, Ability source, Game game) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null) {
-            return false;
-        }
-        if (!cPlane.getPlaneType().equals(Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM)) {
+        if (!game.getState().hasFaceUpPlane(Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM)) {
             return false;
         }
         return filter.match(permanent, source.getControllerId(), source, game);

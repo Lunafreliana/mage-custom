@@ -88,8 +88,7 @@ class PanopticonTriggeredAbility extends TriggeredAbilityImpl {
 
     @Override
     public boolean checkTrigger(GameEvent event, Game game) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null || !cPlane.getPlaneType().equals(Planes.PLANE_PANOPTICON)) {
+        if (!getSourceId().equals(event.getTargetId())) {
             return false;
         }
 

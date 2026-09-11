@@ -82,11 +82,7 @@ class TheGreatForestCombatDamageRuleEffect extends ContinuousEffectImpl {
 
     @Override
     public boolean apply(Layer layer, SubLayer sublayer, Ability source, Game game) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null) {
-            return false;
-        }
-        if (!cPlane.getPlaneType().equals(Planes.PLANE_THE_GREAT_FOREST)) {
+        if (!game.getState().hasFaceUpPlane(Planes.PLANE_THE_GREAT_FOREST)) {
             return false;
         }
 

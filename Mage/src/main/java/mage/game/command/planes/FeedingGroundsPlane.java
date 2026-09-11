@@ -132,11 +132,7 @@ class FeedingGroundsEffect extends CostModificationEffectImpl {
     @Override
     public boolean applies(Ability abilityToModify, Ability source, Game game) {
         if (abilityToModify instanceof SpellAbility) {
-            Plane cPlane = game.getState().getCurrentPlane();
-            if (cPlane == null) {
-                return false;
-            }
-            if (!cPlane.getPlaneType().equals(Planes.PLANE_FEEDING_GROUNDS)) {
+            if (!game.getState().hasFaceUpPlane(Planes.PLANE_FEEDING_GROUNDS)) {
                 return false;
             }
 

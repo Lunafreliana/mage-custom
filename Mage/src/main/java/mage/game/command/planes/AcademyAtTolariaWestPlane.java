@@ -93,11 +93,7 @@ class DrawCardsActivePlayerEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null) {
-            return false;
-        }
-        if (!cPlane.getPlaneType().equals(Planes.PLANE_ACADEMY_AT_TOLARIA_WEST)) {
+        if (!game.getState().hasFaceUpPlane(Planes.PLANE_ACADEMY_AT_TOLARIA_WEST)) {
             return false;
         }
         Player player = game.getPlayer(game.getActivePlayerId());

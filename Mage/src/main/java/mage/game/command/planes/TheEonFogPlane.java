@@ -91,11 +91,7 @@ class TheEonFogSkipUntapStepEffect extends ContinuousRuleModifyingEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null) {
-            return false;
-        }
-        if (!cPlane.getPlaneType().equals(Planes.PLANE_THE_EON_FOG)) {
+        if (!game.getState().hasFaceUpPlane(Planes.PLANE_THE_EON_FOG)) {
             return false;
         }
         return true;

@@ -1341,9 +1341,8 @@ public class GameController implements GameCallback {
 
         sb.append("<br>Using plane chase?:" + state.isPlaneChase());
         if (state.isPlaneChase()) {
-            Plane currentPlane = state.getCurrentPlane();
-            if (currentPlane != null) {
-                sb.append("<br>Current plane:" + currentPlane.getName());
+            for (Plane plane : state.getFaceUpPlanes()) {
+                sb.append("<br>Face-up plane:" + plane.getName());
             }
         }
 

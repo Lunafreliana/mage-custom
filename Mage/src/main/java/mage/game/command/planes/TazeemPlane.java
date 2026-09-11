@@ -78,9 +78,7 @@ class TazeemCantBlockAllEffect extends RestrictionEffect {
 
     @Override
     public boolean applies(Permanent permanent, Ability source, Game game) {
-        Plane cPlane = game.getState().getCurrentPlane();
-
-        if (cPlane == null || !cPlane.getPlaneType().equals(Planes.PLANE_TAZEEM)) {
+        if (!game.getState().hasFaceUpPlane(Planes.PLANE_TAZEEM)) {
             return false;
         }
         return StaticFilters.FILTER_PERMANENT_CREATURES.match(permanent, source.getControllerId(), source, game);
