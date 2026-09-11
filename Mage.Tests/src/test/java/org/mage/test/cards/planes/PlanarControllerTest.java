@@ -1,5 +1,6 @@
 package org.mage.test.cards.planes;
 
+import java.util.Collections;
 import java.util.UUID;
 import mage.abilities.Ability;
 import mage.abilities.SpellAbility;
@@ -7,6 +8,7 @@ import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.common.ChaosEnsuesEffect;
 import mage.constants.CardType;
 import mage.constants.PhaseStep;
+import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.GameState;
 import mage.game.command.Plane;
@@ -22,6 +24,7 @@ public class PlanarControllerTest extends CardTestPlayerBase {
     @Test
     public void testControllerFollowsActivePlayer() {
         gameOptions.planeChase = true;
+        useFieldsOfSummerDeck();
 
         setStopAt(2, PhaseStep.UPKEEP);
         execute();
@@ -32,6 +35,7 @@ public class PlanarControllerTest extends CardTestPlayerBase {
     @Test
     public void testControllerFollowsActivePlayerDuringExtraTurn() {
         gameOptions.planeChase = true;
+        useFieldsOfSummerDeck();
         addCard(Zone.HAND, playerA, "Time Warp");
         addCard(Zone.BATTLEFIELD, playerA, "Island", 5);
 
@@ -46,6 +50,7 @@ public class PlanarControllerTest extends CardTestPlayerBase {
     @Test
     public void testChaosAbilityUsesCurrentPlanarController() {
         gameOptions.planeChase = true;
+        useFieldsOfSummerDeck();
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerB, causeChaos, null, CardType.SORCERY);
@@ -68,6 +73,7 @@ public class PlanarControllerTest extends CardTestPlayerBase {
     @Test
     public void testControllerStateIsCopied() {
         gameOptions.planeChase = true;
+        useFieldsOfSummerDeck();
 
         setStopAt(2, PhaseStep.UPKEEP);
         execute();
@@ -94,5 +100,9 @@ public class PlanarControllerTest extends CardTestPlayerBase {
         for (Ability ability : plane.getAbilities()) {
             Assert.assertEquals(expectedControllerId, ability.getControllerId());
         }
+    }
+
+    private void useFieldsOfSummerDeck() {
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
     }
 }

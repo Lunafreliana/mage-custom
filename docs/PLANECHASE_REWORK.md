@@ -663,8 +663,9 @@ its identity. Game-state copy, rollback restore, and restart respectively deep
 copy, restore, and clear the ordering.
 
 The implemented `Planes` registry supplies the initial shared deck and is
-shuffled through `RandomUtil`, while `SharedPlanarDeck.setPlanes(..., false)` is
-the deterministic known-order injection seam for focused tests. This is deck
+shuffled through `RandomUtil`, while `GameOptions.sharedPlanarDeck` and
+`SharedPlanarDeck.setPlanes(..., false)` provide deterministic known-order
+injection seams for integration and narrow unit tests. This is deck
 construction only: traversal never uses a random plane factory or `seenPlanes`.
 Shared-mode ownership continues to resolve through the authoritative planar
 controller API described in Phase 2. A richer planar-card runtime, multiple

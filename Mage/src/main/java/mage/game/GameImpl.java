@@ -1479,12 +1479,15 @@ public abstract class GameImpl implements Game {
     }
 
     private void initializeSharedPlanarDeck() {
-        List<Plane> planes = Arrays.stream(Planes.values())
+        Collection<Planes> configuredPlanes = gameOptions.sharedPlanarDeck.isEmpty()
+                ? Arrays.asList(Planes.values())
+                : gameOptions.sharedPlanarDeck;
+        List<Plane> planes = configuredPlanes.stream()
                 .map(Plane::createPlane)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         planes.forEach(this::initializePlanarObject);
-        state.getSharedPlanarDeck().setPlanes(planes, true);
+        state.getSharedPlanarDeck().setPlanes(planes, gameOptions.sharedPlanarDeck.isEmpty());
     }
 
     private void initializePlanarObject(Plane plane) {

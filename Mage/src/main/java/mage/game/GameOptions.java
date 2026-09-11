@@ -2,9 +2,11 @@ package mage.game;
 
 import mage.cards.decks.DeckCardInfo;
 import mage.constants.PhaseStep;
+import mage.constants.Planes;
 import mage.util.Copyable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -67,6 +69,11 @@ public class GameOptions implements Serializable, Copyable<GameOptions> {
 
     // PLANECHASE game mode
     public boolean planeChase = false;
+    /**
+     * Optional known-order shared planar deck, primarily for deterministic tests.
+     * An empty collection uses all implemented planes in shuffled order.
+     */
+    public Collection<Planes> sharedPlanarDeck = Collections.emptyList();
     // xmage uses increased by 1/3 chances (2/2/9) for chaos/planar result, see 1a9f12f5767ce0beeed26a8ff5c8a8f9490c9c47
     // if you need combo support with 6-sides rolls then it can be reset to original values
     public static final int PLANECHASE_PLANAR_DIE_CHAOS_SIDES = 2; // original: 1
@@ -85,6 +92,7 @@ public class GameOptions implements Serializable, Copyable<GameOptions> {
         this.rollbackTurnsAllowed = options.rollbackTurnsAllowed;
         this.bannedUsers.addAll(options.bannedUsers);
         this.planeChase = options.planeChase;
+        this.sharedPlanarDeck = new ArrayList<>(options.sharedPlanarDeck);
         this.perPlayerEmblemCards = new HashSet<>(options.perPlayerEmblemCards);
         this.globalEmblemCards = new HashSet<>(options.globalEmblemCards);
     }
