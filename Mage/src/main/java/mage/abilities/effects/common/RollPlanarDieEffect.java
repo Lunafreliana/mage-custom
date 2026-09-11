@@ -14,6 +14,7 @@ public class RollPlanarDieEffect extends OneShotEffect {
 
     public RollPlanarDieEffect() {
         super(Outcome.Neutral);
+        staticText = "roll the planar die";
     }
 
     protected RollPlanarDieEffect(final RollPlanarDieEffect effect) {
