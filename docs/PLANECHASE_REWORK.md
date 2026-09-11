@@ -1,690 +1,627 @@
 # Planechase Rework
 
-## Upstream Reference
+## 1. Purpose and authority
 
-A previous unfinished Planechase refactor exists as
-[magefree/mage PR #11316](https://github.com/magefree/mage/pull/11316).
-Future Planechase tasks **must** inspect this PR when relevant.
+This document is the canonical architecture and migration plan for Planechase in this fork. Future Planechase engine, card, test, server, and client changes must start here and keep this document current when an implementation decision changes.
 
-Use:
+The goals are to correct the rules core without breaking the existing playable subset, then incrementally add a real planar deck, multiple face-up planar cards, phenomena, content, and UI. The first implementation patch must remain deliberately small. It must not combine rules-core repair with every later data-model and content change.
 
-```shell
-gh pr view 11316 --repo magefree/mage
-gh pr diff 11316 --repo magefree/mage
-```
+This plan is based on:
 
-For complete source inspection:
+* the checked-out `custom`-branch implementation listed in section 2;
+* the official **Magic: The Gathering Comprehensive Rules effective August 7, 2026**, obtained from the current [Wizards rules page](https://magic.wizards.com/en/rules) (research performed September 11, 2026), especially rules 103.7, 108.3a, 116.2i, 311, 312, 408.3, 701.31, 704.6f, and 901;
+* upstream XMage [PR #11316](https://github.com/magefree/mage/pull/11316), inspected only as an unfinished design reference. It must not be cherry-picked, merged, or presumed correct.
 
-```shell
-git fetch https://github.com/magefree/mage.git \
-  refs/pull/11316/head:refs/remotes/upstream-pr/11316
-```
+Where this document says **must**, it describes either a rules requirement or a repository architecture decision. Where it says **compatibility**, it describes temporary scaffolding rather than the target model.
 
-Do not merge or cherry-pick this PR. It is an unfinished architecture reference only.
+## 2. Current XMage architecture
 
-I have now actually gone through **#11316 as an architecture proposal**, rather than just giving it a quick look. The most important conclusion first:
+### 2.1 Runtime representation and registry
 
-**I would absolutely not cherry-pick PR #11316. I would reuse its core ideas and rebuild the implementation properly.** The PR has been an open draft since 2023, consists of only two commits, changes 35 files, and was explicitly posted by its author as an unfinished attempt.
+`mage.game.command.Plane` (`Mage/src/main/java/mage/game/command/Plane.java`) is a `CommandObjectImpl`, not a `CardImpl`. It owns a `Planes planeType`, a mutable `controllerId`, an ability collection, token-repository image metadata, and copy/source fields. It currently:
 
-I also found an important clarification while checking the **current June 2026 Comprehensive Rules**: we should **not introduce a new `Zone.PLANAR_DECK`**. Plane and phenomenon cards remain rules-wise in the **command zone**, even while they are part of the face-down planar deck. The “planar deck” is therefore an additional **ordering of cards within the command zone**, not a separate Magic zone.
+* reports no `CardType`, subtype, or supertype;
+* treats its zone-change counter as permanently `1`;
+* has no owner, face-up state, revealed state, or planar-deck identity/order;
+* reflectively constructs implementations from `mage.game.command.planes`;
+* provides `createRandomPlane()`, which uniformly selects an enum value with `RandomUtil`.
 
-That actually makes the XMage design somewhat cleaner.
+`mage.constants.Planes` (`Mage/src/main/java/mage/constants/Planes.java`) is a fixed registry of 21 implemented planes. It maps an enum value to a Java class name and display name. It is neither a deck list nor a complete registry of printed planar cards, and it has no phenomenon representation.
 
-## What #11316 got right
+Keeping `Plane` command-object-based during the early phases is intentional. Converting every plane to `CardImpl` in Phase 1 would unnecessarily couple rules repair to card repositories, deck construction, serialization, images, views, and client work. The runtime abstraction must nevertheless evolve so it can eventually describe both planes and phenomena correctly.
 
-The PR essentially tries to transform this:
+### 2.2 Game initialization and planeswalking
 
-```text
-Plane
- ├─ actual Plane ability
- ├─ "Roll planar die" ActivatedAbility
- ├─ CHAOS effect
- ├─ PlanarRollWatcher
- └─ CostIncreasingEffect
-```
+In `mage.game.GameImpl` (`Mage/src/main/java/mage/game/GameImpl.java`):
 
-into this:
+1. When `GameOptions.planeChase` is true, `init` calls `Plane.createRandomPlane()`.
+2. It assigns the starting player as controller, calls `addPlane`, and then marks `GameState` as Planechase.
+3. `addPlane` rejects the new object if any `Plane` already exists in the command collection, explicitly enforcing a one-plane model.
+4. Otherwise it copies the plane, assigns the supplied player as controller, gives the copy and its abilities new IDs, adds it to command, announces it, offers a replaceable `PLANESWALK` event, and fires `PLANESWALKED` if it was not replaced.
 
-```text
-Planechase rules
- └─ RollPlanarDieSpecialAction
-       ↓
-     planar die
-       ↓
- ┌─────┼──────────┐
-blank chaos   planeswalker
-       │
-       ▼
- CHAOS_ENSUES
-       │
-       ▼
-Plane chaos trigger
-```
+`mage.abilities.effects.common.PlaneswalkEffect` removes the one current plane, records its name in `seenPlanes`, repeatedly calls `Plane.createRandomPlane()` until it finds an unseen name (clearing `seenPlanes` after all enum values have appeared), and calls `Game.addPlane`. This approximates “do not repeat until all have appeared”; it does not put cards on the bottom or navigate an ordered deck.
 
-**That direction is absolutely correct.**
+The existing `PLANESWALK`/`PLANESWALKED` event pair may provide useful replacement/before-and-after boundaries. Its payload, controller, target identity, cancellation semantics, and behavior with several face-up planar cards must be reviewed before reuse. Names alone are not proof that the events model rules 701.31 and 901.11 correctly.
 
-`SpecialAction` is already designed in XMage not to use the stack; the base class explicitly sets `usesStack = false`. That makes it much closer to rule 901.9 than the current activated ability attached to every individual Plane.
+### 2.3 Game state
 
-The other major idea is also correct: the PR introduces `ChaosEnsuesTriggeredAbility`. Instead of every Plane passing its chaos effect into `RollPlanarDieEffect`, code like this:
+`mage.game.GameState` (`Mage/src/main/java/mage/game/GameState.java`) stores:
 
-```java
-new RollPlanarDieEffect(chaosEffects, chaosTargets)
-```
+* `boolean isPlaneChase`;
+* `List<String> seenPlanes`;
+* planes indirectly in the general `Command` collection.
 
-becomes simply:
+`getCurrentPlane()` scans command objects and returns the first `Plane`; it therefore assumes exactly one. The Planechase fields participate in copy, restore, restart, and state-value behavior only to the extent implemented there. There is no ordered planar deck, collection explicitly representing face-up planar cards, face-down planar-card state, deck owner/mode, or central planar controller.
 
-```java
-new ChaosEnsuesTriggeredAbility(
-    new DiscardHandControllerEffect()
-)
-```
+`seenPlanes` is simulation bookkeeping, not a planar deck. It cannot express a known top card, bottom placement, ownership, reveals, individual decks, phenomena, or deterministic deck traversal.
 
-on the Plane itself.
+### 2.4 Current planar roll ability, result handling, and cost
 
-That can be seen, for example, in Academy at Tolaria West. This is roughly how modern Plane implementations should look. The current rules wording really is “Whenever chaos ensues,” and chaos can explicitly be caused by spells and abilities now, not only by rolling the planar die.
-
-The attempt to replace Panopticon’s custom class:
-
-```java
-PanopticonTriggeredAbility
-```
-
-with a generic:
-
-```java
-PlaneswalkToSourceTriggeredAbility
-```
-
-is also conceptually excellent. It prevents 100 future Plane classes from reimplementing the same event checks.
-
-## But #11316 is not usable as production code
-
-These are the most important findings from the PR:
-
-| Part of #11316                       | Assessment                             | Reason                                                                                |
-| ------------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------- |
-| `RollPlanarDieSpecialAction`         | **Keep the concept, rewrite the code** | correct mechanism, but timing and result handling are incomplete/incorrect            |
-| `ChaosEnsuesTriggeredAbility`        | **Keep**                               | fundamentally sound abstraction                                                       |
-| `PlaneswalkToSourceTriggeredAbility` | **Keep the concept**                   | implementation is unfinished                                                          |
-| `ROLLED_PLANESWALK` event            | **Change the design**                  | the actual inherent triggered ability is missing                                      |
-| `Player.rollPlanarDieResult()`       | **Partially keep**                     | separating raw rolling is good, but Planechase rule logic should not live in `Player` |
-| `getActivatedThisTurnCount()`        | **Keep the concept**                   | correct direction for planar roll costs                                               |
-| migration of existing Planes         | **Reuse later**                        | engine should be fixed first                                                          |
-| `Plane.addAbility()`                 | **Fine**                               | convenience helper only                                                               |
-| real planar deck                     | **Missing entirely**                   | PR does not solve the central structural issue                                        |
-| Phenomena                            | **Missing entirely**                   | no encounter/SBA engine                                                               |
-| planar controller                    | **Not solved**                         | still structurally incorrect                                                          |
-
-The first concrete problem is significant: `SpecialAction` inherits from `ActivatedAbilityImpl`, whose default timing is:
-
-```java
-protected TimingRule timing = TimingRule.INSTANT;
-```
-
-The new `RollPlanarDieSpecialAction` never changes that timing.
-
-The Comprehensive Rules instead require the action to be available only to the active player, while they have priority, during their main phase, while the stack is empty.
-
-So the PR introduces the correct kind of special action, but with the wrong timing behavior.
-
-## The new die-roll flow is also not fully connected
-
-The PR sensibly separates raw rolling into:
-
-```java
-rollPlanarDieResult(...)
-```
-
-and another layer that is supposed to process the result.
-
-However, `RollPlanarDieSpecialActionEffect` ultimately just calls:
-
-```java
-player.rollPlanarDieResult(...)
-```
-
-and discards the returned value.
-
-That means the Special Action rolls the planar die but does not correctly cause either chaos or planeswalking afterward.
-
-There is also a confirmed bug in the `Player` patch: `CHAOS_ROLL` and the planeswalker result were mapped to the wrong events. A reviewer pointed this out, and the author said it was probably caused by a merge conflict because the code had already become old.
-
-That illustrates the state of the PR quite well:
-
-**It is an architecture sketch, not an implementation that should be imported.**
-
-## `ROLLED_PLANESWALK` does not actually planeswalk
-
-This is the next important architectural point.
-
-#11316 adds:
-
-```java
-GameEvent.EventType.ROLLED_PLANESWALK
-GameEvent.EventType.CHAOS_ENSUES
-```
-
-and `WillOfThePlaneswalkersEffect` fires `ROLLED_PLANESWALK` when the relevant vote wins.
-
-But the PR never finishes the ability that turns that event into actual planeswalking.
-
-That matters because the real rules are more subtle than:
+Every implemented `Plane` repeats essentially the same voluntary-roll infrastructure:
 
 ```text
-roll planeswalker symbol
-→ immediately change Plane
+ActivateIfConditionActivatedAbility (Zone.COMMAND)
+  + MainPhaseStackEmptyCondition
+  + GenericManaCost(0)
+  + RollPlanarDieEffect(plane-specific chaos effects/targets)
+  + mayActivate(ANY)
+  + PlanarRollWatcher
+  + SimpleStaticAbility(PlanarDieRollCostIncreasingEffect)
 ```
 
-Under the current rules:
+This makes the rules-provided roll look like an activated ability of the current plane. The repeated ability is available through each plane rather than once through the Planechase game rules.
+
+`mage.abilities.effects.common.RollPlanarDieEffect` both rolls and interprets the result. It asks the controller to roll, then:
+
+* applies the plane-specific effect list immediately for chaos; or
+* immediately applies `PlaneswalkEffect` for a planeswalker result.
+
+Consequences:
+
+* chaos is coupled to a die-roll effect rather than modeled as “chaos ensues”;
+* a spell or ability can only obtain the current plane's chaos behavior if that behavior is passed into the roll effect;
+* the planeswalking inherent ability never triggers and never gives players a response window;
+* voluntary and effect-generated rolls share too much machinery.
+
+`mage.watchers.common.PlanarRollWatcher` counts `ROLL_DIE` events with a null numerical result per player each turn. `mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect` reads that count to increase the repeated plane ability's mana cost. This counts planar die rolls, not uses of the rules special action. It therefore cannot implement rules 116.2i/901.9 when a card effect also rolls the planar die.
+
+The watcher is registered among `GameImpl`'s default watchers with a comment that the Planechase code needs improvement. It also supports current dice regression tests, so removal must be caller-audited rather than assumed safe.
+
+### 2.5 Representative plane implementations
+
+The following classes expose distinct migration risks:
+
+* `PanopticonPlane`: defines a bespoke `PanopticonTriggeredAbility` for `PLANESWALKED`, examines `getCurrentPlane()`, and targets the active player. It demonstrates the need for a source-bound “planeswalk to this” trigger and correct planar control.
+* `AcademyAtTolariaWestPlane`: implements active-player end-step behavior and packages `DiscardHandControllerEffect` into its roll effect. It demonstrates ambiguity between the active player and a stale source controller.
+* `EdgeOfMalacolPlane`: includes the repeated roll/cost boilerplate and manually changes an ability's controller to `game.getActivePlayerId()` while applying an effect, then restores it. This is a direct planar-controller workaround that the central model must eliminate.
+* `TazeemPlane`: uses `IsStillOnPlaneCondition`, delayed effects, and another temporary active-player/source-controller assignment. It demonstrates why delayed effects and source identity must survive migration, not merely why boilerplate should be deleted.
+
+Migration must inspect each plane's functional behavior rather than mechanically replacing imports. Existing implementations are useful evidence, not a rules authority.
+
+### 2.6 Game options, server, client, and content surface
+
+`mage.game.GameOptions` has a `planeChase` boolean and deliberately defines a nine-sided historical die: one chaos side, one planeswalker side, and seven blanks. The rules die is six-sided (901.3a), but changing probabilities is explicitly deferred to a separate correction after the architecture is stable.
+
+The match/server path carries one boolean from `MatchOptions` through `TableController` into `GameOptions`. `Mage.Client`'s `CustomOptionsDialog` exposes a single “Planechase” checkbox. There is no planar-deck editor, shared/individual deck choice, list validation, ordering display, phenomenon configuration, or deck selection protocol.
+
+The test framework already offers deterministic hooks:
+
+* `CardTestPlayerAPIImpl.addPlane(Player, Planes)` places a named test plane;
+* `CardTestPlayerAPIImpl.setDieRollResult(TestPlayer, int)` queues a die result;
+* `TestPlayer.rollDieResult` consumes that queued value in strict mode;
+* `RollDiceTest` and `FracturedPowerstoneTest` contain existing planar/non-planar dice coverage.
+
+Those hooks should be extended or wrapped for semantic planar results rather than tests relying on random retries or hard-coding the eventual physical die distribution.
+
+### 2.7 `WillOfThePlaneswalkersEffect`
+
+`mage.abilities.effects.common.WillOfThePlaneswalkersEffect` resolves a vote and directly invokes `PlaneswalkEffect` when planeswalking wins. It contains an explicit TODO to refactor once Planechase support is improved. The future implementation must decide whether its current Oracle action directly instructs a planeswalk or causes a symbol-equivalent event; it must not blindly route all non-die instructions through the die-result path. This caller belongs in the audit for the new reusable rules primitives.
+
+## 3. Current rules model
+
+This section records the rules constraints the architecture must preserve. Rule numbers refer to the Comprehensive Rules effective August 7, 2026.
+
+### 3.1 Planar cards, decks, and the command zone
+
+* A default Planechase game gives each player a supplementary planar deck of at least ten plane and/or phenomenon cards. At most two may be phenomena, and English names must be unique within a deck (901.3).
+* The planar die is rules-wise six-sided: one planeswalker symbol, one chaos symbol, and four blanks (901.3a).
+* Plane and phenomenon cards remain in the command zone throughout the game, whether in a planar deck or face up (311.2, 312.2, 901.4). A planar deck is therefore an ordered supplemental structure, not a Magic zone.
+* Plane and phenomenon cards are not permanents, cannot be cast, and remain in command if an effect would move them out of it (311.2, 312.2).
+* Only face-up planar cards normally have functioning abilities (311.4, 901.7); turning a face-up plane or phenomenon face down makes it a new object (311.6, 312.6, 901.7a).
+* The optional single communal deck has at least forty cards or ten times the number of players, whichever is smaller; it has a phenomenon cap of twice the number of players and unique English names (901.15a). References to a player's deck use the communal deck (901.15c).
+* Nontraditional/specially designated cards start in command (408.3). At game start, the starting player turns over cards from the top until finding a plane; encountered phenomena go to the bottom, and no abilities of cards turned face up during this setup trigger (103.7, 901.5).
+
+The initial fork architecture will continue the current **single shared planar deck mode**, but implement it as a real ordered deck. The data model must not prevent later default individual-deck support.
+
+### 3.2 Planar controller and ownership
+
+The controller of every face-up plane or phenomenon is the designated planar controller. Normally that is the active player (311.5, 312.4, 901.6). The rules also specify continuity when that player would leave the game (901.6), a primary-player/team variation for Two-Headed Giant (901.12b-c), and potentially several planar controllers in Grand Melee (901.14).
+
+Under the single planar deck option, the planar controller is considered the owner of every card in that deck (108.3a, 901.15b). Under individual decks, the owner is the player who began with the card in their deck (901.6). The engine must therefore distinguish underlying deck association/owner data from dynamic planar control, while applying the shared-deck ownership rule at rules-query boundaries.
+
+The current fixed `Plane.controllerId` assigned on creation does not satisfy these rules. “You” and source-controller effects on face-up planar cards must observe the current planar controller without per-plane controller mutation hacks.
+
+### 3.3 Rolling the planar die
+
+Rolling under the inherent Planechase rule is a **special action**, not an activated ability. It does not use the stack. Only the active player may take it, while that player has priority, during a main phase of their turn, and only while the stack is empty (116.2i, 901.9).
+
+Its cost is generic mana equal to the number of times that player previously took **this special action** that turn (116.2i, 901.9). Effect-generated rolls do not increment that count. Thus:
 
 ```text
-Planar die shows planeswalker symbol
-             ↓
-source-less inherent planeswalking ability triggers
-             ↓
-ability goes onto the stack
-             ↓
-players may respond
-             ↓
-on resolution:
-planeswalk
+first voluntary special-action roll    {0}
+effect-generated roll                  no counter change
+second voluntary special-action roll   {1}
+third voluntary special-action roll    {2}
 ```
 
-Rule 901.8 explicitly defines this source-less inherent triggered ability, and 901.9c explicitly says it uses the stack.
+A blank has no Planechase consequence (901.9a). Chaos causes chaos to ensue (901.9b). A planeswalker symbol triggers the inherent planeswalking ability, which is put on the stack (901.8, 901.9c). A planar roll still causes general “roll one or more dice” triggers, but numerical-result effects ignore it (901.9d).
 
-The current XMage implementation is therefore also not quite correct, because `RollPlanarDieEffect` directly executes:
+### 3.4 Chaos ensues
 
-```java
-new PlaneswalkEffect(false).apply(...)
-```
+Every plane has an inherent chaos ability, “Whenever chaos ensues” (311.7). Chaos ensues when:
 
-#11316 appears to recognize that an event should exist between the die result and the actual planeswalk, but it never finishes the second half.
+1. a player rolls chaos on the planar die;
+2. a resolving spell or ability says chaos ensues; or
+3. a resolving spell or ability says chaos ensues for a particular object.
 
-## The roll-cost idea is surprisingly important
+In the third case, the relevant plane's chaos ability may trigger while that plane is revealed but still in the planar deck. The chaos ability is controlled by the current planar controller (311.7). Consequently, the event must be able to represent ordinary global chaos and, later, chaos for a particular planar object. A reusable direct effect is required; a die roll cannot be the only event producer.
 
-This is one area where the current code contains a subtle rules issue and #11316 moves in the correct direction.
+### 3.5 Planeswalking
 
-Today XMage uses `PlanarRollWatcher`, which essentially counts:
+Planechase supplies a source-less inherent triggered ability: “Whenever you roll the Planeswalker symbol on the planar die, planeswalk.” It is controlled by the player whose roll caused it to trigger (901.8). A special-action planeswalker result triggers that ability and puts it on the stack, after which the active player gets priority (901.9c). The die action must not directly planeswalk.
 
-```text
-how many times this player
-rolled the planar die this turn
-```
+Only the planar controller may planeswalk (701.31a). To planeswalk, put **each** face-up plane and phenomenon face down on the bottom of its owner's planar deck, then move the top card of the planeswalking player's deck off that deck and turn it face up (701.31b). After game start, doing so is planeswalking; relevant durations end and triggers fire (901.11). The turned-up plane is the plane walked to, and cards turned down/removed are those walked away from (701.31d, 901.11b). With multiple face-up planes, the player walks away from all of them (901.11c).
 
-But **that is not what the increasing Planechase cost is supposed to count**.
+Planeswalking can result from the inherent trigger, a planar-card owner's departure, the phenomenon state-based action, or an instruction from a spell/ability (701.31c, 901.10-901.11a). These causes must share one operation while preserving different trigger/source/controller semantics.
 
-Rule 901.9 says the cost depends on how many times that player has taken **this special action** during the turn.
+### 3.6 Phenomena
 
-If a spell or ability causes an additional planar die roll, it does **not** increase the cost of the next voluntary Planechase roll.
+A phenomenon is a nontraditional card type used only in Planechase (312.1). It remains in command, is not a permanent, cannot be cast, has no subtype, uses the planar controller, and becomes a new object when turned face down (312.2-312.6).
 
-For example:
+“To encounter” a phenomenon means moving it off a planar deck and turning it face up. Each phenomenon has an encounter trigger (312.5). Beginning-of-game handling is deliberately different: phenomena turned up while finding the starting plane are put on the bottom and no ability triggers (103.7, 901.5).
 
-```text
-first voluntary Planechase roll → {0}
-Fractured Powerstone rolls      → does not affect the counter
-second voluntary roll           → {1}
-third voluntary roll            → {2}
-```
+If a phenomenon is face up and is not the source of a triggered ability that has triggered but not yet left the stack, the planar controller planeswalks the next time a player would receive priority. This is a state-based action (312.7, 704.6f). The architecture must track the phenomenon object and its encounter ability on the stack; a timer or immediate second planeswalk is not equivalent.
 
-The old `PlanarRollWatcher` cannot correctly distinguish those cases.
+### 3.7 Multiple face-up planar cards and multiplayer variants
 
-#11316 instead bases the cost on the **activation count of the Special Action**.
+The rules explicitly define planeswalking with more than one face-up plane (901.11c), and Grand Melee can have multiple face-up planes/phenomena and multiple planar controllers (901.14). Therefore no new engine API may assume a singleton current plane. Even if Grand Melee and individual decks are deferred, state must expose collections and associate each face-up object with its owning planar deck and relevant planar controller context.
 
-Conceptually, that is exactly right.
+## 4. Rules/implementation differences and known gaps
 
-I would not necessarily expose `getActivatedThisTurnCount()` publicly on the entire `ActivatedAbilityImpl` class, though. The `RollPlanarDieSpecialAction` subclass may be able to use the existing activation information internally, which would avoid touching more general engine code than necessary.
+| Concern | Current implementation | Required/target behavior |
+|---|---|---|
+| Card location | A `Plane` is in command, but has no ordered deck membership or face state | All planar cards remain command-zone-associated; deck structure supplies order and face-up/down runtime state (311.2, 312.2, 901.4) |
+| Starting plane | Random enum selection | Move the actual top card off the ordered deck; skip starting phenomena without triggers (103.7, 901.5) |
+| Planar deck | `seenPlanes` plus repeated random selection | Ordered, shuffled supplemental deck with top/bottom operations |
+| Content | 21 enum-backed plane implementations | Registry/runtime eventually covers Plane and Phenomenon; content added incrementally |
+| Phenomena | No proper engine | Encounter triggers, setup handling, object tracking, and 704.6f SBA |
+| Voluntary roll | Activated ability embedded in every plane | One rules-provided `SpecialAction` with exact availability (116.2i, 901.9) |
+| Roll cost | Counts planar `ROLL_DIE` events | Counts prior uses of this special action by that player this turn |
+| Effect-generated rolls | Indistinguishable for cost purposes | Process result identically but never increment voluntary-action count |
+| Chaos | Plane-specific effects passed into `RollPlanarDieEffect` | `ChaosEnsuesEffect` emits a semantic event; reusable trigger listens |
+| Planeswalker result | Immediately applies `PlaneswalkEffect` | Creates the source-less inherent trigger on the stack (901.8, 901.9c) |
+| Planeswalking | Removes one plane, randomly creates another | Bottom all applicable face-up planar cards and turn up actual deck top (701.31b) |
+| Planar control | Controller fixed when plane is added | Central, normally tracks active player; handles departure and variants (901.6) |
+| “You” | Some planes target active player or mutate ability controller manually | Source-controller semantics naturally resolve to planar controller |
+| Face-up planes | `getCurrentPlane()` returns one and `addPlane` rejects another | Collections of face-up planar cards/planes with identity/deck association |
+| Events | `PLANESWALK`/`PLANESWALKED` exist | Audit/reuse or replace with documented payload and ordering contract |
+| UI/options | Boolean checkbox only | Later shared deck selection, validation, visibility, and additional modes |
+| Die distribution | Historical 9-sided 1/1/7 behavior | Rules say 6-sided 1/1/4 (901.3a); correct only in a later isolated task |
+| Will of the Planeswalkers | Direct effect with refactor TODO | Audit Oracle semantics and route through the appropriate shared operation |
 
-## The planar-controller problem becomes even more obvious
+## 5. Lessons from upstream PR #11316
 
-Take Panopticon.
+### 5.1 What is useful
 
-#11316 simplifies its custom trigger into:
+PR #11316 is a two-commit, 35-file WIP opened in 2023. Its strongest architectural ideas are:
 
-```java
-new PlaneswalkToSourceTriggeredAbility(
-    new DrawCardSourceControllerEffect(1)
-)
-```
+* **`RollPlanarDieSpecialAction`:** the voluntary roll belongs in game-level special actions rather than every plane.
+* **Activation-count cost:** cost should derive from activations/uses of that special action, not all planar rolls.
+* **Raw result separation:** renaming toward `rollPlanarDieResult` recognizes that random rolling and Planechase consequence processing are different responsibilities.
+* **`ChaosEnsuesTriggeredAbility`:** plane implementations should declare semantic chaos triggers instead of supplying effect/target lists to a die effect.
+* **`PlaneswalkToSourceTriggeredAbility`:** a shared source-bound trigger is the right replacement for bespoke plane-name/current-plane checks such as Panopticon's.
+* **Plane migrations:** its edits are a useful inventory and migration sketch after the engine primitives and planar controller are correct.
+* **Event vocabulary:** adding a semantic `CHAOS_ENSUES` event is directionally correct, and considering a planeswalker-result boundary is useful even though the proposed implementation is incomplete.
 
-That would be elegant — **if the Plane had the correct planar controller**.
+### 5.2 What must be rejected or rewritten
 
-Currently it does not.
+The PR is not production-ready and must not be merged wholesale:
 
-The existing `Plane` object simply stores:
+* `PlaneswalkToSourceTriggeredAbility.checkEventType` and `checkTrigger` are TODOs returning false.
+* Review identified an event/result inversion: chaos and planeswalker results were fired as the opposite event. The author attributed it to stale merge-conflict code. This confirms that the patch is a sketch, not trusted behavior.
+* Its `RollPlanarDieSpecialAction` does not establish the complete active-player/priority/main-phase/empty-stack availability contract. `SpecialAction` inherits activated-ability machinery whose default timing is not sufficient by itself.
+* Its placeholder rule string and effect/result handling are unfinished. The effect calls `rollPlanarDieResult` and discards the returned value, so neither semantic result is reliably completed.
+* A `ROLLED_PLANESWALK` event alone does not implement rule 901.8. The source-less inherent triggered ability must be created, controlled by the roller, put on the stack, and resolve into planeswalking.
+* Its `ChaosEnsuesTriggeredAbility` always accepts the event and does not solve “chaos ensues for a particular object” identity/filtering.
+* Moving Plane effects to `SourceControllerEffect` remains wrong while plane controller IDs are stale.
+* Broadly exposing activation counters on `ActivatedAbilityImpl` may be unnecessary. Prefer the narrowest stable action-use counter or API after inspecting copy/rollback/turn-reset behavior.
+* It does not implement a real planar deck, top/bottom ordering, ownership, individual/shared mode semantics, multiple face-up planes, or phenomena.
+* It does not fully solve planar control, departure rules, Two-Headed Giant, or Grand Melee.
 
-```java
-private UUID controllerId;
-```
+Use its names and separation of concerns as design inspiration; rewrite and test the implementations against the current branch and current rules.
 
-and that controller is assigned when the Plane is created.
+## 6. Target architecture
 
-The rules instead say that the **planar controller is normally the active player**.
+### 6.1 Ownership of responsibilities
 
-With the single planar deck option, that planar controller is also treated as the owner of the cards in the shared planar deck for relevant rules purposes.
-
-That means many of the cleaner `SourceControllerEffect` conversions from #11316 would still affect the wrong player.
-
-**Planar-controller handling should therefore be fixed before mass-migrating the Plane classes.**
-
-# Proposed target architecture
-
-I would avoid scattering Planechase logic across `Player`, `GameImpl`, and every individual Plane class.
-
-Instead, there should be a small dedicated Planechase core:
+The target should concentrate variant rules rather than distribute them through `Player`, `GameImpl`, and every plane:
 
 ```text
 GameState
-   │
-   └── PlanechaseState
-          │
-          ├── PlanarDeck
-          │      └── ordered PlanarCard IDs
-          │
-          ├── faceUpPlanarCards
-          │
-          ├── planarControllerId
-          │
-          └── mode: SHARED / INDIVIDUAL
+└── PlanechaseState
+    ├── mode (initially SHARED; later INDIVIDUAL)
+    ├── planar deck(s): ordered planar-card IDs
+    ├── face-up planar-card IDs
+    ├── planar-controller context
+    └── per-player special-action use counts (or action activation state)
 
-PlanarCard
-   ├── Plane
-   └── Phenomenon
+PlanarCard runtime abstraction
+├── Plane (existing CommandObject model evolved incrementally)
+└── Phenomenon (future)
 
-Planechase Rules
-   ├── RollPlanarDieSpecialAction
-   ├── PlanarDieRollResolver
-   ├── ChaosEnsuesEffect
-   ├── ChaosEnsuesTriggeredAbility
-   ├── PlanarDiePlaneswalkTriggeredAbility
-   ├── PlaneswalkEffect
-   └── EncounterPhenomenonAbility
+Planechase rules primitives
+├── RollPlanarDieSpecialAction
+├── raw planar die roller / PlanarDieRollResult
+├── PlanechasePlanarDieResultResolver
+├── ChaosEnsuesEffect
+├── ChaosEnsuesTriggeredAbility
+├── inherent PlaneswalkingTriggeredAbility
+├── PlaneswalkEffect / planeswalk operation
+├── PlaneswalkToSourceTriggeredAbility
+└── phenomenon encounter + SBA support
 ```
 
-For now, I would keep `PlanarCard` on the existing `CommandObject` side of the engine rather than immediately converting every Plane into `CardImpl`.
+Exact class names may change, but the boundaries may not collapse:
 
-That minimizes the impact on Mage.Sets, card repositories, serialization, views, and UI.
+1. randomness produces a raw semantic result;
+2. Planechase rules resolve that result;
+3. chaos is an independently producible semantic event;
+4. the planeswalker result creates a stack-using inherent trigger;
+5. planeswalking is a reusable operation over deck/order/face-up state;
+6. planar control is resolved centrally.
 
-However, the runtime representation eventually needs information that `Plane` currently lacks, such as:
+`PlanechaseState` is a recommended cohesive home, not a requirement to create one giant mutable class. Any alternative must copy/restore/serialize/hash hidden state correctly and provide the same boundaries.
 
-```java
-CardType getPlanarCardType(); // PLANE / PHENOMENON
+### 6.2 Identity and events
 
-UUID ownerId;
-UUID controllerId;
+Events must carry semantic identities rather than requiring listeners to scan `getCurrentPlane()`:
 
-boolean faceUp;
-boolean revealed;
-```
+* roller/player who caused a planar result;
+* source ability when one exists (the inherent trigger itself has no source under 901.8);
+* optional specific planar-card ID for “chaos ensues for [object]”;
+* IDs of every object walked away from;
+* ID of the object turned face up and the player who planeswalked;
+* deck association needed for bottom/top operations.
 
-and proper identity inside the planar deck.
+Before retaining `PLANESWALK` and `PLANESWALKED`, write and test their event contract: when replacement checks occur, what `targetId`, `sourceId`, and `playerId` mean, whether multiple walked-away IDs require a batch/context object, and when “to” triggers are collected. Avoid introducing several ambiguous near-synonyms such as `ROLLED_PLANESWALK`, `PLANESWALK`, and `PLANESWALKED` without explicit lifecycle meanings.
 
-The current behavior where:
+## 7. Planar die flow
 
-```java
-getCardType() -> Collections.emptyList()
-```
+### 7.1 Voluntary action
 
-cannot remain the final architecture.
-
-## The planar deck should not be a Zone
-
-This is the most important correction to my earlier architecture sketch.
-
-Under the current rules:
+`RollPlanarDieSpecialAction` must be installed once per eligible player/game, not once per plane. Its availability predicate must explicitly verify all of:
 
 ```text
-COMMAND ZONE
-│
-├─ face-down PlanarCard
-├─ face-down PlanarCard
-├─ face-down PlanarCard
-├─ face-down PlanarCard
-│
-└─ FACE-UP Plane
+game is Planechase
+actor == active player
+actor == priority player
+current phase is that actor's main phase
+stack is empty
+actor can pay {N}
 ```
 
-The `PlanarDeck` merely defines an order:
+Here `N` is the number of prior successful uses of this special action by that actor this turn. The action itself does not use the stack. Its roll and immediate result processing happen as taking the special action, while any normal triggers caused by rolling wait to be put on the stack through normal trigger processing.
+
+Count a use at the engine lifecycle point that matches “taken this action,” including correct behavior if cost payment/activation is declined or fails. Ensure action state survives game-state copy/rollback and resets per turn, including extra turns. Do not use `PlanarRollWatcher` as the new source of truth.
+
+### 7.2 Raw result and resolver
+
+Preferred flow:
 
 ```text
-top
- ↓
-[Agyrem]
-[Tazeem]
-[Phenomenon]
-[Jund]
-[...]
- ↑
-bottom
+RollPlanarDieSpecialAction ─┐
+card RollPlanarDieEffect ───┼─> raw PlanarDieRollResult
+other rules effects ────────┘           │
+                                       v
+                         PlanechasePlanarDieResultResolver
+                         ├── BLANK: no Planechase event
+                         ├── CHAOS: ChaosEnsuesEffect/event
+                         └── PLANESWALKER: create inherent trigger
 ```
 
-All of those cards are still rules-wise associated with the command zone.
+A raw roller may continue to use the common dice engine so rule 901.9d triggers work, but should return a semantic enum rather than expose physical face numbers to callers. Numerical die-result replacement/effects must continue to ignore planar rolls as they do today. `RollPlanarDieEffect` for cards uses the same result resolver but does not touch the special-action counter.
 
-So `PlanarDeck` should be something closer to:
+Do not put Planechase consequence logic in the generic `Player.rollDieResult` path. Do not require the caller to pass the current plane's chaos effect list.
 
-```java
-class PlanarDeck {
-    Deque<UUID> cardOrder;
-}
-```
+### 7.3 Compatibility with the nine-sided house rule
 
-and **not a new Zone**.
+Phase 1 retains `GameOptions.PLANECHASE_PLANAR_DIE_*` probabilities exactly to isolate behavior changes. Tests should force `PlanarDieRollResult` outcomes (or use the existing deterministic integer queue behind a semantic helper) rather than assert frequency. A later, isolated patch may change one chaos/one planeswalker/seven blank to the rules-correct one/one/four and adjust UI/documentation/tests together.
 
-This is also a useful general pattern for other supplemental decks without inventing artificial Magic zones.
+## 8. Chaos ensues
 
-## The planar die flow should be cleanly separated
+Implement a reusable `ChaosEnsuesEffect` that causes the same semantic event whether invoked by a chaos die result or literal card text. It should accept/encode an optional particular planar-card reference so rule 311.7's revealed-card case is possible later.
 
-`Player` should only perform the actual random roll:
+Implement a reusable `ChaosEnsuesTriggeredAbility` for the inherent chaos ability of a plane. It must:
 
-```java
-PlanarDieRollResult result =
-    player.rollPlanarDieResult(...);
-```
+* function from command for the applicable face-up plane;
+* trigger once for ordinary chaos on each applicable plane;
+* trigger only for the specified object in object-specific chaos, including a revealed plane still in a deck;
+* be controlled at trigger creation by the current planar controller;
+* use normal triggered-ability stacking and targeting;
+* preserve source object identity through copying/rollback/face-down new-object transitions.
 
-Then Planechase rules should handle the result:
+During migration, a compatibility adapter may let an unmigrated plane's old roll wrapper respond to the semantic event. There must never be both an adapter and a new chaos trigger active for the same plane, or chaos will trigger twice. Phase 1 tests need at least one pilot plane or test fixture without requiring all 21 classes to migrate.
 
-```java
-planechase.resolvePlanarDieRoll(
-    playerId,
-    result,
-    source,
-    game
-);
-```
+## 9. Planeswalking flow
 
-Conceptually:
+### 9.1 Inherent triggered ability
+
+A planeswalker die result must create a source-less `PlaneswalkingTriggeredAbility` controlled by the roller (901.8). That object goes through the normal triggered-ability queue and stack. Players receive priority and may respond before resolution (901.9c). On resolution it invokes the common planeswalk operation for the proper planar controller/deck context.
+
+If compatibility state cannot yet navigate a real deck in Phase 1, resolution may temporarily delegate to the existing random `PlaneswalkEffect`. That is explicitly temporary; the trigger/response boundary must already be correct.
+
+Rule 901.10a says an inherent planeswalking ability on the stack ceases to exist if a plane leaves the game. This departure behavior must be included in the Phase 4/5 audit when real ownership and multiple face-up objects exist; decide whether Phase 1 can test it meaningfully under the compatibility model.
+
+### 9.2 Common planeswalk operation
+
+By Phase 4/5, one operation must implement rule 701.31b atomically:
+
+1. verify the acting player is allowed to planeswalk in the current mode;
+2. snapshot every applicable face-up plane and phenomenon;
+3. turn each face down and put it on the bottom of its owner's associated planar deck;
+4. move the actual top card of the acting player's applicable deck off its ordering and turn it face up;
+5. record the walked-away set and walked-to identity;
+6. end “until a player planeswalks” durations and emit clearly contracted before/after events;
+7. allow encounter/planeswalk-to triggers to be collected under normal APNAP ordering;
+8. run normal priority/SBA processing.
+
+Do not choose a random implementation class during this operation.
+
+### 9.3 Planeswalk-to-source trigger
+
+`PlaneswalkToSourceTriggeredAbility` (or equivalent) must match the exact source ID against the walked-to ID in the completed event. It must not compare a plane enum/name or ask for a singleton current plane. It must capture the correct planar controller at trigger creation and remain valid even if control changes before resolution, according to normal XMage trigger/controller semantics.
+
+## 10. Planar controller
+
+Planar controller is a rules-engine concept, not a field assigned once when `addPlane` runs. Phase 2 must define one authoritative resolver/API used by:
+
+* `Plane.getControllerId`/abilities during compatibility;
+* event and triggered-ability creation;
+* source-controller effects and targets;
+* planeswalk permission and deck choice;
+* face-up phenomenon abilities;
+* shared-deck rules ownership queries;
+* player departure and turn transitions.
+
+For ordinary current shared-deck games it normally resolves to `game.getActivePlayerId()`. It must update at the appropriate turn boundary before plane triggers for the new active player's turn are evaluated. If the controller would leave, transfer before departure as 901.6 requires. Do not scatter `ability.setControllerId(game.getActivePlayerId())` mutations through plane effects.
+
+Design the API to accept planar-card/deck context even if Phase 2 has only one shared context. Grand Melee can have several planar controllers (901.14), and Two-Headed Giant changes “you” semantics (901.12b-c); a single global UUID is an implementation step, not a universal truth.
+
+Required controller tests include turn change, extra turn, active-player departure, trigger controller captured correctly, “you” effects, and no stale original-creator controller. Team/Grand Melee tests may be deferred with explicit unsupported-mode guards.
+
+## 11. Planar deck representation
+
+### 11.1 No `Zone.PLANAR_DECK`
+
+Do **not** create `Zone.PLANAR_DECK`. Rules 311.2, 312.2, and 901.4 keep all planar cards in command. Represent the planar deck as ordering metadata over command-zone-associated objects:
 
 ```text
-BLANK
-  ↓
-nothing
+Command zone association
+  planar card A (face down)
+  planar card B (face up)
+  planar card C (face down)
 
+PlanarDeck ordering
+  top -> [A, C, ...] -> bottom
 
-CHAOS
-  ↓
-ChaosEnsuesEffect
-  ↓
-CHAOS_ENSUES event
-  ↓
-ChaosEnsuesTriggeredAbility on the relevant Plane
-  ↓
-stack
-
-
-PLANESWALKER
-  ↓
-PLANAR_DIE_PLANESWALK event
-  ↓
-inherent PlaneswalkingTriggeredAbility
-  ↓
-stack
-  ↓
-PlaneswalkEffect on resolution
+Face-up set
+  [B]
 ```
 
-This finally separates **rolling a die** from **Planechase rules processing**.
+A possible implementation is `Deque<UUID>`, but serialization libraries, deterministic copy/restore, iteration stability, reveal/look APIs, and hidden-information views must be evaluated before selecting the concrete collection.
 
-Cards can still simply use something like:
+### 11.2 Required invariants
 
-```java
-new RollPlanarDieEffect()
-```
+* Each planar-card object is either in exactly one deck ordering or face up in command, except during an atomic transition.
+* Deck order contains stable object IDs/references, never class names or display names.
+* Every object retains an associated owner/deck needed for bottom placement.
+* Shared mode provides one ordering; the model can later provide one per player.
+* Shuffle uses the game RNG path and is deterministic under test facilities.
+* Copies, rollback snapshots, restarts, reconnects, spectators, game logs, and network views preserve appropriate state without leaking hidden order.
+* Bottoming several face-up cards must define the rules-compliant ordering/choice behavior after checking all applicable rules and card rulings during implementation; do not silently use hash/command iteration order.
 
-without increasing the activation counter of the Planechase Special Action.
+`Plane.createRandomPlane()` and `seenPlanes` may remain only behind a migration adapter through Phase 3. Phase 4 removes them from gameplay selection. Reflection/`Planes` may remain temporarily as factories for implemented content, but must not define deck order.
 
-## Add `ChaosEnsuesEffect`
+## 12. Multiple face-up planar cards
 
-#11316 only introduces the trigger:
-
-```java
-ChaosEnsuesTriggeredAbility
-```
-
-The PR discussion itself suggests that a dedicated effect analogous to `PlaneswalkEffect` would be useful, especially for cards such as Missy.
-
-So:
-
-```java
-new ChaosEnsuesEffect()
-```
-
-should fire something like:
-
-```java
-game.fireEvent(
-    CHAOS_ENSUES
-);
-```
-
-Then a card with text like:
+Add collection-first APIs, for example:
 
 ```text
-"... draw a card and chaos ensues."
-```
-
-could simply implement:
-
-```java
-ability.addEffect(new DrawCardSourceControllerEffect(1));
-ability.addEffect(new ChaosEnsuesEffect());
-```
-
-That is exactly the kind of reusable primitive needed for WHO/MOC cards.
-
-I would also design the effect so that it can later optionally refer to a **specific Plane object**.
-
-The current rules support “chaos ensues for a particular object”; in that case the chaos ability of a revealed Plane in the planar deck may matter even if it is not the normal face-up Plane.
-
-## Finish `PlaneswalkToSourceTriggeredAbility`
-
-The underlying concept is straightforward.
-
-XMage already has `PLANESWALK` and `PLANESWALKED`, and `GameImpl.addPlane()` currently fires `PLANESWALKED` after the new Plane has been added.
-
-A generic trigger can therefore roughly check:
-
-```java
-event.getType() == PLANESWALKED
-&& event.getTargetId().equals(source.getSourceId())
-```
-
-and then trigger using the correct planar controller.
-
-#11316 creates this class, but the important methods effectively still contain:
-
-```java
-// TODO: implement
-return false;
-```
-
-That means, for example, the converted Panopticon ability in that PR would not work.
-
-So the class is useful as an **API/name proposal**, not as finished code.
-
-## New code must not assume there is exactly one current Plane
-
-This is another architectural issue worth fixing early.
-
-XMage currently relies heavily on:
-
-```java
-game.getState().getCurrentPlane()
-```
-
-and `GameImpl.addPlane()` even rejects the presence of a second Plane.
-
-That is insufficient for complete Planechase.
-
-The current rules explicitly support situations where **multiple Plane cards are face up at the same time**, and Phenomena also create mechanics where this distinction matters.
-
-Rule 901.11c even defines what happens when planeswalking while multiple Plane cards are face up.
-
-Therefore, long term:
-
-```java
-Plane getCurrentPlane()
-```
-
-should become something like:
-
-```java
-Collection<Plane> getFaceUpPlanes()
 Collection<PlanarCard> getFaceUpPlanarCards()
+Collection<Plane> getFaceUpPlanes()
+Collection<Phenomenon> getFaceUpPhenomena()
 ```
 
-`getCurrentPlane()` may remain temporarily as a compatibility helper:
+The names and mutability may differ, but callers must not receive a mutable internal collection. New rules code iterates the collection. `GameState.getCurrentPlane()` may temporarily remain, marked compatibility/deprecated, and should fail clearly or define restricted-mode behavior if more than one is present; it must not silently select the first in new code.
 
-```java
-@Deprecated
-Plane getCurrentPlane()
-```
+Face-up status cannot be inferred merely from presence in `Command`, because face-down deck members are also command-zone cards. Store explicit runtime state or derive it from the invariant that face-up IDs are absent from deck order. The design must support multiple independent deck/controller contexts for Grand Melee even if that variant is not enabled immediately.
 
-but new engine code should not be built around it.
+## 13. Phenomena design
 
-That avoids a second major refactor later.
+Phenomena are excluded from Phase 1 but must fit the common planar-card runtime. The eventual design needs:
 
-# Phenomena require a real engine
+* card type `PHENOMENON` distinct from `PLANE`, with no subtype (312.1, 312.3);
+* stable object identity, owner/deck association, face-up/down state, command-zone behavior, and planar controller;
+* an `EncounterPhenomenonTriggeredAbility` tied to moving that exact object off a deck and turning it face up (312.5);
+* a setup path that bottoms phenomena and suppresses all their triggers until a starting plane appears (103.7, 901.5);
+* stack tracking sufficient to determine whether the face-up phenomenon is the source of a triggered ability that has triggered but not yet left the stack;
+* an explicit 704.6f state-based-action check that planeswalks at the next priority point only after the relevant triggered ability has left the stack;
+* correct behavior if the encounter trigger is countered, otherwise removed, copied, or accompanied by other triggers;
+* tests for repeated phenomena, empty/invalid decks, departure, and several face-up planar cards.
 
-This is where the current random-Plane model fundamentally stops being sufficient.
+Do not model the follow-up as a delayed trigger or unconditional tail effect of the encounter ability. It is a state-based action and must still occur when the original ability leaves the stack without resolving.
 
-The rules work roughly like this:
+## 14. Compatibility and migration strategy
 
-```text
-Top card of planar deck becomes face up
-            ↓
-is it a Plane?
-      → normal Plane behavior
+1. Preserve the existing Planechase checkbox and 21-plane experience while foundations change.
+2. Add rules primitives and pilot tests before mass edits.
+3. Provide a narrowly scoped bridge for old plane roll/chaos implementations. Document the bridge's removal phase and prevent duplicate actions/triggers.
+4. Establish central planar control before converting active-player hacks to ordinary source-controller effects.
+5. Migrate planes in small audited groups, with focused tests for special triggers/delayed behavior. Do not regex-convert all classes.
+6. Keep old random/seen selection behind the planeswalk operation until ordered-deck Phase 4, then delete it from gameplay paths.
+7. Add collection APIs before enabling multiple face-up state; retain singleton helpers only for compatibility.
+8. Extend network/view/options structures only when their phase needs them; version/serialization compatibility must be reviewed.
+9. Keep docs and tests in each phase. Each phase must leave the branch functional and reviewable.
 
-is it a Phenomenon?
-      ↓
-"When you encounter ..." triggers
-      ↓
-ability goes onto the stack
-      ↓
-after the Phenomenon ability leaves the stack
-      ↓
-state-based action
-      ↓
-planar controller planeswalks again
-```
+Removal gates:
 
-Rule 312.5 defines “encounter,” and 312.7 defines the relevant state-based action.
+| Legacy component | Remove when |
+|---|---|
+| per-plane roll activated abilities | every existing plane uses the game special action and semantic chaos trigger (Phase 3) |
+| `PlanarDieRollCostIncreasingEffect` for Planechase | no migrated plane/action caller needs it and dice callers are audited (Phase 3) |
+| `PlanarRollWatcher` as Planechase cost truth | Phase 1 action counter passes effect-roll separation tests; remove class only after all non-Planechase/test callers are audited |
+| `seenPlanes` and random selection | ordered shared deck passes traversal/copy/rollback tests (Phase 4) |
+| `getCurrentPlane()` in rules code | collection APIs are adopted and multiple-face-up tests pass (Phase 5) |
+| controller mutation hacks | central planar controller and affected plane tests pass (Phases 2-3) |
 
-At the **start of the game**, the behavior is different again: if the top card is a Phenomenon, it is put on the bottom of the planar deck and the process continues. Its encounter ability does not trigger.
+## 15. Implementation phases
 
-That cannot be modeled cleanly with `Plane.createRandomPlane()`.
+### Phase 1 — Planechase Rules Core
 
-# Recommended project breakdown
+Implement:
 
-I would not implement this as one enormous 100-file commit.
+* one `RollPlanarDieSpecialAction` per eligible player/game;
+* exact active-player, priority, main-phase, and empty-stack availability;
+* activation/use-count-based `{0}`, `{1}`, `{2}` escalating cost;
+* raw `PlanarDieRollResult` separated from Planechase result resolution;
+* effect-generated planar rolls that share resolution but not action count;
+* `ChaosEnsuesEffect`, semantic `CHAOS_ENSUES`, and reusable `ChaosEnsuesTriggeredAbility`;
+* the source-less inherent planeswalking triggered ability;
+* planeswalker-result behavior that uses the stack, then invokes compatibility `PlaneswalkEffect` on resolution;
+* focused deterministic engine tests and one migration fixture/pilot plane.
 
-I would split it into seven independently testable phases:
+Do **not** implement the real planar deck, phenomena, central controller overhaul, mass plane migration, or die probability change.
 
-1. **Planechase Rules Core.** Rebuild `RollPlanarDieSpecialAction` correctly, enforce active-player/main-phase/stack-empty timing, use the Special Action activation count instead of `PlanarRollWatcher` for increasing costs, add `ChaosEnsuesEffect` + `CHAOS_ENSUES`, and implement the inherent planeswalking trigger so the planeswalk itself goes onto the stack. Do not mass-migrate all existing Planes yet.
+### Phase 2 — Planar Controller
 
-2. **Planar Controller.** Introduce central `planarControllerId` behavior and update it correctly when turns change or players leave. Face-up Plane abilities must automatically operate under the correct controller. Remove the need for manual `source.setControllerId(activePlayer)` hacks.
+Implement authoritative planar-controller resolution/update behavior, wire plane ability/source-controller queries to it, handle normal turn/extra-turn/departure transitions, and add focused tests. Remove the architectural need for temporary active-player/controller mutation, but migrate individual hacks in Phase 3. Explicitly guard/defer unsupported Two-Headed Giant and Grand Melee semantics rather than pretending one UUID solves them.
 
-3. **Migrate Existing Plane Abilities.** Convert the current Plane classes to `ChaosEnsuesTriggeredAbility`, `PlaneswalkToSourceTriggeredAbility`, and the new controller model. Remove the repeated `ActivateIfConditionActivatedAbility + PlanarRollWatcher + CostIncreasingEffect` boilerplate. This is the point where much of #11316 becomes useful as a migration reference.
+### Phase 3 — Existing Plane Migration
 
-4. **Real `PlanarDeck`.** Replace random Plane selection / `seenPlanes` simulation with a real ordered and shuffled supplemental planar deck. Do not introduce a new Magic zone; the planar cards remain command-zone objects. `PlaneswalkEffect` should put the relevant face-up cards on the bottom of their decks and reveal the actual next card.
+Audit and migrate all existing `mage.game.command.planes` classes away from:
 
-5. **`PlanarCard` + Multiple Face-Up Planes.** Introduce a shared runtime abstraction for Plane and Phenomenon, properly model face-up/face-down state and ownership, and migrate the engine away from `getCurrentPlane()` toward collections.
+* `ActivateIfConditionActivatedAbility` planar-roll boilerplate;
+* plane-owned `RollPlanarDieEffect` chaos lists;
+* `PlanarRollWatcher`-based cost behavior;
+* `PlanarDieRollCostIncreasingEffect`;
+* bespoke current-plane/name triggers where `PlaneswalkToSourceTriggeredAbility` applies;
+* manual active-player/controller hacks.
 
-6. **Phenomena.** Implement encounter triggers, beginning-of-game special handling, and the required state-based action. Only then start adding actual Phenomenon cards.
+Add/update focused tests for every non-mechanical conversion, especially Panopticon, Academy at Tolaria West, Edge of Malacol, and Tazeem. Remove compatibility adapters only after the full inventory is clean.
 
-7. **Content and UI.** Add MOC, WHO, and the remaining Planechase Planes/Phenomena, then add shared planar-deck selection and eventually individual planar decks in the client. The existing XMage mode can initially remain compatible by automatically generating a shared deck from all implemented planar cards.
+### Phase 4 — Real Shared Planar Deck
 
-After **Phase 1**, the Planechase core is already significantly more correct without tearing apart the entire engine.
+Implement one ordered, shuffled supplemental planar deck of IDs/references while every planar card remains command-zone-associated. Add deterministic deck injection/shuffle/order test APIs. Replace initialization and `PlaneswalkEffect` random/seen behavior with actual top/bottom traversal. Model association/ownership for shared mode and apply 901.15 ownership semantics. Test copy, rollback, restart, departure, hidden views, reconnect/serialization, exhaustion/cycling, and event order.
 
-After Phase 3, the existing Plane classes are cleanly migrated.
+Do not create `Zone.PLANAR_DECK`.
 
-Phases 4–6 then turn the existing simulation into an actual Planechase implementation.
+### Phase 5 — Planar Card Runtime / Multiple Face-Up Planes
 
-## What I would specifically reuse from #11316
+Introduce/evolve a common runtime abstraction for planes and future phenomena, including type, stable identity, associated deck/owner, face state, and abilities. Add collection-first face-up APIs and migrate engine callers away from singleton assumptions. Support bottoming/walking away from all applicable face-up planar cards and test multiple-face-up event/controller behavior. Keep the CommandObject model unless implementation research demonstrates a concrete blocker; do not mass-convert to `CardImpl` by default.
 
-Not the PR as a whole.
+### Phase 6 — Phenomena
 
-I would extract these ideas:
+Implement phenomenon runtime content, encounter triggers, beginning-of-game skip/no-trigger logic, triggered-ability source tracking, and the 704.6f/312.7 state-based action. Add deterministic ordered-deck tests for resolution, countering/removal from stack, setup, multiple face-up cards, and controller/departure behavior before adding broad phenomenon content.
 
-```text
-RollPlanarDieSpecialAction
-        ✓ concept
+### Phase 7 — Content and UI
 
-ChaosEnsuesTriggeredAbility
-        ✓ almost directly reusable
+Add missing Planechase content, including applicable MOC/WHO planes and phenomena, only after their mechanics have focused tests. Add shared planar-deck selection/editor/validation and appropriate server protocol and game views. Later evaluate individual planar decks, Two-Headed Giant specifics, and Grand Melee/multiple-controller UI. Keep the simple auto-generated shared deck as a compatibility/default option where useful.
 
-PlaneswalkToSourceTriggeredAbility
-        ✓ API/name
-        ✗ implementation must be rewritten
-```
+### Separate follow-up — Planar die probability correction
 
-The mass edits to existing Plane classes can also serve as a useful **migration reference** later.
+In an isolated patch after Phase 1 stability, change the historical nine-sided house rule to the six-sided distribution in 901.3a, unless product owners explicitly retain it as a labeled configurable house rule. Update constants, semantic test helpers, UI wording, and regression tests together. Do not mix this probability change into the architecture patch.
 
-I would deliberately **not copy** these parts directly:
+## 16. Testing strategy
 
-```text
-Player.rollPlanarDie() containing Planechase event logic
-ROLLED_PLANESWALK without a real triggered ability
-the current RollPlanarDieSpecialAction implementation
-the current Plane controller model
-the unfinished PlaneswalkToSource trigger
-```
+### 16.1 General principles
 
-Most importantly, I would **not try to make #11316 compile first and then build on top of it**.
+* Tests must be deterministic. Use/extend `setDieRollResult`, semantic result injection, named plane fixtures, and deterministic deck order; never loop until randomness yields an outcome.
+* Prefer tests at the narrowest engine boundary plus end-to-end tests through the player action interface.
+* Verify negative availability, event count, stack presence, priority windows, source/controller identity, and state after resolution—not only final visible outcomes.
+* Retain non-Planechase dice regressions because planar rolls deliberately participate in some general die triggers but have no numerical result under 901.9d.
+* Every new state component needs copy/restore/rollback and restart coverage. Ordered hidden data needs serialization/view-leak coverage.
+* GitHub Actions is the authoritative Maven/JDK 17 validator under repository policy; implementation PRs must include focused `Mage.Tests` coverage.
 
-That would preserve several of its architectural problems only for us to remove them again afterward.
+### 16.2 Mandatory Phase 1 matrix
 
-## The first Codex task should be much smaller than “implement Planechase”
+1. Special action unavailable during upkeep, draw, combat, end step, and another player's turn.
+2. Unavailable when the actor lacks priority.
+3. Unavailable while the stack is nonempty.
+4. Unavailable to non-active players.
+5. Available in precombat and postcombat main phases with priority and an empty stack.
+6. First voluntary roll costs `{0}`, second `{1}`, third `{2}`.
+7. A card/effect-generated planar roll between voluntary rolls does not increment cost.
+8. Declining/failing an action or cost does not incorrectly increment count.
+9. Count resets on the player's next turn and behaves correctly for extra turns.
+10. Blank produces no chaos or planeswalking consequence and returns priority normally.
+11. Chaos result causes one semantic chaos event.
+12. Direct `ChaosEnsuesEffect` causes the same trigger path without rolling.
+13. The applicable plane chaos ability triggers exactly once and uses the correct source/controller.
+14. Planeswalker result creates the inherent source-less planeswalking trigger.
+15. Planeswalking has not occurred while that trigger is on the stack; players can respond.
+16. Countering/removing that trigger prevents its planeswalk; resolving it invokes planeswalking.
+17. A spell/ability planar roll also creates the correct inherent trigger without altering action count.
+18. Existing “roll one or more dice” triggers observe planar rolls as required.
+19. Numerical die-result effects continue to ignore the planar result.
+20. Ordinary numerical dice, replacement effects, and dice tests remain unaffected.
+21. Special-action/action-count state survives game-state copy and rollback.
 
-For the first implementation step, I would give Codex only this target:
+Extend `Mage.Tests/src/test/java/org/mage/test/cards/rolldice/RollDiceTest.java` for cross-dice regressions or add a dedicated Planechase engine test package; retain `FracturedPowerstoneTest` as the key effect-generated-roll cost scenario.
 
-```text
-OLD
-Plane owns planar die ability
-        ↓
-RollPlanarDieEffect directly runs chaos/planeswalk
+### 16.3 Later-phase minimums
 
+* **Phase 2:** turn/extra-turn controller transitions; active player leaves; “you” effects; trigger controller snapshot; no controller-mutation hacks.
+* **Phase 3:** each implemented plane remains behaviorally covered; planeswalk-to source matching; chaos exactly once; delayed effects retain identity.
+* **Phase 4:** known order, shuffle determinism, top/bottom cycling, all face-up cards bottom correctly, shared ownership, no premature repeats caused by random selection, rollback/reconnect/no hidden-order leak.
+* **Phase 5:** zero/one/multiple face-up planes; collection API; walk-away-from-all; different deck associations; events carry exact IDs.
+* **Phase 6:** start-game phenomenon skips with no trigger; encounter trigger stacks; SBA waits while its source trigger remains on stack; SBA occurs after resolve/counter/removal; next card traversal; multiple phenomena; departure.
+* **Phase 7:** deck legality (size, uniqueness, phenomenon cap), client/server round-trip, invalid input, generated-default deck, and visibility.
 
-NEW
-Game owns RollPlanarDieSpecialAction
-        ↓
-raw planar die result
-        ↓
-Planechase result resolver
+## 17. Explicit non-goals
 
-CHAOS
- → ChaosEnsuesEffect
- → CHAOS_ENSUES
- → plane trigger
+For the first architecture implementation patch (Phase 1), do not:
 
-PLANESWALKER
- → inherent planeswalking triggered ability
- → STACK
- → existing PlaneswalkEffect
-```
+* create `Zone.PLANAR_DECK`;
+* implement real deck ordering or phenomena;
+* convert every `Plane` to `CardImpl`;
+* migrate every plane class;
+* change the historical nine-sided distribution;
+* add WHO/MOC content or a planar deck editor;
+* solve every multiplayer variant;
+* cherry-pick or merge PR #11316;
+* broadly redesign generic dice, actions, command objects, or card repositories beyond demonstrated needs.
 
-**No real Planar Deck in the same task. No Phenomena. No mass migration of all 21 existing Planes.**
+For this documentation task specifically, no gameplay Java or tests are changed and no Java/Maven toolchain or dependencies are downloaded.
 
-That is the key difference between a controlled refactor and one giant prompt: build the foundation first so we do not have to rewrite 100 Plane classes twice.
+## 18. Open questions and required pre-implementation investigations
 
-One detail I would also leave alone during Phase 1: the current XMage **9-sided planar die**.
+These do not block adoption of the architecture, but the responsible phase must resolve and document them before code lands:
 
-First fix the engine architecture and get tests passing.
+1. **State shape:** dedicated serializable `PlanechaseState` versus smaller structures on `GameState`; either must support deep copy, rollback, restart, equality/value computation, and network serialization.
+2. **Action count storage:** use protected activation bookkeeping, a Planechase-specific per-turn counter, or a dedicated action instance API. Confirm exact increment timing and copy/rollback behavior without widening generic APIs unnecessarily.
+3. **Special-action installation:** one persistent action per player versus dynamically generated actions; confirm AI/action discovery, reconnects, player departure, controller availability, and duplicate prevention.
+4. **Trigger pipeline:** the cleanest XMage representation of a rule-created source-less triggered ability and how to test/counter it without fabricating a source ID.
+5. **Event contract:** retain/refine `PLANESWALK` and `PLANESWALKED`, or replace them. Define replacement semantics, batching, IDs, and ordering before implementing `PlaneswalkToSourceTriggeredAbility`.
+6. **Compatibility bridge:** how unmigrated plane chaos effects listen to the semantic event without also exposing an obsolete voluntary roll or triggering twice.
+7. **Shared ownership:** where to implement 108.3a/901.15b so owner queries are correct without destructively changing stable deck association needed for bottom placement.
+8. **Bottom order:** when several face-up planar cards are put on deck bottoms simultaneously, identify all controlling rules/choice requirements and a deterministic UI/test representation.
+9. **Face-down new objects:** how command-object IDs/zone-change counters should represent 311.6/312.6 without premature `CardImpl` conversion.
+10. **Revealed planar cards:** representation and visibility for object-specific chaos under 311.7.
+11. **Planar controller scope:** ordinary shared mode first, while leaving a clear extension for Two-Headed Giant's “you” rule and Grand Melee's multiple controllers.
+12. **Player departure:** exact ordered-deck behavior, inherited trigger disappearance under 901.10a, phenomenon abilities under 901.10b, and event ordering.
+13. **Test API:** introduce semantic `setPlanarDieRollResult` so tests do not depend on whether the compatibility die has six or nine physical sides.
+14. **Registry/content:** evolve `Planes` or introduce a planar-card factory/metadata registry that accommodates phenomena and deck validation without requiring all runtime objects to become `CardImpl`.
+15. **UI and hidden information:** which planar deck data is public, revealed, or hidden in game views/logs and how spectators/reconnects receive it.
+16. **House-rule compatibility:** remove the nine-sided distribution or retain it only as an explicitly labeled option after the isolated rules correction.
 
-Changing the probabilities to the rules-correct:
-
-```text
-1 Chaos
-1 Planeswalker
-4 blank
-```
-
-can then be done as a very small isolated follow-up.
-
-That makes regressions much easier to diagnose because we can distinguish architecture problems from probability changes.
-
----
-
-In short: **PR #11316 is extremely useful as a design reference, but not as code to merge.** The strongest ideas are the Special Action, a dedicated chaos event/trigger, and reusable planeswalk-to-source handling. The missing pieces are the real planar deck, correct planar-controller semantics, the inherent planeswalking trigger, multiple face-up planar cards, and Phenomena. Those should be built incrementally rather than patched into the unfinished PR.
-
-
-
+Until an open question is resolved, choose the narrowest reversible implementation consistent with the rules and phase boundaries above. Do not use uncertainty as justification to restore singleton, random-selection, plane-owned-roll, or stale-controller architecture.
