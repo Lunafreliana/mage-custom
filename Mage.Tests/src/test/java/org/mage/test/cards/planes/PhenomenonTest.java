@@ -32,6 +32,8 @@ public class PhenomenonTest extends CardTestPlayerBase {
 
     @Test
     public void testSetupSkipsPhenomenonWithoutEncounteringIt() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 20);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 20);
         gameOptions.planeChase = true;
         gameOptions.sharedPlanarPhenomena = Collections.singletonList(Phenomena.MUTUAL_EPIPHANY);
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
@@ -42,44 +44,56 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals(1, currentGame.getState().getFaceUpPlanes().size());
         Assert.assertTrue(currentGame.getState().getFaceUpPhenomena().isEmpty());
         Assert.assertEquals(1, currentGame.getState().getSharedPlanarDeck().size());
-        Assert.assertEquals(7, playerA.getHand().size());
-        Assert.assertEquals(7, playerB.getHand().size());
+        assertHandCount(playerA, 0);
+        assertHandCount(playerB, 0);
     }
 
     @Test
     public void testEncounterTriggerDelaysSbaUntilResolution() {
-        addCard(Zone.LIBRARY, playerA, "Mountain", 10);
-        addCard(Zone.LIBRARY, playerB, "Mountain", 10);
-        addPlane(playerA, Planes.PLANE_FIELDS_OF_SUMMER);
-        Assert.assertTrue(currentGame.addPhenomenon(new MutualEpiphanyPhenomenon(), playerA.getId()));
+        prepareStartedPlanechaseGame();
+        runCode("encounter and resolve phenomenon", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(game.addPhenomenon(new MutualEpiphanyPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            Assert.assertEquals(info, 1, game.getStack().size());
+            Assert.assertEquals(info, 1, game.getState().getFaceUpPhenomena().size());
 
-        currentGame.checkStateAndTriggered();
-        Assert.assertEquals(1, currentGame.getStack().size());
-        Assert.assertEquals(1, currentGame.getState().getFaceUpPhenomena().size());
+            int handA = playerA.getHand().size();
+            int handB = playerB.getHand().size();
+            game.getStack().resolve(game);
+            Assert.assertEquals(info, handA + 4, playerA.getHand().size());
+            Assert.assertEquals(info, handB + 4, playerB.getHand().size());
 
-        int handA = playerA.getHand().size();
-        int handB = playerB.getHand().size();
-        currentGame.getStack().resolve(currentGame);
-        Assert.assertEquals(handA + 4, playerA.getHand().size());
-        Assert.assertEquals(handB + 4, playerB.getHand().size());
-
-        currentGame.checkStateAndTriggered();
-        Assert.assertTrue(currentGame.getState().getFaceUpPhenomena().isEmpty());
-        Assert.assertEquals(1, currentGame.getState().getFaceUpPlanes().size());
+            game.checkStateAndTriggered();
+            Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+            Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
     }
 
     @Test
     public void testRemovingEncounterTriggerMakesSbaPlaneswalk() {
-        addPlane(playerA, Planes.PLANE_FIELDS_OF_SUMMER);
-        Assert.assertTrue(currentGame.addPhenomenon(new MutualEpiphanyPhenomenon(), playerA.getId()));
-        currentGame.checkStateAndTriggered();
+        prepareStartedPlanechaseGame();
+        runCode("remove encounter trigger", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(game.addPhenomenon(new MutualEpiphanyPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
 
-        StackObject encounterTrigger = currentGame.getStack().getFirstOrNull();
-        Assert.assertNotNull(encounterTrigger);
-        currentGame.getStack().remove(encounterTrigger, currentGame);
-        currentGame.checkStateAndTriggered();
+            StackObject encounterTrigger = game.getStack().getFirstOrNull();
+            Assert.assertNotNull(info, encounterTrigger);
+            game.getStack().remove(encounterTrigger, game);
+            game.checkStateAndTriggered();
 
-        Assert.assertTrue(currentGame.getState().getFaceUpPhenomena().isEmpty());
-        Assert.assertEquals(1, currentGame.getState().getFaceUpPlanes().size());
+            Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+            Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    private void prepareStartedPlanechaseGame() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 20);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 20);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
     }
 }

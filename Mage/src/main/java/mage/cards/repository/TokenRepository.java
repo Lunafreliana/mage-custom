@@ -143,7 +143,7 @@ public enum TokenRepository {
                         imageNumber = Integer.parseInt(params.get(3));
                     }
 
-                    if (objectType.isEmpty() || !objectType.matches("(?:DUNGEON|EMBLEM|PLANE|TOK):[A-Z0-9]{3,4}")) {
+                    if (objectType.isEmpty() || !objectType.matches("(?:DUNGEON|EMBLEM|PHENOMENON|PLANE|TOK):[A-Z0-9]{3,4}")) {
                         errorsList.add("Tokens database: invalid object type declaration: " + line);
                         continue;
                     }
