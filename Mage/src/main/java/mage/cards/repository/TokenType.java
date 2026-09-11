@@ -4,7 +4,7 @@ package mage.cards.repository;
  * GUI related
  * XMage's token types for images
  *
- * @author JayDi85
+ * @author VibecodingQueens
  */
 public enum TokenType {
 

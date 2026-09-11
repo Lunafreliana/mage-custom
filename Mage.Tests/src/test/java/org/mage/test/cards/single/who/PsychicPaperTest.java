@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public class PsychicPaperTest extends CardTestPlayerBase {
 

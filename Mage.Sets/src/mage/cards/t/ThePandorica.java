@@ -27,7 +27,7 @@ import mage.target.TargetPermanent;
 import java.util.UUID;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class ThePandorica extends CardImpl {
 

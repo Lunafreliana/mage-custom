@@ -11,7 +11,7 @@ import mage.players.Player;
 import mage.watchers.common.CardsDrawnDuringDrawStepWatcher;
 
 /**
- * @author muz
+ * @author VibecodingQueens
  */
 public class DrawExceptFirstDrawReplacementEffect extends ReplacementEffectImpl {
 

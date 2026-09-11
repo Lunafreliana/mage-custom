@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class AcademyAtTolariaWestPlane extends Plane {
 

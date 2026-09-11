@@ -3,7 +3,7 @@ package mage.cards.repository;
 /**
  * Token item for tokens database
  *
- * @author JayDi85
+ * @author VibecodingQueens
  */
 public class TokenInfo {
 

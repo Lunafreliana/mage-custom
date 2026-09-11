@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class SecretsOfStrixhaven extends ExpansionSet {
 

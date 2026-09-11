@@ -27,7 +27,7 @@ import mage.players.Player;
 import java.util.UUID;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class TheCyberController extends CardImpl {
 

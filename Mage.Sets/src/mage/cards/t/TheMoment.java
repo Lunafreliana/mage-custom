@@ -28,7 +28,7 @@ import mage.target.common.TargetControlledCreaturePermanent;
 import java.util.UUID;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class TheMoment extends CardImpl {
 

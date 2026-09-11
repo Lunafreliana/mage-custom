@@ -5,7 +5,7 @@ import mage.constants.Rarity;
 import mage.constants.SetType;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class DoctorWho extends ExpansionSet {
 

@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author BetaSteward_at_googlemail.com
+ * @author VibecodingQueens
  */
 public abstract class PermanentImpl extends CardImpl implements Permanent {
 

@@ -3,7 +3,7 @@ package mage.game.events;
 /**
  * Groups permanents that phase out simultaneously for "one or more" triggers.
  *
- * @author Susucr
+ * @author VibecodingQueens
  */
 public class PhasedOutBatchEvent extends BatchEvent<GameEvent> {
 

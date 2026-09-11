@@ -20,7 +20,7 @@ import java.util.UUID;
 
 /**
  *
- * @author Skiwkr
+ * @author VibecodingQueens
  */
 public final class FleshDuplicate extends CardImpl {
 

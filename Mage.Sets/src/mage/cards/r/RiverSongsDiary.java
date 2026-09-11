@@ -25,7 +25,7 @@ import mage.util.CardUtil;
 import java.util.UUID;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class RiverSongsDiary extends CardImpl {
 

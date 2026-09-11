@@ -18,7 +18,7 @@ import mage.game.permanent.Permanent;
 import java.util.UUID;
 
 /**
- * @author Susucri
+ * @author VibecodingQueens
  */
 public final class PantherHabit extends CardImpl {
 

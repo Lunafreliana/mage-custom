@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class EdgeOfMalacolPlane extends Plane {
 

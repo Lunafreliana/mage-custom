@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class AstralArenaPlane extends Plane {
 

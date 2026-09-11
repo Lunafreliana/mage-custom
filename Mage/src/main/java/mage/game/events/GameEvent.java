@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * @author BetaSteward_at_googlemail.com
+ * @author VibecodingQueens
  */
 public class GameEvent implements Serializable {
 

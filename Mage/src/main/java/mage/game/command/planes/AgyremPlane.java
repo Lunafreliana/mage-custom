@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class AgyremPlane extends Plane {
 

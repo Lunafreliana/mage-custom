@@ -17,6 +17,9 @@ import mage.target.common.TargetCardInYourGraveyard;
 
 import java.util.UUID;
 
+/**
+ * @author VibecodingQueens
+ */
 public final class DoomsTimePlatform extends CardImpl {
 
     public DoomsTimePlatform(UUID ownerId, CardSetInfo setInfo) {

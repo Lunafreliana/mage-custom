@@ -8,7 +8,7 @@ import org.mage.test.serverside.base.CardTestPlayerBase;
 /**
  * {@link mage.cards.k.KangDynasty Kang Dynasty}
  *
- * @author Susucr
+ * @author VibecodingQueens
  */
 public class KangDynastyTest extends CardTestPlayerBase {
 

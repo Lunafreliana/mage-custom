@@ -15,7 +15,7 @@ import mage.players.Player;
 import mage.target.targetpointer.FixedTarget;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class FieldsOfSummerPlane extends Plane {
 

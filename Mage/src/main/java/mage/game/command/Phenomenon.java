@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public abstract class Phenomenon extends CommandObjectImpl implements PlanarCard {
 

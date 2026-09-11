@@ -26,7 +26,7 @@ import mage.game.permanent.Permanent;
 import java.util.UUID;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class PsychicPaper extends CardImpl {
 

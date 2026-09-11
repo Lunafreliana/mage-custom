@@ -8,7 +8,7 @@ import mage.game.command.Plane;
 import mage.players.Player;
 
 /**
- * @author Susucr
+ * @author VibecodingQueens
  */
 public class PlaneswalkEffect extends OneShotEffect {
 
