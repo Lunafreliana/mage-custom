@@ -1485,7 +1485,8 @@ public abstract class GameImpl implements Game {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             configuredCards.forEach(this::initializePlanarObject);
-            state.getSharedPlanarDeck().setPlanes(configuredCards, false);
+            // The custom-options editor selects cards but does not define their order.
+            state.getSharedPlanarDeck().setPlanes(configuredCards, true);
             return;
         }
         Collection<Planes> configuredPlanes = gameOptions.sharedPlanarDeck.isEmpty()

@@ -7,6 +7,7 @@ import mage.game.command.SharedPlanarDeck;
 import mage.game.command.planes.AgyremPlane;
 import mage.game.command.planes.FieldsOfSummerPlane;
 import mage.game.command.planes.PanopticonPlane;
+import mage.util.RandomUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,6 +40,29 @@ public class SharedPlanarDeckTest {
 
         Assert.assertEquals(3, original.size());
         Assert.assertEquals(2, copy.size());
+    }
+
+    @Test
+    public void testShuffleUsesRandomUtilAndDoesNotPreserveConfiguredOrder() {
+        List<Plane> planes = Arrays.asList(
+                new FieldsOfSummerPlane(),
+                new AgyremPlane(),
+                new PanopticonPlane());
+        List<UUID> configuredOrder = Arrays.asList(
+                planes.get(0).getId(),
+                planes.get(1).getId(),
+                planes.get(2).getId());
+
+        RandomUtil.setSeed(123L);
+        SharedPlanarDeck first = new SharedPlanarDeck();
+        first.setPlanes(planes, true);
+        RandomUtil.setSeed(123L);
+        SharedPlanarDeck second = new SharedPlanarDeck();
+        second.setPlanes(planes, true);
+
+        Assert.assertEquals(first.getOrder(), second.getOrder());
+        Assert.assertNotEquals(configuredOrder, first.getOrder());
+        RandomUtil.setSeed(System.nanoTime());
     }
 
     @Test

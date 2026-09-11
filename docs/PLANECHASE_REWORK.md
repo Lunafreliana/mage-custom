@@ -672,7 +672,9 @@ copy, restore, and clear the ordering.
 The implemented `Planes` registry supplies the initial shared deck and is
 shuffled through `RandomUtil`, while `GameOptions.sharedPlanarDeck` and
 `SharedPlanarDeck.setPlanes(..., false)` provide deterministic known-order
-injection seams for integration and narrow unit tests. This is deck
+injection seams for integration and narrow unit tests. Registry-id decks are
+also shuffled because the custom-options editor selects membership only and
+does not offer a way to define deck order. This is deck
 construction only: traversal never uses a random plane factory or `seenPlanes`.
 Shared-mode ownership continues to resolve through the authoritative planar
 controller API described in Phase 2. A richer planar-card runtime, multiple
@@ -772,10 +774,12 @@ legality rule baked into the engine.
 `PlanarCardRegistry` is now the stable-id catalog and factory boundary shared by
 the client, match protocol, server, and game. Its serializable metadata exposes
 English name, planar type, image name, and set code without exposing Java class
-names. `SharedPlanarDeckValidator` validates mixed ordered lists for the communal
-minimum, unique English names, phenomenon cap, known ids, and the presence of a
-plane. The match-to-game protocol carries one ordered list of registry ids; the
-older split plane/phenomenon options remain only as deterministic test seams.
+names. `SharedPlanarDeckValidator` validates mixed card selections for the
+communal minimum, unique English names, phenomenon cap, known ids, and the
+presence of a plane. The match-to-game protocol carries one list of registry ids
+whose order is not significant; game initialization shuffles the selected
+cards. The older split plane/phenomenon options remain only as deterministic
+test seams.
 
 The custom-options dialog provides the initial four-player Commander shared-deck
 editor and reports legality errors before submission; the server repeats
