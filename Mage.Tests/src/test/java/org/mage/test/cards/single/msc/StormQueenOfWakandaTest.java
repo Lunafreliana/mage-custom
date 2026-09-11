@@ -13,9 +13,10 @@ public class StormQueenOfWakandaTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Storm, Queen of Wakanda");
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
 
+        setStrictChooseMode(true);
         attack(1, playerA, "Storm, Queen of Wakanda");
         attack(1, playerA, "Grizzly Bears");
-        setTarget(1, playerA, "Grizzly Bears");
+        addTarget(playerA, "Grizzly Bears");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
