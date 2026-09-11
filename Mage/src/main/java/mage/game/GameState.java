@@ -5,6 +5,7 @@ import mage.MageObjectReference;
 import mage.abilities.*;
 import mage.abilities.effects.ContinuousEffect;
 import mage.abilities.effects.ContinuousEffects;
+import mage.abilities.effects.ContinuousEffectsList;
 import mage.abilities.effects.Effect;
 import mage.cards.*;
 import mage.constants.PhaseStep;
@@ -83,6 +84,7 @@ public class GameState implements Serializable, Copyable<GameState> {
     private SpellStack stack;
     private Command command;
     private boolean isPlaneChase;
+    private UUID planarControllerId;
     private List<String> seenPlanes = new ArrayList<>();
     private List<Designation> designations = new ArrayList<>();
     private List<Emblem> helperEmblems = new ArrayList<>(); // fake emblems for inner usage like better UX
@@ -156,6 +158,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.stack = state.stack.copy();
         this.command = state.command.copy();
         this.isPlaneChase = state.isPlaneChase;
+        this.planarControllerId = state.planarControllerId;
         this.seenPlanes.addAll(state.seenPlanes);
         this.designations.addAll(state.designations);
         this.helperEmblems = CardUtil.deepCopyObject(state.helperEmblems);
@@ -209,6 +212,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         helperEmblems.clear();
         seenPlanes.clear();
         isPlaneChase = false;
+        planarControllerId = null;
         revealed.clear();
         lookedAt.clear();
         companion.clear();
@@ -246,6 +250,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.stack = state.stack;
         this.command = state.command;
         this.isPlaneChase = state.isPlaneChase;
+        this.planarControllerId = state.planarControllerId;
         this.seenPlanes = state.seenPlanes;
         this.designations = state.designations;
         this.helperEmblems = state.helperEmblems;
@@ -301,7 +306,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         StringBuilder sb = threadLocalBuilder.get();
 
         sb.append(turn.getValue(turnNum));
-        sb.append(activePlayerId).append(priorityPlayerId).append(playerByOrderId);
+        sb.append(activePlayerId).append(priorityPlayerId).append(playerByOrderId).append(planarControllerId);
 
         for (Player player : players.values()) {
             sb.append("player").append(player.getLife()).append("hand");
@@ -342,7 +347,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         StringBuilder sb = threadLocalBuilder.get();
 
         sb.append(turn.getValue(turnNum));
-        sb.append(activePlayerId).append(priorityPlayerId).append(playerByOrderId);
+        sb.append(activePlayerId).append(priorityPlayerId).append(playerByOrderId).append(planarControllerId);
 
         for (Player player : players.values()) {
             sb.append("player").append(player.isPassed()).append(player.getLife()).append("hand");
@@ -398,7 +403,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         StringBuilder sb = threadLocalBuilder.get();
 
         sb.append(turn.getValue(turnNum));
-        sb.append(activePlayerId).append(priorityPlayerId).append(playerByOrderId);
+        sb.append(activePlayerId).append(priorityPlayerId).append(playerByOrderId).append(planarControllerId);
 
         for (Player player : players.values()) {
             sb.append("player").append(player.isPassed()).append(player.getLife()).append("hand");
@@ -540,6 +545,40 @@ public class GameState implements Serializable, Copyable<GameState> {
 
     public boolean isPlaneChase() {
         return isPlaneChase;
+    }
+
+    public UUID getPlanarControllerId() {
+        return planarControllerId;
+    }
+
+    public void setPlanarControllerId(UUID planarControllerId) {
+        this.planarControllerId = planarControllerId;
+        Set<UUID> planarSourceIds = new HashSet<>();
+        for (CommandObject commandObject : command) {
+            if (commandObject instanceof Plane) {
+                planarSourceIds.add(commandObject.getId());
+                ((Plane) commandObject).setControllerId(planarControllerId);
+            }
+        }
+        for (TriggeredAbility ability : triggers.values()) {
+            if (planarSourceIds.contains(ability.getSourceId())) {
+                ability.setControllerId(planarControllerId);
+            }
+        }
+        for (ContinuousEffectsList<?> effectsList : effects.allEffectsLists) {
+            for (ContinuousEffect effect : effectsList) {
+                for (Ability ability : effectsList.getAbility(effect.getId())) {
+                    if (planarSourceIds.contains(ability.getSourceId())) {
+                        ability.setControllerId(planarControllerId);
+                    }
+                }
+            }
+        }
+        for (Watcher watcher : watchers.values()) {
+            if (planarSourceIds.contains(watcher.getSourceId())) {
+                watcher.setControllerId(planarControllerId);
+            }
+        }
     }
 
     public Command getCommand() {

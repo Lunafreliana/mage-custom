@@ -98,6 +98,19 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
 
     UUID getControllerId(UUID objectId);
 
+    /**
+     * Returns the planar controller for the shared planar-card context.
+     *
+     * @param planarCardId planar card whose context is being queried; retained
+     *                     for future multiple-deck/controller support
+     */
+    UUID getPlanarControllerId(UUID planarCardId);
+
+    /**
+     * Updates the planar controller and all face-up planar command objects.
+     */
+    void setPlanarControllerId(UUID playerId);
+
     UUID getOwnerId(UUID objectId);
 
     UUID getOwnerId(MageObject object);

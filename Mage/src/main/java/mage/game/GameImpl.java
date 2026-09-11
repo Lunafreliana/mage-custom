@@ -656,6 +656,9 @@ public abstract class GameImpl implements Game {
 
     @Override
     public UUID getOwnerId(MageObject object) {
+        if (object instanceof Plane) {
+            return getPlanarControllerId(object.getId());
+        }
         if (object instanceof Spell) {
             return ((Spell) object).getOwnerId();
         }
@@ -687,6 +690,8 @@ public abstract class GameImpl implements Game {
                 return ((StackObject) object).getControllerId();
             } else if (object instanceof Permanent) {
                 return ((Permanent) object).getControllerId();
+            } else if (object instanceof Plane) {
+                return getPlanarControllerId(objectId);
             } else if (object instanceof CommandObject) {
                 return ((CommandObject) object).getControllerId();
             }
@@ -705,6 +710,20 @@ public abstract class GameImpl implements Game {
             }
         }
         return null;
+    }
+
+    @Override
+    public UUID getPlanarControllerId(UUID planarCardId) {
+        return state.getPlanarControllerId();
+    }
+
+    @Override
+    public void setPlanarControllerId(UUID playerId) {
+        Player player = getPlayer(playerId);
+        if (playerId != null && (player == null || player.hasLeft())) {
+            throw new IllegalArgumentException("Planar controller must be a player in the game");
+        }
+        state.setPlanarControllerId(playerId);
     }
 
     @Override
@@ -1190,6 +1209,9 @@ public abstract class GameImpl implements Game {
                 player = getPlayer(state.getActivePlayerId());
             } else {
                 state.setActivePlayerId(player.getId());
+                if (state.isPlaneChase()) {
+                    setPlanarControllerId(player.getId());
+                }
                 saveRollBackGameState();
             }
             if (checkStopOnTurnOption()) {
@@ -1423,7 +1445,7 @@ public abstract class GameImpl implements Game {
             // plane-owned rolls with the rules special action would expose two
             // incompatible Planechase engines.
             Plane plane = new FieldsOfSummerPlane();
-            plane.setControllerId(startingPlayerId);
+            state.setPlanarControllerId(startingPlayerId);
             addPlane(plane, startingPlayerId);
             state.setPlaneChase(this, gameOptions.planeChase);
             for (Player player : getPlayers().values()) {
@@ -2066,7 +2088,12 @@ public abstract class GameImpl implements Game {
         }
         Plane newPlane = plane.copy();
         newPlane.setSourceObjectAndInitImage();
-        newPlane.setControllerId(toPlayerId);
+        UUID controllerId = state.getPlanarControllerId();
+        if (controllerId == null) {
+            controllerId = toPlayerId;
+            state.setPlanarControllerId(controllerId);
+        }
+        newPlane.setControllerId(controllerId);
         newPlane.assignNewId();
         newPlane.getAbilities().newId();
         for (Ability ability : newPlane.getAbilities()) {
@@ -3375,6 +3402,14 @@ public abstract class GameImpl implements Game {
             return;
         }
         logger.debug("Start leave game: " + player.getName());
+        if (state.isPlaneChase() && playerId.equals(getPlanarControllerId(null))) {
+            UUID successorId = getActivePlayerId();
+            if (playerId.equals(successorId)) {
+                Player successor = state.getPlayerList(playerId).getNext(this, false);
+                successorId = successor == null ? null : successor.getId();
+            }
+            setPlanarControllerId(successorId);
+        }
         player.leave();
         if (checkIfGameIsOver()) {
             // no need to remove objects if only one player is left so the game is over
@@ -3461,32 +3496,15 @@ public abstract class GameImpl implements Game {
             }
         }
 
-        //Remove all commander/emblems/plane the player controls
-        boolean addPlaneAgain = false;
+        // Remove all commander/emblems the player controls. Plane control was
+        // transferred before departure and the shared planar card stays.
         for (Iterator<CommandObject> it = this.getState().getCommand().iterator(); it.hasNext(); ) {
             CommandObject obj = it.next();
             if (obj.isControlledBy(playerId)) {
                 if (obj instanceof Emblem) {
                     ((Emblem) obj).discardEffects();// This may not be the best fix but it works
                 }
-                if (obj instanceof Plane) {
-                    ((Plane) obj).discardEffects();
-                    // Readd a new one
-                    addPlaneAgain = true;
-                }
                 it.remove();
-            }
-        }
-
-        if (addPlaneAgain) {
-            boolean addedAgain = false;
-            for (Player aplayer : state.getPlayers().values()) {
-                if (!aplayer.hasLeft() && !addedAgain) {
-                    addedAgain = true;
-                    Plane plane = Plane.createRandomPlane();
-                    plane.setControllerId(aplayer.getId());
-                    addPlane(plane, aplayer.getId());
-                }
             }
         }
         Iterator<Entry<UUID, Card>> it = gameCards.entrySet().iterator();
