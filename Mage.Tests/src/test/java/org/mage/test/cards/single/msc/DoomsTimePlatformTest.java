@@ -8,8 +8,6 @@ import org.mage.test.serverside.base.CardTestPlayerBase;
 
 /**
  * {@link mage.cards.d.DoomsTimePlatform Doom's Time Platform}
- *
- * @author TheElk801
  */
 public class DoomsTimePlatformTest extends CardTestPlayerBase {
 
