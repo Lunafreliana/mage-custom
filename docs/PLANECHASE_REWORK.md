@@ -651,6 +651,25 @@ Implement one ordered, shuffled supplemental planar deck of IDs/references while
 
 Do not create `Zone.PLANAR_DECK`.
 
+#### Phase 4 implementation
+
+The shared deck is stored in `GameState` as `SharedPlanarDeck`. Its face-down
+ordering contains copied plane objects with stable IDs; `getOrder()` exposes an
+immutable ID-only snapshot so callers cannot inspect the hidden objects. The
+single face-up plane is absent from that ordering and remains in `Command`.
+Planeswalking removes that same object from the face-up command collection,
+puts it on the bottom, and turns the actual top object face up without changing
+its identity. Game-state copy, rollback restore, and restart respectively deep
+copy, restore, and clear the ordering.
+
+The implemented `Planes` registry supplies the initial shared deck and is
+shuffled through `RandomUtil`, while `SharedPlanarDeck.setPlanes(..., false)` is
+the deterministic known-order injection seam for focused tests. This is deck
+construction only: traversal never uses a random plane factory or `seenPlanes`.
+Shared-mode ownership continues to resolve through the authoritative planar
+controller API described in Phase 2. A richer planar-card runtime, multiple
+simultaneous face-up cards, and phenomena remain assigned to Phases 5 and 6.
+
 ### Phase 5 — Planar Card Runtime / Multiple Face-Up Planes
 
 Introduce/evolve a common runtime abstraction for planes and future phenomena, including type, stable identity, associated deck/owner, face state, and abilities. Add collection-first face-up APIs and migrate engine callers away from singleton assumptions. Support bottoming/walking away from all applicable face-up planar cards and test multiple-face-up event/controller behavior. Keep the CommandObject model unless implementation research demonstrates a concrete blocker; do not mass-convert to `CardImpl` by default.

@@ -20,7 +20,6 @@ import mage.constants.SubType;
 import mage.constants.SuperType;
 import mage.game.Game;
 import mage.game.events.ZoneChangeEvent;
-import mage.util.RandomUtil;
 import mage.util.SubTypes;
 
 import java.lang.reflect.Constructor;
@@ -317,9 +316,4 @@ public abstract class Plane extends CommandObjectImpl {
         return createPlane(planeType);
     }
 
-    public static Plane createRandomPlane() {
-        int pick = RandomUtil.nextInt(Planes.values().length);
-        Planes planeType = Planes.values()[pick];
-        return createPlane(planeType);
-    }
 }
