@@ -37,6 +37,7 @@ public class MatchOptions implements Serializable {
     protected boolean rollbackTurnsAllowed;
     protected boolean spectatorsAllowed;
     protected boolean planeChase;
+    protected List<String> sharedPlanarCardIds = new ArrayList<>();
     protected int quitRatio;
     protected int minimumRating;
     protected int edhPowerLevel;
@@ -211,6 +212,14 @@ public class MatchOptions implements Serializable {
 
     public void setPlaneChase(boolean planeChase) {
         this.planeChase = planeChase;
+    }
+
+    public List<String> getSharedPlanarCardIds() {
+        return Collections.unmodifiableList(sharedPlanarCardIds);
+    }
+
+    public void setSharedPlanarCardIds(Collection<String> sharedPlanarCardIds) {
+        this.sharedPlanarCardIds = new ArrayList<>(sharedPlanarCardIds);
     }
 
     public int getQuitRatio() {

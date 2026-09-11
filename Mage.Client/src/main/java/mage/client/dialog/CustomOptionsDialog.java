@@ -6,6 +6,8 @@ import mage.cards.decks.importer.DeckImporter;
 import mage.client.MageFrame;
 import mage.game.GameException;
 import mage.game.match.MatchOptions;
+import mage.game.command.PlanarCardRegistry;
+import mage.game.command.SharedPlanarDeckValidator;
 import mage.game.mulligan.MulliganType;
 import org.apache.log4j.Logger;
 
@@ -13,6 +15,8 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * App GUI: custom options for match/tournament
@@ -88,6 +92,7 @@ public class CustomOptionsDialog extends MageDialog {
     private final JButton openButton;
     private final JFileChooser fcSelectEmblemCardsPerPlayer;
     private final JFileChooser fcSelectEmblemCardsStartingPlayer;
+    private final List<String> sharedPlanarCardIds = new ArrayList<>();
 
     /**
      * Creates new form NewTableDialog
@@ -109,6 +114,7 @@ public class CustomOptionsDialog extends MageDialog {
         fcSelectEmblemCardsStartingPlayer = new JFileChooser();
         fcSelectEmblemCardsStartingPlayer.setAcceptAllFileFilterUsed(false);
         fcSelectEmblemCardsStartingPlayer.addChoosableFileFilter(new DeckFileFilter("dck", "XMage's deck files (*.dck)"));
+        PlanarCardRegistry.getAvailableCards().forEach(card -> sharedPlanarCardIds.add(card.getId()));
     }
 
     /**
@@ -402,6 +408,14 @@ public class CustomOptionsDialog extends MageDialog {
     }//GEN-LAST:event_btnPreviousConfigurationActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
+        if (chkPlaneChase.isSelected()) {
+            List<String> errors = SharedPlanarDeckValidator.validate(sharedPlanarCardIds, 4);
+            if (!errors.isEmpty()) {
+                JOptionPane.showMessageDialog(this, String.join("\n", errors),
+                        "Invalid shared planar deck", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
         this.hideDialog();
     }//GEN-LAST:event_btnOKActionPerformed
 
@@ -414,6 +428,9 @@ public class CustomOptionsDialog extends MageDialog {
     }//GEN-LAST:event_spnFreeMulligansStateChanged
 
     private void chkPlaneChaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPlaneChaseActionPerformed
+        if (chkPlaneChase.isSelected()) {
+            editSharedPlanarDeck();
+        }
         updateActiveCount();
     }//GEN-LAST:event_chkPlaneChaseActionPerformed
 
@@ -550,6 +567,8 @@ public class CustomOptionsDialog extends MageDialog {
         options.setCustomStartHandSizeEnabled(checkStartingHandSize.isSelected());
         options.setCustomStartHandSize((Integer) spnCustomStartingHand.getValue());
         options.setPlaneChase(chkPlaneChase.isSelected());
+        options.setSharedPlanarCardIds(chkPlaneChase.isSelected()
+                ? sharedPlanarCardIds : Collections.emptyList());
         if (chkEmblemCards.isSelected()) {
             if (!txtEmblemCardsPerPlayer.getText().isEmpty()) {
                 Deck perPlayerEmblemDeck = null;
@@ -583,6 +602,35 @@ public class CustomOptionsDialog extends MageDialog {
             options.setPerPlayerEmblemCards(Collections.emptySet());
             options.setGlobalEmblemCards(Collections.emptySet());
         }
+    }
+
+    private void editSharedPlanarDeck() {
+        List<PlanarCardRegistry.Metadata> cards = PlanarCardRegistry.getAvailableCards();
+        DefaultListModel<String> model = new DefaultListModel<>();
+        cards.forEach(card -> model.addElement(card.getType() + " — " + card.getEnglishName()));
+        JList<String> list = new JList<>(model);
+        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        int[] selected = java.util.stream.IntStream.range(0, cards.size())
+                .filter(index -> sharedPlanarCardIds.contains(cards.get(index).getId()))
+                .toArray();
+        list.setSelectedIndices(selected);
+        int result = JOptionPane.showConfirmDialog(this, new JScrollPane(list),
+                "Shared planar deck (four-player Commander)", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) {
+            return;
+        }
+        sharedPlanarCardIds.clear();
+        for (int index : list.getSelectedIndices()) {
+            sharedPlanarCardIds.add(cards.get(index).getId());
+        }
+        List<String> errors = SharedPlanarDeckValidator.validate(sharedPlanarCardIds, 4);
+        if (!errors.isEmpty()) {
+            JOptionPane.showMessageDialog(this, String.join("\n", errors),
+                    "Invalid shared planar deck", JOptionPane.WARNING_MESSAGE);
+        }
+        planechaseDescriptionLabel.setText("<html>Custom shared planar deck: "
+                + sharedPlanarCardIds.size() + " cards.<br>Four-player free-for-all Commander is the supported UI mode.");
     }
 
     public void updateActiveCount() {

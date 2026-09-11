@@ -6,12 +6,14 @@ import mage.constants.Phenomena;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.Phenomenon;
+import mage.game.command.PlanarCardRegistry;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.stack.StackObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 public class PhenomenonTest extends CardTestPlayerBase {
@@ -46,6 +48,24 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals(1, currentGame.getState().getSharedPlanarDeck().size());
         assertHandCount(playerA, 0);
         assertHandCount(playerB, 0);
+    }
+
+    @Test
+    public void testMixedRegistryIdDeckPreservesOrder() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 20);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 20);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarCardIds = Arrays.asList(
+                PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY),
+                PlanarCardRegistry.getId(Planes.PLANE_FIELDS_OF_SUMMER),
+                PlanarCardRegistry.getId(Planes.PLANE_AKOUM));
+
+        setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
+        execute();
+
+        Assert.assertEquals("Plane - Fields of Summer",
+                currentGame.getState().getFaceUpPlanes().get(0).getName());
+        Assert.assertEquals(2, currentGame.getState().getSharedPlanarDeck().size());
     }
 
     @Test
