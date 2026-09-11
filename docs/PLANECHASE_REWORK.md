@@ -21,31 +21,36 @@ git fetch https://github.com/magefree/mage.git \
 ```
 
 Do not merge or cherry-pick this PR. It is an unfinished architecture reference only.
-Ja. Ich habe **#11316 jetzt wirklich als Architekturentwurf auseinandergenommen**, nicht nur oberflächlich angeschaut. Das wichtigste Ergebnis zuerst:
 
-**Ich würde PR #11316 auf keinen Fall cherry-picken. Ich würde seine Grundideen übernehmen und die Implementierung neu aufsetzen.** Der PR ist seit 2023 ein offener Draft, besteht nur aus zwei Commits, verändert 35 Dateien und wurde vom Autor ausdrücklich als nie fertiggestellter Versuch eingestellt.
+Absolutely — here is a repo-friendly English version of the text you pasted:
 
-Und ich habe beim Nachschlagen der **aktuellen Comprehensive Rules von Juni 2026** noch eine wichtige Präzisierung gegenüber meiner vorigen Antwort gefunden: Wir sollten **keine neue `Zone.PLANAR_DECK` einführen**. Plane- und Phenomenon-Karten bleiben regeltechnisch **immer in der Command Zone**, auch solange sie Teil des verdeckten Planar Decks sind. Das „Planar Deck“ ist also eine zusätzliche **Deckordnung innerhalb der Command Zone**, keine eigene Zone. 
+---
 
-Das macht die Sache für XMage interessanter – und eigentlich etwas eleganter.
+I have now actually gone through **#11316 as an architecture proposal**, rather than just giving it a quick look. The most important conclusion first:
 
-## Was #11316 richtig erkannt hat
+**I would absolutely not cherry-pick PR #11316. I would reuse its core ideas and rebuild the implementation properly.** The PR has been an open draft since 2023, consists of only two commits, changes 35 files, and was explicitly posted by its author as an unfinished attempt.
 
-Der PR versucht im Kern, das hier:
+I also found an important clarification while checking the **current June 2026 Comprehensive Rules**: we should **not introduce a new `Zone.PLANAR_DECK`**. Plane and phenomenon cards remain rules-wise in the **command zone**, even while they are part of the face-down planar deck. The “planar deck” is therefore an additional **ordering of cards within the command zone**, not a separate Magic zone.
+
+That actually makes the XMage design somewhat cleaner.
+
+## What #11316 got right
+
+The PR essentially tries to transform this:
 
 ```text
 Plane
- ├─ eigentliche Plane-Fähigkeit
- ├─ "Roll planar die"-ActivatedAbility
- ├─ CHAOS-Effekt
+ ├─ actual Plane ability
+ ├─ "Roll planar die" ActivatedAbility
+ ├─ CHAOS effect
  ├─ PlanarRollWatcher
  └─ CostIncreasingEffect
 ```
 
-in das hier zu verwandeln:
+into this:
 
 ```text
-Planechase-Regeln
+Planechase rules
  └─ RollPlanarDieSpecialAction
        ↓
      planar die
@@ -57,20 +62,20 @@ blank chaos   planeswalker
  CHAOS_ENSUES
        │
        ▼
-Plane-Chaos-Trigger
+Plane chaos trigger
 ```
 
-**Diese Richtung ist absolut richtig.**
+**That direction is absolutely correct.**
 
-`SpecialAction` ist in XMage bereits dafür gemacht, nicht den Stack zu benutzen; die Basisklasse setzt ausdrücklich `usesStack = false`.  Damit passt sie viel besser zu Regel 901.9 als die heutige Activated Ability auf jeder Plane.
+`SpecialAction` is already designed in XMage not to use the stack; the base class explicitly sets `usesStack = false`. That makes it much closer to rule 901.9 than the current activated ability attached to every individual Plane.
 
-Auch die andere große Idee ist richtig: Der PR führt `ChaosEnsuesTriggeredAbility` ein. Statt dass jede Plane ihren Chaos-Effekt in `RollPlanarDieEffect` hineinreicht, wird aus:
+The other major idea is also correct: the PR introduces `ChaosEnsuesTriggeredAbility`. Instead of every Plane passing its chaos effect into `RollPlanarDieEffect`, code like this:
 
 ```java
 new RollPlanarDieEffect(chaosEffects, chaosTargets)
 ```
 
-auf der Plane schlicht:
+becomes simply:
 
 ```java
 new ChaosEnsuesTriggeredAbility(
@@ -78,155 +83,166 @@ new ChaosEnsuesTriggeredAbility(
 )
 ```
 
-Das sieht man beispielsweise bei Academy at Tolaria West. Genau so sollten moderne Plane-Implementierungen ungefähr aussehen. Der aktuelle Oracle-Mechanismus ist tatsächlich „Whenever chaos ensues“, und Chaos kann inzwischen ausdrücklich auch durch Zaubersprüche und Fähigkeiten entstehen, nicht nur durch den Würfel. ([MAGIC: THE GATHERING][1])
+on the Plane itself.
 
-Auch der Versuch, Panopticons selbstgeschriebene Spezialklasse
+That can be seen, for example, in Academy at Tolaria West. This is roughly how modern Plane implementations should look. The current rules wording really is “Whenever chaos ensues,” and chaos can explicitly be caused by spells and abilities now, not only by rolling the planar die.
+
+The attempt to replace Panopticon’s custom class:
 
 ```java
 PanopticonTriggeredAbility
 ```
 
-durch eine generische
+with a generic:
 
 ```java
 PlaneswalkToSourceTriggeredAbility
 ```
 
-zu ersetzen, ist konzeptionell goldrichtig. Damit würden später 100 Plane-Klassen nicht jeweils dieselben Event-Prüfungen neu implementieren.
+is also conceptually excellent. It prevents 100 future Plane classes from reimplementing the same event checks.
 
-## Aber #11316 ist als laufender Code ziemlich kaputt
+## But #11316 is not usable as production code
 
-Hier sind die wichtigsten Punkte meiner Sezierung:
+These are the most important findings from the PR:
 
-| Teil von #11316                      | Bewertung                             | Warum                                                                        |
-| ------------------------------------ | ------------------------------------- | ---------------------------------------------------------------------------- |
-| `RollPlanarDieSpecialAction`         | **Idee behalten, Code neu schreiben** | richtiger Mechanismus, aber Timing und Ergebnisverarbeitung fehlerhaft       |
-| `ChaosEnsuesTriggeredAbility`        | **behalten**                          | grundsätzlich richtige Abstraktion                                           |
-| `PlaneswalkToSourceTriggeredAbility` | **Idee behalten**                     | im PR komplett unfertig                                                      |
-| `ROLLED_PLANESWALK` Event            | **Idee ändern**                       | es fehlt die eigentliche inherent triggered ability                          |
-| `Player.rollPlanarDieResult()`       | **teilweise behalten**                | Rohwurf ist gut, Planechase-Regeln gehören aber nicht ins `Player`-Interface |
-| `getActivatedThisTurnCount()`        | **Konzept behalten**                  | richtige Lösung für die Rollkosten                                           |
-| Migration der 21 Planes              | **später wiederverwenden**            | erst Engine korrekt machen                                                   |
-| `Plane.addAbility()`                 | **harmlos**                           | reine Convenience                                                            |
-| Planar Deck                          | **fehlt komplett**                    | PR löst das Kernproblem nicht                                                |
-| Phenomena                            | **fehlen komplett**                   | keine Encounter-/SBA-Engine                                                  |
-| planar controller                    | **nicht gelöst**                      | weiterhin strukturell falsch                                                 |
+| Part of #11316                       | Assessment                             | Reason                                                                                |
+| ------------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------- |
+| `RollPlanarDieSpecialAction`         | **Keep the concept, rewrite the code** | correct mechanism, but timing and result handling are incomplete/incorrect            |
+| `ChaosEnsuesTriggeredAbility`        | **Keep**                               | fundamentally sound abstraction                                                       |
+| `PlaneswalkToSourceTriggeredAbility` | **Keep the concept**                   | implementation is unfinished                                                          |
+| `ROLLED_PLANESWALK` event            | **Change the design**                  | the actual inherent triggered ability is missing                                      |
+| `Player.rollPlanarDieResult()`       | **Partially keep**                     | separating raw rolling is good, but Planechase rule logic should not live in `Player` |
+| `getActivatedThisTurnCount()`        | **Keep the concept**                   | correct direction for planar roll costs                                               |
+| migration of existing Planes         | **Reuse later**                        | engine should be fixed first                                                          |
+| `Plane.addAbility()`                 | **Fine**                               | convenience helper only                                                               |
+| real planar deck                     | **Missing entirely**                   | PR does not solve the central structural issue                                        |
+| Phenomena                            | **Missing entirely**                   | no encounter/SBA engine                                                               |
+| planar controller                    | **Not solved**                         | still structurally incorrect                                                          |
 
-Der erste konkrete Bug ist ziemlich heftig: `SpecialAction` erbt von `ActivatedAbilityImpl`, und dort ist das Standard-Timing:
+The first concrete problem is significant: `SpecialAction` inherits from `ActivatedAbilityImpl`, whose default timing is:
 
 ```java
 protected TimingRule timing = TimingRule.INSTANT;
 ```
 
-Der neue `RollPlanarDieSpecialAction` setzt dieses Timing **nicht** auf Sorcery. Die Comprehensive Rules sagen dagegen ausdrücklich: aktiver Spieler, Priority, Main Phase, Stack leer. ([Wizards Media][2])
+The new `RollPlanarDieSpecialAction` never changes that timing.
 
-Der PR würde die schöne neue Special Action also ausgerechnet mit dem falschen Timing einführen.
+The Comprehensive Rules instead require the action to be available only to the active player, while they have priority, during their main phase, while the stack is empty.
 
-## Noch schlimmer: Der neue Würfel-Flow ist nicht fertig verbunden
+So the PR introduces the correct kind of special action, but with the wrong timing behavior.
 
-Der PR teilt sinnvollerweise das reine Würfeln in:
+## The new die-roll flow is also not fully connected
+
+The PR sensibly separates raw rolling into:
 
 ```java
 rollPlanarDieResult(...)
 ```
 
-und eine Methode auf, die das Ergebnis verarbeitet.
+and another layer that is supposed to process the result.
 
-Aber `RollPlanarDieSpecialActionEffect` ruft anschließend ausgerechnet nur:
+However, `RollPlanarDieSpecialActionEffect` ultimately just calls:
 
 ```java
 player.rollPlanarDieResult(...)
 ```
 
-auf und verwirft das Resultat.
+and discards the returned value.
 
-Damit bekommt man zwar einen Würfelwurf, aber die neue Special Action löst anschließend weder ordentlich Chaos noch Planeswalking aus.
+That means the Special Action rolls the planar die but does not correctly cause either chaos or planeswalking afterward.
 
-Dazu kommt ein bestätigter Fehler im `Player`-Patch: Dort wurden `CHAOS_ROLL` und Planeswalker-Ergebnis beim Feuern der neuen Events vertauscht. Ein Reviewer hat genau das markiert; der Autor antwortete, das sei vermutlich durch einen Merge-Konflikt entstanden, weil der Code schon alt gewesen sei.
+There is also a confirmed bug in the `Player` patch: `CHAOS_ROLL` and the planeswalker result were mapped to the wrong events. A reviewer pointed this out, and the author said it was probably caused by a merge conflict because the code had already become old.
 
-Das zeigt ziemlich deutlich, in welchem Zustand der PR ist: **Design-Skizze, nicht Implementierung zum Übernehmen.**
+That illustrates the state of the PR quite well:
 
-## `ROLLED_PLANESWALK` löst außerdem gar kein Planeswalking aus
+**It is an architecture sketch, not an implementation that should be imported.**
 
-Das ist der nächste zentrale Punkt.
+## `ROLLED_PLANESWALK` does not actually planeswalk
 
-#11316 fügt hinzu:
+This is the next important architectural point.
+
+#11316 adds:
 
 ```java
 GameEvent.EventType.ROLLED_PLANESWALK
 GameEvent.EventType.CHAOS_ENSUES
 ```
 
-und `WillOfThePlaneswalkersEffect` feuert bei entsprechendem Abstimmungsergebnis `ROLLED_PLANESWALK`.
+and `WillOfThePlaneswalkersEffect` fires `ROLLED_PLANESWALK` when the relevant vote wins.
 
-Aber im gesamten PR gibt es keine fertiggestellte Ability, die daraus korrekt **Planeswalk** macht.
+But the PR never finishes the ability that turns that event into actual planeswalking.
 
-Das ist besonders wichtig, weil die echten Regeln etwas subtiler sind als „PW würfeln → sofort nächste Plane“.
-
-Aktuell, 2026, gilt:
+That matters because the real rules are more subtle than:
 
 ```text
-Planar die zeigt Planeswalker
+roll planeswalker symbol
+→ immediately change Plane
+```
+
+Under the current rules:
+
+```text
+Planar die shows planeswalker symbol
              ↓
-"inherent planeswalking ability" triggert
+source-less inherent planeswalking ability triggers
              ↓
-Ability geht auf den Stack
+ability goes onto the stack
              ↓
-Spieler können reagieren
+players may respond
              ↓
-bei Resolution:
+on resolution:
 planeswalk
 ```
 
-Regel 901.8 definiert diese source-less inherent triggered ability ausdrücklich, und 901.9c sagt ausdrücklich, dass sie auf den Stack geht. 
+Rule 901.8 explicitly defines this source-less inherent triggered ability, and 901.9c explicitly says it uses the stack.
 
-Die heutige XMage-Implementierung ist also auch hier nicht ganz richtig, weil `RollPlanarDieEffect` direkt:
+The current XMage implementation is therefore also not quite correct, because `RollPlanarDieEffect` directly executes:
 
 ```java
 new PlaneswalkEffect(false).apply(...)
 ```
 
-ausführt.
+#11316 appears to recognize that an event should exist between the die result and the actual planeswalk, but it never finishes the second half.
 
-#11316 hatte offenbar erkannt, dass ein Event dazwischengehört – hat aber die zweite Hälfte nicht mehr gebaut.
+## The roll-cost idea is surprisingly important
 
-## Dafür ist seine neue Kostenidee überraschend wichtig
+This is one area where the current code contains a subtle rules issue and #11316 moves in the correct direction.
 
-Hier hat der alte Code tatsächlich einen subtilen Regelfehler, und #11316 läuft in die richtige Richtung.
-
-Heute verwendet XMage `PlanarRollWatcher`. Der zählt:
+Today XMage uses `PlanarRollWatcher`, which essentially counts:
 
 ```text
-wie oft hat dieser Spieler diesen Zug
-den planar die gewürfelt?
+how many times this player
+rolled the planar die this turn
 ```
 
-Aber **das ist nicht das, was die Rollkosten zählen sollen**.
+But **that is not what the increasing Planechase cost is supposed to count**.
 
-Die aktuelle Regel 901.9 sagt ausdrücklich, dass die Kosten davon abhängen, wie oft der Spieler **diese spezielle Spielaktion** bereits genommen hat. Würfelt ein Karteneffekt zusätzlich den Weltenwürfel, erhöht das die Kosten des nächsten freiwilligen Wurfs **nicht**. ([Wizards Media][2])
+Rule 901.9 says the cost depends on how many times that player has taken **this special action** during the turn.
 
-Also beispielsweise:
+If a spell or ability causes an additional planar die roll, it does **not** increase the cost of the next voluntary Planechase roll.
+
+For example:
 
 ```text
-erster freiwilliger Roll    → {0}
-Fractured Powerstone rollt  → kein Einfluss
-zweiter freiwilliger Roll   → {1}
-dritter freiwilliger Roll   → {2}
+first voluntary Planechase roll → {0}
+Fractured Powerstone rolls      → does not affect the counter
+second voluntary roll           → {1}
+third voluntary roll            → {2}
 ```
 
-Der alte `PlanarRollWatcher` kann das nicht korrekt unterscheiden.
+The old `PlanarRollWatcher` cannot correctly distinguish those cases.
 
-#11316 benutzt stattdessen die **Activation Count der Special Action**.
+#11316 instead bases the cost on the **activation count of the Special Action**.
 
-Das ist konzeptionell exakt richtig.
+Conceptually, that is exactly right.
 
-Ich würde dafür allerdings nicht unbedingt `getActivatedThisTurnCount()` öffentlich in die allgemeine `ActivatedAbilityImpl` einbauen. Der `RollPlanarDieSpecialAction`-Subclass kann seine eigene ActivationInfo verwenden. Dadurch verändern wir weniger Engine-Core.
+I would not necessarily expose `getActivatedThisTurnCount()` publicly on the entire `ActivatedAbilityImpl` class, though. The `RollPlanarDieSpecialAction` subclass may be able to use the existing activation information internally, which would avoid touching more general engine code than necessary.
 
-## Das Controller-Problem wird durch #11316 sogar sichtbarer
+## The planar-controller problem becomes even more obvious
 
-Nehmen wir Panopticon.
+Take Panopticon.
 
-Heute kompensiert die Klasse das schlechte Controller-Modell teilweise manuell. #11316 vereinfacht das zu:
+#11316 simplifies its custom trigger into:
 
 ```java
 new PlaneswalkToSourceTriggeredAbility(
@@ -234,33 +250,31 @@ new PlaneswalkToSourceTriggeredAbility(
 )
 ```
 
-Das wäre wunderschön — **wenn die Plane korrekt vom planar controller kontrolliert würde.**
+That would be elegant — **if the Plane had the correct planar controller**.
 
-Tut sie aber nicht.
+Currently it does not.
 
-Das aktuelle `Plane`-Objekt speichert einfach:
+The existing `Plane` object simply stores:
 
 ```java
 private UUID controllerId;
 ```
 
-und dieser Controller wird beim Erzeugen gesetzt.
+and that controller is assigned when the Plane is created.
 
-Die echten Regeln sagen dagegen:
+The rules instead say that the **planar controller is normally the active player**.
 
-> Normalerweise ist der aktive Spieler der planar controller.
+With the single planar deck option, that planar controller is also treated as the owner of the cards in the shared planar deck for relevant rules purposes.
 
-Und bei der Single-Planar-Deck-Option gilt dieser planar controller sogar als Besitzer aller Karten dieses gemeinsamen Planar Decks. 
+That means many of the cleaner `SourceControllerEffect` conversions from #11316 would still affect the wrong player.
 
-Damit würden viele hübsch vereinfachte `SourceControllerEffect`s aus #11316 weiterhin den falschen Spieler treffen.
+**Planar-controller handling should therefore be fixed before mass-migrating the Plane classes.**
 
-**Deshalb muss planar-controller handling vor der Massenmigration der Planes erledigt werden.**
+# Proposed target architecture
 
----
+I would avoid scattering Planechase logic across `Player`, `GameImpl`, and every individual Plane class.
 
-# Meine Zielarchitektur
-
-Ich würde nicht alles in `Player`, `GameImpl` und 100 Plane-Klassen verteilen. Stattdessen sollte ein kleiner Planechase-Kern existieren:
+Instead, there should be a small dedicated Planechase core:
 
 ```text
 GameState
@@ -268,7 +282,7 @@ GameState
    └── PlanechaseState
           │
           ├── PlanarDeck
-          │      └── geordnete PlanarCard-IDs
+          │      └── ordered PlanarCard IDs
           │
           ├── faceUpPlanarCards
           │
@@ -290,11 +304,11 @@ Planechase Rules
    └── EncounterPhenomenonAbility
 ```
 
-Und dabei würde ich **vorerst `PlanarCard` weiter auf der CommandObject-Seite von XMage aufbauen**, statt sofort alle Planes zu `CardImpl` umzubauen.
+For now, I would keep `PlanarCard` on the existing `CommandObject` side of the engine rather than immediately converting every Plane into `CardImpl`.
 
-Das minimiert den Eingriff in Mage.Sets, Card Repository, Serialization, Views usw.
+That minimizes the impact on Mage.Sets, card repositories, serialization, views, and UI.
 
-Aber `PlanarCard` muss Dinge bekommen, die `Plane` heute fehlen:
+However, the runtime representation eventually needs information that `Plane` currently lacks, such as:
 
 ```java
 CardType getPlanarCardType(); // PLANE / PHENOMENON
@@ -306,34 +320,34 @@ boolean faceUp;
 boolean revealed;
 ```
 
-sowie eine echte Identität im Planar Deck.
+and proper identity inside the planar deck.
 
-Das jetzige:
+The current behavior where:
 
 ```java
 getCardType() -> Collections.emptyList()
 ```
 
-muss mittelfristig verschwinden.
+cannot remain the final architecture.
 
-## Und das „Deck“ wird keine Zone
+## The planar deck should not be a Zone
 
-Das ist die wichtigste Änderung zu meiner gestrigen Skizze.
+This is the most important correction to my earlier architecture sketch.
 
-Nach den aktuellen Regeln:
+Under the current rules:
 
 ```text
 COMMAND ZONE
 │
-├─ verdeckte PlanarCard
-├─ verdeckte PlanarCard
-├─ verdeckte PlanarCard
-├─ verdeckte PlanarCard
+├─ face-down PlanarCard
+├─ face-down PlanarCard
+├─ face-down PlanarCard
+├─ face-down PlanarCard
 │
 └─ FACE-UP Plane
 ```
 
-Der `PlanarDeck` sagt lediglich:
+The `PlanarDeck` merely defines an order:
 
 ```text
 top
@@ -347,9 +361,9 @@ top
 bottom
 ```
 
-Alle diese Karten sind regeltechnisch weiterhin in `Zone.COMMAND`. 
+All of those cards are still rules-wise associated with the command zone.
 
-Das heißt, `PlanarDeck` sollte eher etwas wie:
+So `PlanarDeck` should be something closer to:
 
 ```java
 class PlanarDeck {
@@ -357,20 +371,20 @@ class PlanarDeck {
 }
 ```
 
-sein und **keine Zone**.
+and **not a new Zone**.
 
-Das ist langfristig außerdem ein sehr brauchbares Modell für weitere supplementary decks, ohne die Magic-Zonen künstlich aufzublähen.
+This is also a useful general pattern for other supplemental decks without inventing artificial Magic zones.
 
-## Der Würfel-Flow sollte exakt getrennt werden
+## The planar die flow should be cleanly separated
 
-Ich würde `Player` ausschließlich würfeln lassen:
+`Player` should only perform the actual random roll:
 
 ```java
 PlanarDieRollResult result =
     player.rollPlanarDieResult(...);
 ```
 
-Danach übernimmt Planechase:
+Then Planechase rules should handle the result:
 
 ```java
 planechase.resolvePlanarDieRoll(
@@ -381,63 +395,63 @@ planechase.resolvePlanarDieRoll(
 );
 ```
 
-Dann:
+Conceptually:
 
 ```text
 BLANK
   ↓
-nichts
+nothing
 
 
 CHAOS
   ↓
 ChaosEnsuesEffect
   ↓
-CHAOS_ENSUES Event
+CHAOS_ENSUES event
   ↓
-ChaosEnsuesTriggeredAbility der passenden Plane
+ChaosEnsuesTriggeredAbility on the relevant Plane
   ↓
-Stack
+stack
 
 
 PLANESWALKER
   ↓
-PLANAR_DIE_PLANESWALK Event
+PLANAR_DIE_PLANESWALK event
   ↓
 inherent PlaneswalkingTriggeredAbility
   ↓
-Stack
+stack
   ↓
-PlaneswalkEffect bei Resolution
+PlaneswalkEffect on resolution
 ```
 
-Damit sind **Würfeln** und **Planechase-Regeln** endlich sauber getrennt.
+This finally separates **rolling a die** from **Planechase rules processing**.
 
-Und Karten können weiterhin einfach sagen:
+Cards can still simply use something like:
 
 ```java
 new RollPlanarDieEffect()
 ```
 
-ohne dadurch den Kosten-Counter der Special Action zu erhöhen.
+without increasing the activation counter of the Planechase Special Action.
 
-## `ChaosEnsuesEffect` sollten wir zusätzlich zu #11316 bauen
+## Add `ChaosEnsuesEffect`
 
-#11316 hat nur den Trigger:
+#11316 only introduces the trigger:
 
 ```java
 ChaosEnsuesTriggeredAbility
 ```
 
-Der Kommentar im PR deutet selbst schon darauf hin, dass analog zu `PlaneswalkEffect` ein eigener Chaos-Effekt sinnvoll wäre. Ein Maintainer nannte dabei ausdrücklich Karten wie Missy.
+The PR discussion itself suggests that a dedicated effect analogous to `PlaneswalkEffect` would be useful, especially for cards such as Missy.
 
-Also:
+So:
 
 ```java
 new ChaosEnsuesEffect()
 ```
 
-soll:
+should fire something like:
 
 ```java
 game.fireEvent(
@@ -445,175 +459,187 @@ game.fireEvent(
 );
 ```
 
-auslösen.
-
-Dann kann eine Karte wie:
+Then a card with text like:
 
 ```text
 "... draw a card and chaos ensues."
 ```
 
-einfach schreiben:
+could simply implement:
 
 ```java
 ability.addEffect(new DrawCardSourceControllerEffect(1));
 ability.addEffect(new ChaosEnsuesEffect());
 ```
 
-Das wäre genau die Art wiederverwendbarer Primitive, die wir für WHO/MOC brauchen.
+That is exactly the kind of reusable primitive needed for WHO/MOC cards.
 
-Ich würde den Effekt sogar schon so designen, dass später optional eine **bestimmte Plane** adressiert werden kann. Die aktuellen Regeln kennen nämlich auch „chaos ensues for a particular object“; in diesem Fall kann die Chaos-Ability sogar einer aufgedeckten Plane im Planar Deck triggern. 
+I would also design the effect so that it can later optionally refer to a **specific Plane object**.
 
-## `PlaneswalkToSourceTriggeredAbility` bauen wir fertig
+The current rules support “chaos ensues for a particular object”; in that case the chaos ability of a revealed Plane in the planar deck may matter even if it is not the normal face-up Plane.
 
-Das Grundprinzip ist simpel. Wir haben bereits `PLANESWALK` und `PLANESWALKED`. `GameImpl.addPlane()` feuert heute `PLANESWALKED`, nachdem das neue Plane-Objekt hinzugefügt wurde.
+## Finish `PlaneswalkToSourceTriggeredAbility`
 
-Der generische Trigger kann daher grob prüfen:
+The underlying concept is straightforward.
+
+XMage already has `PLANESWALK` and `PLANESWALKED`, and `GameImpl.addPlane()` currently fires `PLANESWALKED` after the new Plane has been added.
+
+A generic trigger can therefore roughly check:
 
 ```java
 event.getType() == PLANESWALKED
 && event.getTargetId().equals(source.getSourceId())
 ```
 
-und muss dann unter dem korrekten planar controller triggern.
+and then trigger using the correct planar controller.
 
-#11316 legt die Klasse zwar an, aber beide Kernmethoden enden dort faktisch mit:
+#11316 creates this class, but the important methods effectively still contain:
 
 ```java
 // TODO: implement
 return false;
 ```
 
-Damit funktioniert beispielsweise die in diesem PR umgebaute Panopticon-Ability gar nicht.
+That means, for example, the converted Panopticon ability in that PR would not work.
 
-Die Klasse ist also ein guter **Namens- und API-Vorschlag**, nicht mehr.
+So the class is useful as an **API/name proposal**, not as finished code.
 
-## Wir dürfen nicht mehr von „der einen aktuellen Plane“ ausgehen
+## New code must not assume there is exactly one current Plane
 
-Das ist ein weiterer Punkt, den ich gegenüber meiner ersten Analyse verschärfen würde.
+This is another architectural issue worth fixing early.
 
-XMage hat überall:
+XMage currently relies heavily on:
 
 ```java
 game.getState().getCurrentPlane()
 ```
 
-und `GameImpl.addPlane()` verhindert sogar eine zweite Plane.
+and `GameImpl.addPlane()` even rejects the presence of a second Plane.
 
-Für vollständiges Planechase reicht das nicht.
+That is insufficient for complete Planechase.
 
-Die aktuellen Regeln kennen ausdrücklich Situationen mit **mehreren gleichzeitig offenen Plane-Karten**; außerdem brauchen Phenomena Mechanismen, die solche Situationen erzeugen können. Regel 901.11c definiert sogar ausdrücklich, was beim Planeswalken passiert, wenn mehrere Planes offen liegen. 
+The current rules explicitly support situations where **multiple Plane cards are face up at the same time**, and Phenomena also create mechanics where this distinction matters.
 
-Deshalb muss langfristig:
+Rule 901.11c even defines what happens when planeswalking while multiple Plane cards are face up.
+
+Therefore, long term:
 
 ```java
 Plane getCurrentPlane()
 ```
 
-ersetzt werden durch etwas wie:
+should become something like:
 
 ```java
 Collection<Plane> getFaceUpPlanes()
 Collection<PlanarCard> getFaceUpPlanarCards()
 ```
 
-`getCurrentPlane()` können wir während der Migration als Legacy-Helfer behalten:
+`getCurrentPlane()` may remain temporarily as a compatibility helper:
 
 ```java
 @Deprecated
 Plane getCurrentPlane()
 ```
 
-aber neuer Code sollte ihn nicht mehr benutzen.
+but new engine code should not be built around it.
 
-Das erspart uns später einen zweiten großen Umbau.
+That avoids a second major refactor later.
 
-# Phenomena verlangen eine richtige Engine
+# Phenomena require a real engine
 
-Das ist der Punkt, an dem das heutige Zufallsmodell endgültig auseinanderfällt.
+This is where the current random-Plane model fundamentally stops being sufficient.
 
-Die aktuellen Regeln sagen:
+The rules work roughly like this:
 
 ```text
-Top card des Planar Decks wird face-up
+Top card of planar deck becomes face up
             ↓
-ist es eine Plane?
-      → normale Plane
+is it a Plane?
+      → normal Plane behavior
 
-ist es ein Phenomenon?
+is it a Phenomenon?
       ↓
-"When you encounter ..." triggert
+"When you encounter ..." triggers
       ↓
-Ability geht auf Stack
+ability goes onto the stack
       ↓
-nachdem die Phenomenon-Ability den Stack verlassen hat
+after the Phenomenon ability leaves the stack
       ↓
-State-Based Action
+state-based action
       ↓
-planar controller planeswalkt weiter
+planar controller planeswalks again
 ```
 
-Regel 312.5 definiert „encounter“, und 312.7 definiert genau diese State-Based Action. 
+Rule 312.5 defines “encounter,” and 312.7 defines the relevant state-based action.
 
-Beim **Spielstart** ist es nochmals anders: Wird dort ein Phenomenon oben getroffen, wird es einfach unten ins Planar Deck gelegt und weitergesucht; seine Ability triggert ausdrücklich nicht. 
+At the **start of the game**, the behavior is different again: if the top card is a Phenomenon, it is put on the bottom of the planar deck and the process continues. Its encounter ability does not trigger.
 
-Das kann man mit `Plane.createRandomPlane()` schlicht nicht sauber abbilden.
+That cannot be modeled cleanly with `Plane.createRandomPlane()`.
 
----
+# Recommended project breakdown
 
-# So würde ich das Projekt tatsächlich schneiden
+I would not implement this as one enormous 100-file commit.
 
-Ich würde das nicht als einen 100-Dateien-Monstercommit machen. Ich würde es in folgende sieben sauber testbare Schritte schneiden:
+I would split it into seven independently testable phases:
 
-1. **Planechase Rules Core.** `RollPlanarDieSpecialAction` sauber neu bauen, Timing korrekt auf Main-Phase/Stack-empty beschränken, Aktivierungszähler statt `PlanarRollWatcher` für die Kosten verwenden, `ChaosEnsuesEffect` + `CHAOS_ENSUES` ergänzen und die inherent planeswalking ability korrekt auf den Stack bringen. Noch keine 21 Planes massenhaft umbauen.
+1. **Planechase Rules Core.** Rebuild `RollPlanarDieSpecialAction` correctly, enforce active-player/main-phase/stack-empty timing, use the Special Action activation count instead of `PlanarRollWatcher` for increasing costs, add `ChaosEnsuesEffect` + `CHAOS_ENSUES`, and implement the inherent planeswalking trigger so the planeswalk itself goes onto the stack. Do not mass-migrate all existing Planes yet.
 
-2. **Planar Controller.** Zentrale `planarControllerId`-Logik einführen und bei Turn-Wechsel bzw. Player-leaves korrekt aktualisieren. Face-up Plane-Abilities müssen ihren Controller automatisch mitwechseln. Keine manuellen `source.setControllerId(activePlayer)`-Hacks mehr.
+2. **Planar Controller.** Introduce central `planarControllerId` behavior and update it correctly when turns change or players leave. Face-up Plane abilities must automatically operate under the correct controller. Remove the need for manual `source.setControllerId(activePlayer)` hacks.
 
-3. **Bestehende Plane-Abilities migrieren.** Jetzt die 21 alten Plane-Klassen auf `ChaosEnsuesTriggeredAbility`, `PlaneswalkToSourceTriggeredAbility` und den neuen Controller umstellen. Den ganzen `ActivateIfConditionActivatedAbility + PlanarRollWatcher + CostIncreasingEffect`-Boilerplate löschen. Genau hier ist der größte Teil von #11316 als Vorlage nützlich.
+3. **Migrate Existing Plane Abilities.** Convert the current Plane classes to `ChaosEnsuesTriggeredAbility`, `PlaneswalkToSourceTriggeredAbility`, and the new controller model. Remove the repeated `ActivateIfConditionActivatedAbility + PlanarRollWatcher + CostIncreasingEffect` boilerplate. This is the point where much of #11316 becomes useful as a migration reference.
 
-4. **Echtes `PlanarDeck`.** `seenPlanes` und Random-Auswahl entfernen. Eine geordnete, mischbare Deckstruktur über PlanarCard-IDs einführen. Wichtig: keine neue Magic-Zone; die Objekte bleiben Command-Zone-Objekte. `PlaneswalkEffect` legt die offenen Objekte tatsächlich unten unter ihre Decks und deckt die richtige oberste Karte auf.
+4. **Real `PlanarDeck`.** Replace random Plane selection / `seenPlanes` simulation with a real ordered and shuffled supplemental planar deck. Do not introduce a new Magic zone; the planar cards remain command-zone objects. `PlaneswalkEffect` should put the relevant face-up cards on the bottom of their decks and reveal the actual next card.
 
-5. **`PlanarCard` + mehrere offene Planes.** `Plane` und neues `Phenomenon` unter einer gemeinsamen Runtime-Abstraktion vereinigen, Face-up/Face-down-Zustand und Ownership korrekt modellieren und die Engine von `getCurrentPlane()` auf Collections umstellen.
+5. **`PlanarCard` + Multiple Face-Up Planes.** Introduce a shared runtime abstraction for Plane and Phenomenon, properly model face-up/face-down state and ownership, and migrate the engine away from `getCurrentPlane()` toward collections.
 
-6. **Phenomena.** Encounter-Trigger, Startgame-Sonderfall und die entsprechende State-Based Action implementieren. Erst hier würde ich anfangen, echte Phenomenon-Karten hinzuzufügen.
+6. **Phenomena.** Implement encounter triggers, beginning-of-game special handling, and the required state-based action. Only then start adding actual Phenomenon cards.
 
-7. **Content und UI.** MOC, WHO und die restlichen alten Planes/Phenomena implementieren; anschließend Shared-Planar-Deck-Auswahl und später Individual Planar Decks im Client. Der aktuelle XMage-Modus bleibt zunächst als automatisch generiertes Shared Deck aller implementierten Planar Cards kompatibel.
+7. **Content and UI.** Add MOC, WHO, and the remaining Planechase Planes/Phenomena, then add shared planar-deck selection and eventually individual planar decks in the client. The existing XMage mode can initially remain compatible by automatically generating a shared deck from all implemented planar cards.
 
-Damit hätten wir nach **Schritt 1 schon einen deutlich besseren Planechase-Core**, ohne gleich alles aufzureißen. Nach Schritt 3 wären die bisherigen 21 Planes sauber. Und Schritt 4–6 verwandeln die Simulation schließlich in echtes Planechase.
+After **Phase 1**, the Planechase core is already significantly more correct without tearing apart the entire engine.
 
-## Was ich konkret aus #11316 kopieren würde
+After Phase 3, the existing Plane classes are cleanly migrated.
 
-Nicht den Code als Ganzes. Ich würde praktisch diese drei Ideen extrahieren:
+Phases 4–6 then turn the existing simulation into an actual Planechase implementation.
+
+## What I would specifically reuse from #11316
+
+Not the PR as a whole.
+
+I would extract these ideas:
 
 ```text
 RollPlanarDieSpecialAction
-        ✓ Konzept
+        ✓ concept
 
 ChaosEnsuesTriggeredAbility
-        ✓ fast direkt verwendbar
+        ✓ almost directly reusable
 
 PlaneswalkToSourceTriggeredAbility
-        ✓ API/Name
-        ✗ Implementation neu
+        ✓ API/name
+        ✗ implementation must be rewritten
 ```
 
-Die Massenänderungen der Plane-Klassen dienen uns anschließend als **Migrationsvorlage**.
+The mass edits to existing Plane classes can also serve as a useful **migration reference** later.
 
-Dagegen würde ich diese Teile bewusst **nicht übernehmen**:
+I would deliberately **not copy** these parts directly:
 
 ```text
-Player.rollPlanarDie() mit Planechase-Events
-ROLLED_PLANESWALK ohne echte triggered ability
-RollPlanarDieSpecialAction in seiner aktuellen Form
-Plane-Controller-Behandlung
-den unfertigen PlaneswalkToSource-Trigger
+Player.rollPlanarDie() containing Planechase event logic
+ROLLED_PLANESWALK without a real triggered ability
+the current RollPlanarDieSpecialAction implementation
+the current Plane controller model
+the unfinished PlaneswalkToSource trigger
 ```
 
-Und vor allem würde ich **nicht versuchen, #11316 erst irgendwie compilefähig zu machen**. Wir würden dann mehrere seiner Architekturfehler konservieren und danach wieder entfernen.
+Most importantly, I would **not try to make #11316 compile first and then build on top of it**.
 
-## Der erste Codex-Auftrag sollte deshalb viel kleiner sein als „implementiere Planechase“
+That would preserve several of its architectural problems only for us to remove them again afterward.
 
-Ich würde Codex im ersten Durchgang ausschließlich diesen Zielzustand geben:
+## The first Codex task should be much smaller than “implement Planechase”
+
+For the first implementation step, I would give Codex only this target:
 
 ```text
 OLD
@@ -640,13 +666,29 @@ PLANESWALKER
  → existing PlaneswalkEffect
 ```
 
-**Kein Planar Deck im selben Auftrag. Keine Phenomena. Keine 21-Plane-Massenmigration.**
+**No real Planar Deck in the same task. No Phenomena. No mass migration of all 21 existing Planes.**
 
-Das ist der entscheidende Unterschied zu einem Mammut-Prompt: Wir bauen erst das Fundament so, dass wir anschließend nicht 100 Plane-Klassen zweimal anfassen müssen.
+That is the key difference between a controlled refactor and one giant prompt: build the foundation first so we do not have to rewrite 100 Plane classes twice.
 
-Und ein Detail würde ich sofort mitnehmen: den XMage-**9-Seiten-Würfel würde ich in Phase 1 noch nicht ändern**. Erst Engine-Verhalten korrigieren und Tests grün bekommen; die Umstellung auf regelkonforme `1 Chaos / 1 PW / 4 blank` ist danach eine winzige, isolierte Änderung. So wissen wir bei Regressionen immer, ob die Architektur oder bloß die Wahrscheinlichkeitsänderung schuld ist.
+One detail I would also leave alone during Phase 1: the current XMage **9-sided planar die**.
 
-**Mein nächster Schritt wäre jetzt der konkrete Codex-Prompt für Phase 1**, bereits auf deinen `Lunafreliana/mage-custom:custom`-Stand zugeschnitten, inklusive exakter Dateien, gewünschter Tests, Dingen die Codex ausdrücklich *nicht* verändern darf und Akzeptanzkriterien. Das wäre jetzt ein sinnvoller erster Implementierungsauftrag.
+First fix the engine architecture and get tests passing.
 
-[1]: https://magic.wizards.com/en/news/feature/march-of-the-machine-release-notes?utm_source=chatgpt.com "March of the Machine Release Notes"
-[2]: https://media.wizards.com/2026/downloads/MagicCompRules%2020260619.pdf?utm_source=chatgpt.com "Magic: The Gathering Comprehensive Rules"
+Changing the probabilities to the rules-correct:
+
+```text
+1 Chaos
+1 Planeswalker
+4 blank
+```
+
+can then be done as a very small isolated follow-up.
+
+That makes regressions much easier to diagnose because we can distinguish architecture problems from probability changes.
+
+---
+
+In short: **PR #11316 is extremely useful as a design reference, but not as code to merge.** The strongest ideas are the Special Action, a dedicated chaos event/trigger, and reusable planeswalk-to-source handling. The missing pieces are the real planar deck, correct planar-controller semantics, the inherent planeswalking trigger, multiple face-up planar cards, and Phenomena. Those should be built incrementally rather than patched into the unfinished PR.
+
+
+
