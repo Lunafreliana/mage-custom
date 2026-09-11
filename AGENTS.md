@@ -2,6 +2,8 @@
 
 This repository contains custom XMage card implementations.
 
+For any Planechase-related task, read `docs/PLANECHASE_REWORK.md` before making changes.
+
 ## Mandatory instructions for card-related work
 
 For every task that implements, fixes, reviews, refactors, or tests Magic: The Gathering card behavior:
