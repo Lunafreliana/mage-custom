@@ -12,6 +12,7 @@ import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.PreventionEffectImpl;
 import mage.abilities.effects.common.BecomesMonarchSourceEffect;
 import mage.abilities.effects.common.ReturnMORToBattlefieldUnderOwnerControlWithCounterEffect;
+import mage.abilities.hint.common.MonarchHint;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
@@ -42,7 +43,7 @@ public final class HeartShapedHerb extends CardImpl {
         // to the battlefield under its owner's control with three +1/+1 counters on it and you become the monarch.
         Ability ability = new SimpleActivatedAbility(
                 new HeartShapedHerbReturnEffect(), new ManaCostsImpl<>("{2}")
-        );
+        ).addHint(MonarchHint.instance);
         ability.addCost(new TapSourceCost());
         ability.addCost(new SacrificeSourceCost().setText("sacrifice this artifact"));
         this.addAbility(ability);
