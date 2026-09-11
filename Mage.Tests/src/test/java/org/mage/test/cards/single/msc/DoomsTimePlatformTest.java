@@ -18,6 +18,7 @@ public class DoomsTimePlatformTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Doom's Time Platform");
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         addCard(Zone.GRAVEYARD, playerA, "Lightning Bolt");
+        addCard(Zone.GRAVEYARD, playerA, "Opt");
         addCard(Zone.GRAVEYARD, playerA, "Mountain");
 
         attack(1, playerA, "Grizzly Bears");
@@ -28,6 +29,7 @@ public class DoomsTimePlatformTest extends CardTestPlayerBase {
 
         assertExileCount(playerA, "Lightning Bolt", 1);
         assertCounterOnExiledCardCount("Lightning Bolt", CounterType.TIME, 2);
+        assertGraveyardCount(playerA, "Opt", 1);
         assertGraveyardCount(playerA, "Mountain", 1);
     }
 }
