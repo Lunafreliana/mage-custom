@@ -2183,13 +2183,6 @@ public abstract class GameImpl implements Game {
             return false;
         }
         for (PlanarCard plane : faceUpPlanarCards) {
-            for (Ability ability : plane.getAbilities()) {
-                for (Effect effect : ability.getEffects()) {
-                    if (effect instanceof ContinuousEffect) {
-                        ((ContinuousEffect) effect).discard();
-                    }
-                }
-            }
             state.removeTriggersOfSourceId(plane.getId());
             state.getCommand().remove(plane);
             state.getSharedPlanarDeck().putOnBottom(plane);

@@ -4,7 +4,6 @@ import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
 import mage.constants.Outcome;
 import mage.game.Game;
-import mage.game.command.Plane;
 import mage.players.Player;
 
 /**
@@ -32,9 +31,7 @@ public class PlaneswalkEffect extends OneShotEffect {
             return false;
         }
 
-        // As of now, a player may planeswalk iff there are planes in the command zone.
-        boolean canPlaneswalk = game.getState().getCommand().stream().anyMatch(obj -> obj instanceof Plane);
-        if (!canPlaneswalk) {
+        if (!game.getState().isPlaneChase() || game.getState().getFaceUpPlanarCards().isEmpty()) {
             return true; // Not playing with planeswalk enabled.
         }
 

@@ -20,7 +20,7 @@ public final class FracturedPowerstone extends CardImpl {
 
         // {T}: Roll the planar die. Activate only as a sorcery.
         Ability ability = new ActivateAsSorceryActivatedAbility(
-                new RollPlanarDieEffect(null, null), new TapSourceCost()
+                new RollPlanarDieEffect(), new TapSourceCost()
         );
         this.addAbility(ability);
     }

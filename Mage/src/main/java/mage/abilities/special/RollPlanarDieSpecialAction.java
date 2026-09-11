@@ -18,7 +18,7 @@ public class RollPlanarDieSpecialAction extends SpecialAction {
 
     public RollPlanarDieSpecialAction() {
         super();
-        addEffect(new RollPlanarDieEffect(null, null));
+        addEffect(new RollPlanarDieEffect());
         this.name = "Roll the planar die";
     }
 
