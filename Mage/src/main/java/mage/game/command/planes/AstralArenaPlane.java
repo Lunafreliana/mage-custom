@@ -86,11 +86,7 @@ class AstralArenaAttackRestrictionEffect extends RestrictionEffect {
 
     @Override
     public boolean applies(Permanent permanent, Ability source, Game game) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null) {
-            return false;
-        }
-        return cPlane.getPlaneType().equals(Planes.PLANE_ASTRAL_ARENA);
+        return game.getState().hasFaceUpPlane(Planes.PLANE_ASTRAL_ARENA);
     }
 
     @Override
@@ -117,11 +113,7 @@ class AstralArenaBlockRestrictionEffect extends RestrictionEffect {
 
     @Override
     public boolean applies(Permanent permanent, Ability source, Game game) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null) {
-            return false;
-        }
-        return cPlane.getPlaneType().equals(Planes.PLANE_ASTRAL_ARENA);
+        return game.getState().hasFaceUpPlane(Planes.PLANE_ASTRAL_ARENA);
     }
 
     @Override

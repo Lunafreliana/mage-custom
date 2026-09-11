@@ -12,19 +12,22 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * The ordered, shared planar deck. Planes in this structure are face down but
- * remain command-zone-associated objects; a face-up plane is temporarily absent
- * from the ordering.
+ * The ordered, shared planar deck. Planar cards in this structure are face down
+ * but remain command-zone-associated objects; a face-up planar card is
+ * temporarily absent from the ordering.
  */
 public final class SharedPlanarDeck implements Serializable, Copyable<SharedPlanarDeck> {
 
-    private final LinkedList<Plane> planes = new LinkedList<>();
+    private final UUID id;
+    private final LinkedList<PlanarCard> cards = new LinkedList<>();
 
     public SharedPlanarDeck() {
+        this.id = UUID.randomUUID();
     }
 
     private SharedPlanarDeck(final SharedPlanarDeck deck) {
-        deck.planes.forEach(plane -> planes.add(plane.copy()));
+        this.id = deck.id;
+        deck.cards.forEach(card -> cards.add((PlanarCard) card.copy()));
     }
 
     @Override
@@ -32,40 +35,51 @@ public final class SharedPlanarDeck implements Serializable, Copyable<SharedPlan
         return new SharedPlanarDeck(this);
     }
 
-    public void setPlanes(Collection<? extends Plane> newPlanes, boolean shuffle) {
-        planes.clear();
-        newPlanes.forEach(plane -> planes.add(plane.copy()));
+    public void setPlanes(Collection<? extends PlanarCard> newCards, boolean shuffle) {
+        cards.clear();
+        newCards.forEach(card -> {
+            PlanarCard copy = (PlanarCard) card.copy();
+            copy.setPlanarDeckId(id);
+            copy.setFaceUp(false);
+            cards.add(copy);
+        });
         if (shuffle) {
-            Collections.shuffle(planes, RandomUtil.getRandom());
+            Collections.shuffle(cards, RandomUtil.getRandom());
         }
     }
 
-    public Plane draw() {
-        return planes.pollFirst();
+    public PlanarCard draw() {
+        return cards.pollFirst();
     }
 
-    public void putOnBottom(Plane plane) {
-        planes.addLast(plane);
+    public void putOnBottom(PlanarCard card) {
+        card.setPlanarDeckId(id);
+        card.setFaceUp(false);
+        cards.addLast(card);
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public int size() {
-        return planes.size();
+        return cards.size();
     }
 
     public boolean isEmpty() {
-        return planes.isEmpty();
+        return cards.isEmpty();
     }
 
     /**
      * Returns only identity/order metadata, never the hidden plane objects.
      */
     public List<UUID> getOrder() {
-        List<UUID> result = new ArrayList<>(planes.size());
-        planes.forEach(plane -> result.add(plane.getId()));
+        List<UUID> result = new ArrayList<>(cards.size());
+        cards.forEach(card -> result.add(card.getId()));
         return Collections.unmodifiableList(result);
     }
 
     public void clear() {
-        planes.clear();
+        cards.clear();
     }
 }

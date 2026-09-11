@@ -1,5 +1,7 @@
 package org.mage.test.cards.planes;
 
+import mage.constants.CardType;
+import mage.game.GameState;
 import mage.game.command.Plane;
 import mage.game.command.SharedPlanarDeck;
 import mage.game.command.planes.AgyremPlane;
@@ -18,7 +20,7 @@ public class SharedPlanarDeckTest {
     public void testKnownOrderAndBottomCycling() {
         SharedPlanarDeck deck = knownDeck();
 
-        Plane first = deck.draw();
+        Plane first = (Plane) deck.draw();
         Assert.assertEquals("Plane - Fields of Summer", first.getName());
         deck.putOnBottom(first);
 
@@ -46,6 +48,45 @@ public class SharedPlanarDeckTest {
 
         Assert.assertEquals(3, order.size());
         Assert.assertThrows(UnsupportedOperationException.class, () -> order.remove(0));
+    }
+
+    @Test
+    public void testRuntimeMetadataAndFaceStateSurviveCopy() {
+        SharedPlanarDeck deck = knownDeck();
+        Plane plane = (Plane) deck.draw();
+
+        Assert.assertEquals(CardType.PLANE, plane.getPlanarCardType());
+        Assert.assertEquals(deck.getId(), plane.getPlanarDeckId());
+        Assert.assertFalse(plane.isFaceUp());
+
+        plane.setFaceUp(true);
+        Plane copy = plane.copy();
+        Assert.assertEquals(plane.getId(), copy.getId());
+        Assert.assertEquals(deck.getId(), copy.getPlanarDeckId());
+        Assert.assertTrue(copy.isFaceUp());
+
+        deck.putOnBottom(plane);
+        Assert.assertFalse(plane.isFaceUp());
+        Assert.assertEquals(1, plane.getZoneChangeCounter(null));
+    }
+
+    @Test
+    public void testFaceUpCollectionSupportsZeroOneAndMultiplePlanes() {
+        GameState state = new GameState();
+        Plane fields = new FieldsOfSummerPlane();
+        Plane agyrem = new AgyremPlane();
+
+        Assert.assertTrue(state.getFaceUpPlanarCards().isEmpty());
+        fields.setFaceUp(true);
+        state.addCommandObject(fields);
+        Assert.assertEquals(1, state.getFaceUpPlanes().size());
+        agyrem.setFaceUp(true);
+        state.addCommandObject(agyrem);
+        Assert.assertEquals(2, state.getFaceUpPlanes().size());
+        Assert.assertTrue(state.hasFaceUpPlane(fields.getPlaneType()));
+        Assert.assertTrue(state.isFaceUpPlanarCard(agyrem.getId()));
+        Assert.assertThrows(UnsupportedOperationException.class,
+                () -> state.getFaceUpPlanes().remove(0));
     }
 
     private static SharedPlanarDeck knownDeck() {

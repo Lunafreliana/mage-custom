@@ -92,11 +92,7 @@ class TrailOfTheMageRingsReboundEffect extends ContinuousEffectImpl {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null) {
-            return false;
-        }
-        if (!cPlane.getPlaneType().equals(Planes.PLANE_TRAIL_OF_THE_MAGE_RINGS)) {
+        if (!game.getState().hasFaceUpPlane(Planes.PLANE_TRAIL_OF_THE_MAGE_RINGS)) {
             return false;
         }
 

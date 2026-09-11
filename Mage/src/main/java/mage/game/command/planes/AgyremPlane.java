@@ -162,8 +162,7 @@ class AgyremRestrictionEffect extends RestrictionEffect {
             return true;
         }
 
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane != null && cPlane.getPlaneType().equals(Planes.PLANE_AGYREM)) {
+        if (game.getState().hasFaceUpPlane(Planes.PLANE_AGYREM)) {
             return !defenderId.equals(source.getControllerId());
         }
         return true;

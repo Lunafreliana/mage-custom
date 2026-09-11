@@ -30,7 +30,7 @@ import java.util.UUID;
 /**
  * @author spjspj
  */
-public abstract class Plane extends CommandObjectImpl {
+public abstract class Plane extends CommandObjectImpl implements PlanarCard {
 
     private static final ManaCosts emptyCost = new ManaCostsImpl<>();
 
@@ -42,6 +42,10 @@ public abstract class Plane extends CommandObjectImpl {
     private MageObject copyFrom; // copied card INFO (used to call original adjusters)
     private FrameStyle frameStyle;
     private Abilities<Ability> abilites = new AbilitiesImpl<>();
+    private UUID planarDeckId;
+    private UUID planarDeckOwnerId;
+    private boolean faceUp;
+    private int planarZoneChangeCounter;
 
     public Plane() {
         super("");
@@ -57,6 +61,10 @@ public abstract class Plane extends CommandObjectImpl {
         this.copy = plane.copy;
         this.copyFrom = (plane.copyFrom != null ? plane.copyFrom.copy() : null);
         this.abilites = plane.abilites.copy();
+        this.planarDeckId = plane.planarDeckId;
+        this.planarDeckOwnerId = plane.planarDeckOwnerId;
+        this.faceUp = plane.faceUp;
+        this.planarZoneChangeCounter = plane.planarZoneChangeCounter;
     }
 
     @Override
@@ -147,8 +155,46 @@ public abstract class Plane extends CommandObjectImpl {
     }
 
     @Override
+    public CardType getPlanarCardType() {
+        return CardType.PLANE;
+    }
+
+    @Override
+    public UUID getPlanarDeckId() {
+        return planarDeckId;
+    }
+
+    @Override
+    public void setPlanarDeckId(UUID planarDeckId) {
+        this.planarDeckId = planarDeckId;
+    }
+
+    @Override
+    public UUID getPlanarDeckOwnerId() {
+        return planarDeckOwnerId;
+    }
+
+    @Override
+    public void setPlanarDeckOwnerId(UUID planarDeckOwnerId) {
+        this.planarDeckOwnerId = planarDeckOwnerId;
+    }
+
+    @Override
+    public boolean isFaceUp() {
+        return faceUp;
+    }
+
+    @Override
+    public void setFaceUp(boolean faceUp) {
+        if (this.faceUp && !faceUp) {
+            planarZoneChangeCounter++;
+        }
+        this.faceUp = faceUp;
+    }
+
+    @Override
     public List<CardType> getCardType(Game game) {
-        return Collections.emptyList();
+        return Collections.singletonList(CardType.PLANE);
     }
 
     @Override
@@ -241,7 +287,7 @@ public abstract class Plane extends CommandObjectImpl {
 
     @Override
     public int getZoneChangeCounter(Game game) {
-        return 1; // Planes can't move zones until now so return always 1
+        return planarZoneChangeCounter;
     }
 
     @Override

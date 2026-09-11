@@ -59,8 +59,7 @@ class FieldsOfSummerEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        Plane cPlane = game.getState().getCurrentPlane();
-        if (cPlane == null || !cPlane.getPlaneType().equals(Planes.PLANE_FIELDS_OF_SUMMER)) {
+        if (!game.getState().hasFaceUpPlane(Planes.PLANE_FIELDS_OF_SUMMER)) {
             return false;
         }
         Player owner = game.getPlayer(this.getTargetPointer().getFirst(game, source));

@@ -675,6 +675,30 @@ simultaneous face-up cards, and phenomena remain assigned to Phases 5 and 6.
 
 Introduce/evolve a common runtime abstraction for planes and future phenomena, including type, stable identity, associated deck/owner, face state, and abilities. Add collection-first face-up APIs and migrate engine callers away from singleton assumptions. Support bottoming/walking away from all applicable face-up planar cards and test multiple-face-up event/controller behavior. Keep the CommandObject model unless implementation research demonstrates a concrete blocker; do not mass-convert to `CardImpl` by default.
 
+#### Phase 5 implementation
+
+`PlanarCard` is the common command-zone runtime contract for planes and future
+phenomena. It exposes the planar card type, stable command-object identity,
+planar-deck association and owner metadata, and explicit face state. `Plane`
+implements that contract and now reports the `PLANE` card type. Turning a
+face-up planar card face down advances its object-change counter without moving
+it to a different Magic zone.
+
+`GameState.getFaceUpPlanarCards()` is the authoritative collection-first API;
+`getFaceUpPlanes()`, `hasFaceUpPlane(...)`, and `isFaceUpPlanarCard(...)` are
+typed/query conveniences. The old singleton `getCurrentPlane()` API has been
+removed, and plane rules, server diagnostics, and tests now use these
+collection APIs. This allows zero, one, or multiple simultaneous face-up
+planar cards without making command-zone ordering observable.
+
+`SharedPlanarDeck` now stores the common runtime type and gives every stored
+object a stable deck ID. Planeswalking snapshots and bottoms every face-up
+planar card, removes all of their active continuous/trigger registrations, and
+then turns the actual top card of the shared deck face up. The `PLANESWALK` and
+`PLANESWALKED` events identify the exact destination object in `targetId` and
+the planeswalking player in `playerId`; source-bound "planeswalk to" triggers
+therefore compare the event target with their own source ID.
+
 ### Phase 6 — Phenomena
 
 Implement phenomenon runtime content, encounter triggers, beginning-of-game skip/no-trigger logic, triggered-ability source tracking, and the 704.6f/312.7 state-based action. Add deterministic ordered-deck tests for resolution, countering/removal from stack, setup, multiple face-up cards, and controller/departure behavior before adding broad phenomenon content.

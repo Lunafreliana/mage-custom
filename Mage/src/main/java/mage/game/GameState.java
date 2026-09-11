@@ -9,6 +9,7 @@ import mage.abilities.effects.ContinuousEffectsList;
 import mage.abilities.effects.Effect;
 import mage.cards.*;
 import mage.constants.PhaseStep;
+import mage.constants.Planes;
 import mage.constants.TurnPhase;
 import mage.constants.Zone;
 import mage.designations.Designation;
@@ -19,6 +20,7 @@ import mage.game.command.Command;
 import mage.game.command.CommandObject;
 import mage.game.command.Emblem;
 import mage.game.command.Plane;
+import mage.game.command.PlanarCard;
 import mage.game.command.SharedPlanarDeck;
 import mage.game.events.*;
 import mage.game.permanent.Battlefield;
@@ -529,15 +531,27 @@ public class GameState implements Serializable, Copyable<GameState> {
         return helperEmblems;
     }
 
-    public Plane getCurrentPlane() {
-        if (command != null && !command.isEmpty()) {
-            for (CommandObject cobject : command) {
-                if (cobject instanceof Plane) {
-                    return (Plane) cobject;
-                }
-            }
-        }
-        return null;
+    public List<PlanarCard> getFaceUpPlanarCards() {
+        return command.stream()
+                .filter(PlanarCard.class::isInstance)
+                .map(PlanarCard.class::cast)
+                .filter(PlanarCard::isFaceUp)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+    }
+
+    public List<Plane> getFaceUpPlanes() {
+        return getFaceUpPlanarCards().stream()
+                .filter(Plane.class::isInstance)
+                .map(Plane.class::cast)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+    }
+
+    public boolean isFaceUpPlanarCard(UUID id) {
+        return id != null && getFaceUpPlanarCards().stream().anyMatch(card -> id.equals(card.getId()));
+    }
+
+    public boolean hasFaceUpPlane(Planes planeType) {
+        return getFaceUpPlanes().stream().anyMatch(plane -> planeType == plane.getPlaneType());
     }
 
     public SharedPlanarDeck getSharedPlanarDeck() {
@@ -556,9 +570,9 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.planarControllerId = planarControllerId;
         Set<UUID> planarSourceIds = new HashSet<>();
         for (CommandObject commandObject : command) {
-            if (commandObject instanceof Plane) {
+            if (commandObject instanceof PlanarCard) {
                 planarSourceIds.add(commandObject.getId());
-                ((Plane) commandObject).setControllerId(planarControllerId);
+                ((PlanarCard) commandObject).setControllerId(planarControllerId);
             }
         }
         for (TriggeredAbility ability : triggers.values()) {
