@@ -62,6 +62,8 @@ public class GameView implements Serializable {
     private final int turn;
     private boolean special = false;
     private final boolean rollbackTurnsAllowed;
+    private final List<PlanarCardView> faceUpPlanarCards = new ArrayList<>();
+    private final int sharedPlanarDeckSize;
 
     // for debug only
     // TODO: implement and support in admin tools
@@ -213,9 +215,19 @@ public class GameView implements Serializable {
             this.special = false;
         }
         this.rollbackTurnsAllowed = game.getOptions().rollbackTurnsAllowed;
+        state.getFaceUpPlanarCards().forEach(card -> faceUpPlanarCards.add(new PlanarCardView(card)));
+        this.sharedPlanarDeckSize = state.getSharedPlanarDeck().size();
         this.totalErrorsCount = game.getTotalErrorsCount();
         this.totalEffectsCount = game.getTotalEffectsCount();
         this.gameCycle = game.getState().getApplyEffectsCounter();
+    }
+
+    public List<PlanarCardView> getFaceUpPlanarCards() {
+        return Collections.unmodifiableList(faceUpPlanarCards);
+    }
+
+    public int getSharedPlanarDeckSize() {
+        return sharedPlanarDeckSize;
     }
 
     private void checkPaid(UUID uuid, StackAbility stackAbility) {

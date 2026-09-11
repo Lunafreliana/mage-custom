@@ -767,6 +767,24 @@ evaluate them only after the four-player free-for-all Commander flow is usable
 and tested. Four players is the initial product focus, not a new Planechase deck
 legality rule baked into the engine.
 
+#### Phase 7 implementation
+
+`PlanarCardRegistry` is now the stable-id catalog and factory boundary shared by
+the client, match protocol, server, and game. Its serializable metadata exposes
+English name, planar type, image name, and set code without exposing Java class
+names. `SharedPlanarDeckValidator` validates mixed ordered lists for the communal
+minimum, unique English names, phenomenon cap, known ids, and the presence of a
+plane. The match-to-game protocol carries one ordered list of registry ids; the
+older split plane/phenomenon options remain only as deterministic test seams.
+
+The custom-options dialog provides the initial four-player Commander shared-deck
+editor and reports legality errors before submission; the server repeats
+validation using the actual player count rather than trusting the client. Game
+views expose every face-up planar card plus only the face-down shared deck's
+public size, so hidden order and identities do not cross the view boundary.
+There are currently too few implemented unique planar cards to assemble a legal
+four-player communal deck; adding enough selectable content remains Phase 8.
+
 ### Phase 8 — Incremental Plane and Phenomenon Implementation
 
 Implement additional planar cards one plane or phenomenon at a time, selecting
