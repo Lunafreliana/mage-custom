@@ -6,16 +6,18 @@ import mage.constants.Zone;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBaseWithAIHelps;
 
+import java.util.Collections;
+
 public class FracturedPowerstoneTest extends CardTestPlayerBaseWithAIHelps {
     
     @Test
     public void test_FracturedPowerstone_Single() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
         addCard(Zone.BATTLEFIELD, playerA, "Fractured Powerstone", 1);
 
         // first chaos
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         //second chaos (fractured powerstone)
@@ -33,12 +35,12 @@ public class FracturedPowerstoneTest extends CardTestPlayerBaseWithAIHelps {
     @Test
     public void test_FracturedPowerstone_NoCost() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 1);
         addCard(Zone.BATTLEFIELD, playerA, "Fractured Powerstone", 1);
 
         // first chaos
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         //second chaos (fractured powerstone)
@@ -46,7 +48,7 @@ public class FracturedPowerstoneTest extends CardTestPlayerBaseWithAIHelps {
         setDieRollResult(playerA, 1); // make chaos
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         // third chaos (with additional cost)
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
 
         setStrictChooseMode(true);
@@ -55,5 +57,10 @@ public class FracturedPowerstoneTest extends CardTestPlayerBaseWithAIHelps {
 
         assertPermanentCount(playerA, "Eldrazi Token", 3);
         assertTappedCount("Mountain", true, 1); // cost for second planar die
+    }
+
+    private void useHedronFieldsPlanechase() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
     }
 }

@@ -668,6 +668,21 @@ public class TestPlayer implements Player {
                             groupsForTargetHandling = null;
                         }
                     }
+                    // Non-mana special actions are exposed separately from normal playable
+                    // abilities by the engine. Include them here so tests can exercise rules
+                    // actions such as rolling the planar die through the player interface.
+                    for (SpecialAction specialAction : game.getState().getSpecialActions()
+                            .getControlledBy(this.getId(), false).values()) {
+                        if (hasAbilityTargetNameOrAlias(game, specialAction, groups[0])) {
+                            int bookmark = game.bookmarkState();
+                            if (computerPlayer.activateAbility(specialAction.copy(), game)) {
+                                actions.remove(action);
+                                foundNoAction = 0;
+                                return true;
+                            }
+                            computerPlayer.restoreState(bookmark, specialAction.getRule(), game);
+                        }
+                    }
                     printStart(game, "Available for " + this.getName());
                     printMana(game, this.getManaAvailable(game));
                     printAbilities(game, this.getPlayable(game, true));
