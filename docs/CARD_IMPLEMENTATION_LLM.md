@@ -291,6 +291,14 @@ independently.
 
 Zone changes are events and generally produce a new game object identity/state. Use the engine move/exile/return effects and zone-change counters; do not keep a `Permanent`/`Card` reference and assume it represents the object after it moves. A blinked permanent is new. A card moved graveyard-to-battlefield is not the graveyard object for continuous tracking.
 
+When a stable supplemental or command-zone runtime object is temporarily made
+inactive and may later become active again, do not call `discard()` on the
+continuous-effect templates stored in its printed abilities. Those templates
+are copied when the abilities are registered; mutating them prevents the same
+runtime object from restoring its printed effects when it becomes active again.
+Deactivate or remove the registered runtime copies, and preserve the printed
+ability graph.
+
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A
 battlefield ability that has not yet triggered can still have

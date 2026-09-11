@@ -75,6 +75,10 @@ ActivateIfConditionActivatedAbility (Zone.COMMAND)
 Phase 3 removed that repeated infrastructure from all 21 registered planes. Each
 plane now owns a `ChaosEnsuesTriggeredAbility`, while voluntary rolls are exposed
 only by the game-level special action and card-generated rolls remain independent.
+The former compatibility parameters on `RollPlanarDieEffect` have also been
+removed: every caller now produces a semantic planar result and routes it through
+the common resolver, so later phases cannot accidentally revive plane-local chaos
+execution.
 
 `mage.abilities.effects.common.RollPlanarDieEffect` both rolls and interprets the result. It asks the controller to roll, then:
 
@@ -696,11 +700,17 @@ planar cards without making command-zone ordering observable.
 
 `SharedPlanarDeck` now stores the common runtime type and gives every stored
 object a stable deck ID. Planeswalking snapshots and bottoms every face-up
-planar card, removes all of their active continuous/trigger registrations, and
-then turns the actual top card of the shared deck face up. The `PLANESWALK` and
+planar card, removes its trigger registrations, lets continuous registrations
+become inactive with their source, and then turns the actual top card of the
+shared deck face up. The `PLANESWALK` and
 `PLANESWALKED` events identify the exact destination object in `targetId` and
 the planeswalking player in `playerId`; source-bound "planeswalk to" triggers
 therefore compare the event target with their own source ID.
+
+Bottoming a planar card never discards the continuous effects embedded in its
+printed abilities. Active registrations become inapplicable when the source is
+no longer face up; preserving the printed templates is required so the same
+stable planar object can function again after cycling through the ordered deck.
 
 ### Phase 6 — Phenomena
 
