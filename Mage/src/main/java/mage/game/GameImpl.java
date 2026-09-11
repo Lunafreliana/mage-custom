@@ -1442,7 +1442,7 @@ public abstract class GameImpl implements Game {
         if (gameOptions.planeChase) {
             state.setPlanarControllerId(startingPlayerId);
             initializeSharedPlanarDeck();
-            turnTopPlanarCardFaceUp(startingPlayerId);
+            turnStartingPlaneFaceUp(startingPlayerId);
             state.setPlaneChase(this, gameOptions.planeChase);
             for (Player player : getPlayers().values()) {
                 RollPlanarDieSpecialAction action = new RollPlanarDieSpecialAction();
@@ -1482,12 +1482,23 @@ public abstract class GameImpl implements Game {
         Collection<Planes> configuredPlanes = gameOptions.sharedPlanarDeck.isEmpty()
                 ? Arrays.asList(Planes.values())
                 : gameOptions.sharedPlanarDeck;
-        List<Plane> planes = configuredPlanes.stream()
+        List<PlanarCard> planarCards = new ArrayList<>();
+        Collection<Phenomena> configuredPhenomena = gameOptions.sharedPlanarPhenomena.isEmpty()
+                && gameOptions.sharedPlanarDeck.isEmpty()
+                ? Arrays.asList(Phenomena.values())
+                : gameOptions.sharedPlanarPhenomena;
+        configuredPhenomena.stream()
+                .map(Phenomenon::createPhenomenon)
+                .filter(Objects::nonNull)
+                .forEach(planarCards::add);
+        configuredPlanes.stream()
                 .map(Plane::createPlane)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        planes.forEach(this::initializePlanarObject);
-        state.getSharedPlanarDeck().setPlanes(planes, gameOptions.sharedPlanarDeck.isEmpty());
+                .forEach(planarCards::add);
+        planarCards.forEach(this::initializePlanarObject);
+        boolean useDefaultDeck = gameOptions.sharedPlanarDeck.isEmpty()
+                && gameOptions.sharedPlanarPhenomena.isEmpty();
+        state.getSharedPlanarDeck().setPlanes(planarCards, useDefaultDeck);
     }
 
     private void initializePlanarObject(PlanarCard plane) {
@@ -1500,18 +1511,49 @@ public abstract class GameImpl implements Game {
         }
     }
 
+    private boolean turnStartingPlaneFaceUp(UUID startingPlayerId) {
+        int cardsToCheck = state.getSharedPlanarDeck().size();
+        while (cardsToCheck-- > 0) {
+            PlanarCard planarCard = state.getSharedPlanarDeck().draw();
+            if (planarCard == null) {
+                return false;
+            }
+            if (planarCard.getPlanarCardType() == CardType.PLANE) {
+                return turnPlanarCardFaceUp(planarCard, startingPlayerId, false);
+            }
+            // 103.7/901.5: turn setup phenomena face up, but suppress all
+            // triggers, then turn them face down on the bottom.
+            planarCard.setFaceUp(true);
+            state.getSharedPlanarDeck().putOnBottom(planarCard);
+        }
+        return false;
+    }
+
     private boolean turnTopPlanarCardFaceUp(UUID planeswalkingPlayerId) {
-        PlanarCard plane = state.getSharedPlanarDeck().draw();
-        if (plane == null) {
+        PlanarCard planarCard = state.getSharedPlanarDeck().draw();
+        if (planarCard == null) {
             return false;
         }
-        plane.setControllerId(state.getPlanarControllerId());
-        plane.setFaceUp(true);
-        state.addCommandObject(plane);
-        informPlayers("You have planeswalked to " + plane.getLogName());
-        GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK, plane.getId(), (Ability) null, planeswalkingPlayerId, 0, true);
+        return turnPlanarCardFaceUp(planarCard, planeswalkingPlayerId, true);
+    }
+
+    private boolean turnPlanarCardFaceUp(PlanarCard planarCard, UUID playerId, boolean emitEvents) {
+        planarCard.setControllerId(state.getPlanarControllerId());
+        planarCard.setFaceUp(true);
+        state.addCommandObject(planarCard);
+        if (!emitEvents) {
+            return true;
+        }
+        if (planarCard.getPlanarCardType() == CardType.PHENOMENON) {
+            informPlayers(getPlayer(playerId).getLogName() + " encountered " + planarCard.getLogName());
+            fireEvent(new GameEvent(GameEvent.EventType.ENCOUNTERED_PHENOMENON,
+                    planarCard.getId(), (Ability) null, playerId, 0, true));
+            return true;
+        }
+        informPlayers("You have planeswalked to " + planarCard.getLogName());
+        GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK, planarCard.getId(), (Ability) null, playerId, 0, true);
         if (!replaceEvent(event)) {
-            fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED, plane.getId(), (Ability) null, planeswalkingPlayerId, 0, true));
+            fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED, planarCard.getId(), (Ability) null, playerId, 0, true));
         }
         return true;
     }
@@ -2123,6 +2165,18 @@ public abstract class GameImpl implements Game {
     }
 
     @Override
+    public boolean addPhenomenon(Phenomenon phenomenon, UUID toPlayerId) {
+        Phenomenon newPhenomenon = phenomenon.copy();
+        if (state.getPlanarControllerId() == null) {
+            state.setPlanarControllerId(toPlayerId);
+        }
+        initializePlanarObject(newPhenomenon);
+        newPhenomenon.setPlanarDeckOwnerId(toPlayerId);
+        state.getSharedPlanarDeck().putOnBottom(newPhenomenon);
+        return turnTopPlanarCardFaceUp(toPlayerId);
+    }
+
+    @Override
     public boolean planeswalk(UUID playerId) {
         List<PlanarCard> faceUpPlanarCards = new ArrayList<>(state.getFaceUpPlanarCards());
         if (faceUpPlanarCards.isEmpty() || !Objects.equals(playerId, state.getPlanarControllerId())) {
@@ -2455,6 +2509,22 @@ public abstract class GameImpl implements Game {
      */
     protected boolean checkStateBasedActions() {
         boolean somethingHappened = false;
+
+        // 704.6f/312.7: after its encounter trigger has left the stack, a
+        // face-up phenomenon makes its planar controller planeswalk.
+        for (Phenomenon phenomenon : new ArrayList<>(state.getFaceUpPhenomena())) {
+            boolean sourceTriggerPending = getStack().stream()
+                    .filter(stackObject -> !stackObject.isCopy())
+                    .filter(stackObject -> stackObject.getStackAbility() instanceof TriggeredAbility)
+                    .anyMatch(stackObject -> phenomenon.getId().equals(stackObject.getSourceId()))
+                    || state.getPlayers().keySet().stream()
+                    .flatMap(playerId -> state.getTriggered(playerId).stream())
+                    .anyMatch(ability -> phenomenon.getId().equals(ability.getSourceId()));
+            if (!sourceTriggerPending && planeswalk(state.getPlanarControllerId())) {
+                somethingHappened = true;
+                break;
+            }
+        }
 
         //20091005 - 704.5a/704.5b/704.5c
         for (Player player : state.getPlayers().values()) {

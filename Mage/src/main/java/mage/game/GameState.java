@@ -20,6 +20,7 @@ import mage.game.command.Command;
 import mage.game.command.CommandObject;
 import mage.game.command.Emblem;
 import mage.game.command.Plane;
+import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
 import mage.game.command.SharedPlanarDeck;
 import mage.game.events.*;
@@ -543,6 +544,13 @@ public class GameState implements Serializable, Copyable<GameState> {
         return getFaceUpPlanarCards().stream()
                 .filter(Plane.class::isInstance)
                 .map(Plane.class::cast)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+    }
+
+    public List<Phenomenon> getFaceUpPhenomena() {
+        return getFaceUpPlanarCards().stream()
+                .filter(Phenomenon.class::isInstance)
+                .map(Phenomenon.class::cast)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 

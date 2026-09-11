@@ -143,7 +143,7 @@ public enum TokenRepository {
                         imageNumber = Integer.parseInt(params.get(3));
                     }
 
-                    if (objectType.isEmpty() || !objectType.matches("(?:DUNGEON|EMBLEM|PLANE|TOK):[A-Z0-9]{3,4}")) {
+                    if (objectType.isEmpty() || !objectType.matches("(?:DUNGEON|EMBLEM|PHENOMENON|PLANE|TOK):[A-Z0-9]{3,4}")) {
                         errorsList.add("Tokens database: invalid object type declaration: " + line);
                         continue;
                     }
@@ -187,6 +187,18 @@ public enum TokenRepository {
                         }
                         if (!tokenClassName.endsWith("Plane")) {
                             errorsList.add("Tokens database: plane's class name must ends with [...Plane] word: " + line);
+                            continue;
+                        }
+                    }
+
+                    if (typeAndSet[0].equals("PHENOMENON")) {
+                        tokenType = TokenType.PHENOMENON;
+                        if (!tokenName.startsWith("Phenomenon - ")) {
+                            errorsList.add("Tokens database: phenomenon's name must start with [Phenomenon - ...] word: " + line);
+                            continue;
+                        }
+                        if (!tokenClassName.endsWith("Phenomenon")) {
+                            errorsList.add("Tokens database: phenomenon's class name must ends with [...Phenomenon] word: " + line);
                             continue;
                         }
                     }
