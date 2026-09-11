@@ -1,14 +1,10 @@
 package mage.game.command.planes;
 
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.Effect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.abilities.effects.common.search.SearchLibraryPutInHandEffect;
 import mage.abilities.keyword.ReboundAbility;
 import mage.cards.Card;
@@ -21,13 +17,9 @@ import mage.game.command.Plane;
 import mage.game.stack.Spell;
 import mage.game.stack.StackObject;
 import mage.players.Player;
-import mage.target.Target;
 import mage.target.common.TargetCardInLibrary;
-import mage.watchers.common.PlanarRollWatcher;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,20 +34,11 @@ public class TrailOfTheMageRingsPlane extends Plane {
         Ability ability = new SimpleStaticAbility(Zone.COMMAND, new TrailOfTheMageRingsReboundEffect());
         this.getAbilities().add(ability);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, you may search your library for an instant or sorcery card, reveal it, put it into your hand, then shuffle your library
+        // Whenever chaos ensues, you may search your library for an instant or sorcery card, reveal it, put it into your hand, then shuffle your library
         Effect chaosEffect = new SearchLibraryPutInHandEffect(new TargetCardInLibrary(0, 1, new FilterInstantOrSorceryCard()), true);
-        Target chaosTarget = null;
 
-        List<Effect> chaosEffects = new ArrayList<Effect>();
-        chaosEffects.add(chaosEffect);
-        List<Target> chaosTargets = new ArrayList<Target>();
-        chaosTargets.add(chaosTarget);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
+        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
         this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
     }
 
     private TrailOfTheMageRingsPlane(final TrailOfTheMageRingsPlane plane) {

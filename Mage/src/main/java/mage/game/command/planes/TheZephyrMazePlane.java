@@ -1,21 +1,16 @@
 package mage.game.command.planes;
 
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.condition.common.IsStillOnPlaneCondition;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.decorator.ConditionalContinuousEffect;
 import mage.abilities.effects.Effect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
 import mage.abilities.effects.common.continuous.BoostAllEffect;
 import mage.abilities.effects.common.continuous.GainAbilityTargetEffect;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.abilities.keyword.FlyingAbility;
 import mage.constants.Duration;
 import mage.constants.Planes;
-import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.Predicates;
@@ -23,10 +18,6 @@ import mage.filter.predicate.mageobject.AbilityPredicate;
 import mage.game.command.Plane;
 import mage.target.Target;
 import mage.target.common.TargetCreaturePermanent;
-import mage.watchers.common.PlanarRollWatcher;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author spjspj
@@ -60,20 +51,13 @@ public class TheZephyrMazePlane extends Plane {
                 walkingRule));
         this.getAbilities().add(ability2);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, target creature gains flying until end of turn
+        // Whenever chaos ensues, target creature gains flying until end of turn
         Effect chaosEffect = new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.EndOfTurn);
         Target chaosTarget = new TargetCreaturePermanent(0, 1);
 
-        List<Effect> chaosEffects = new ArrayList<Effect>();
-        chaosEffects.add(chaosEffect);
-        List<Target> chaosTargets = new ArrayList<Target>();
-        chaosTargets.add(chaosTarget);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
+        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
+        chaosAbility.addTarget(chaosTarget);
         this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
     }
 
     private TheZephyrMazePlane(final TheZephyrMazePlane plane) {

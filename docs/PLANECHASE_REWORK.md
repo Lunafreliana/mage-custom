@@ -59,7 +59,8 @@ The existing `PLANESWALK`/`PLANESWALKED` event pair may provide useful replaceme
 
 ### 2.4 Current planar roll ability, result handling, and cost
 
-Every implemented `Plane` repeats essentially the same voluntary-roll infrastructure:
+Before Phase 3, every implemented `Plane` repeated essentially the same
+voluntary-roll infrastructure:
 
 ```text
 ActivateIfConditionActivatedAbility (Zone.COMMAND)
@@ -71,7 +72,9 @@ ActivateIfConditionActivatedAbility (Zone.COMMAND)
   + SimpleStaticAbility(PlanarDieRollCostIncreasingEffect)
 ```
 
-This makes the rules-provided roll look like an activated ability of the current plane. The repeated ability is available through each plane rather than once through the Planechase game rules.
+Phase 3 removed that repeated infrastructure from all 21 registered planes. Each
+plane now owns a `ChaosEnsuesTriggeredAbility`, while voluntary rolls are exposed
+only by the game-level special action and card-generated rolls remain independent.
 
 `mage.abilities.effects.common.RollPlanarDieEffect` both rolls and interprets the result. It asks the controller to roll, then:
 
@@ -538,12 +541,10 @@ Add/update focused tests for every non-mechanical conversion, especially Panopti
 
 #### Phase 3 execution specification
 
-Phase 3 is a bounded content migration over the 21 classes currently registered in
-`mage.game.command.planes`; it is not another rules-core or planar-deck phase.
-`FieldsOfSummerPlane` is the Phase 1 pilot and already uses
-`ChaosEnsuesTriggeredAbility`. The other 20 classes still contain the complete
-legacy roll wrapper (activated ability, zero-mana cost, watcher, `mayActivate(ANY)`,
-and cost-increasing static ability). The migration must leave **no** plane-owned
+Phase 3 was completed on September 11, 2026 as a bounded content migration over
+the 21 classes registered in `mage.game.command.planes`; it did not add another
+rules-core or planar-deck phase. `FieldsOfSummerPlane` was the Phase 1 pilot, and
+the other 20 classes now also use `ChaosEnsuesTriggeredAbility`. No plane owns a
 way to roll the planar die. The game-level special action and card-generated
 `RollPlanarDieEffect` are the only roll producers after this phase.
 

@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBaseWithAIHelps;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author TheElk801, JayDi85
@@ -211,15 +212,15 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     @Test
     public void test_PlanarDie_Single() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 1);
 
         // first chaos
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         // second chaos (with additional cost)
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
 
         setStrictChooseMode(true);
@@ -233,7 +234,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     @Test
     public void test_PlanarDice_OneOrMoreDieRollTriggersMustWork() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
         //
         // Whenever you roll one or more dice, Farideh, Devil's Chosen gains flying and menace until end of turn.
         // If any of those results was 10 or higher, draw a card.
@@ -242,8 +243,9 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         checkAbility("no fly before", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Farideh, Devil's Chosen", FlyingAbility.class, false);
 
         // roll planar die and trigger Farideh
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
+        setChoice(playerA, "Plane - Hedron Fields of Agadeem"); // order the plane and Farideh triggers
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
 
         checkAbility("must be fly after", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Farideh, Devil's Chosen", FlyingAbility.class, true);
@@ -258,7 +260,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     @Test
     public void test_PlanarDice_DieRollTrigger_MustWorkAndSeeEmptyResult_1() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
         //
         // As Hammer Jammer enters the battlefield, roll a six-sided die. Hammer Jammer enters the battlefield with a number of +1/+1 counters on it equal to the result.
         // Whenever you roll a die, remove all +1/+1 counters from Hammer Jammer, then put a number of +1/+1 counters on it equal to the result.
@@ -272,8 +274,9 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         checkPT("must have 5/5 hammer", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Hammer Jammer", 5, 5);
 
         // roll planar die and trigger event with 0 result
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // make chaos
+        setChoice(playerA, "Plane - Hedron Fields of Agadeem"); // order the plane and Hammer Jammer triggers
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         checkGraveyardCount("hammer must die", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Hammer Jammer", 1);
 
@@ -287,7 +290,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     @Test
     public void test_PlanarDice_DieRollTrigger_MustWorkAndSeeEmptyResult_2() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
         //
         // Whenever you roll a 5 or higher on a die, Steel Squirrel gets +X/+X until end of turn, where X is the result.
         addCard(Zone.BATTLEFIELD, playerA, "Steel Squirrel", 1); // 1/1
@@ -299,7 +302,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         checkPT("no boost before", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Steel Squirrel", 1, 1);
 
         // roll planar die and trigger event with 0 result
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 7); // make blank
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         checkPT("no boost after planar", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "Steel Squirrel", 1, 1);
@@ -403,10 +406,10 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         addCard(Zone.BATTLEFIELD, playerA, "Barbarian Class", 2);
         //
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
 
         // roll planar die, but no triggers with double roll - cause it works with numerical results (lowest)
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // only one roll, chaos
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
 
@@ -423,10 +426,10 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         addCard(Zone.BATTLEFIELD, playerA, "Krark's Other Thumb", 1);
         //
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
 
         // roll planar die, but no triggers with second roll - cause it works with numerical results (lowest)
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 4); // first roll as blank
         setDieRollResult(playerA, 1); // second roll as chaos
         setChoice(playerA, "Chaos Roll"); // must choose result
@@ -451,7 +454,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 4);
         //
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
-        addPlane(playerA, Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
+        useHedronFieldsPlanechase();
 
         // prepare idea cost
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{2}{B/R}{B/R}, {T}");
@@ -466,7 +469,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
 
         // roll planar die, but no triggers with second roll - cause it works with numerical results (sum)
         // or planar dice hasn't 6 sides
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{0}: Roll the planar");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
         setDieRollResult(playerA, 1); // only one roll, chaos
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
 
@@ -500,5 +503,10 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.END_TURN);
         execute();
+    }
+
+    private void useHedronFieldsPlanechase() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_HEDRON_FIELDS_OF_AGADEEM);
     }
 }

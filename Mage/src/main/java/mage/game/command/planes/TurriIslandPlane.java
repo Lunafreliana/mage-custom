@@ -1,28 +1,19 @@
 package mage.game.command.planes;
 
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
 import mage.abilities.SpellAbility;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.effects.Effect;
 import mage.abilities.effects.common.RevealLibraryPutIntoHandEffect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
 import mage.abilities.effects.common.cost.CostModificationEffectImpl;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.cards.Card;
 import mage.constants.*;
 import mage.filter.FilterCard;
 import mage.filter.common.FilterCreatureCard;
 import mage.game.Game;
 import mage.game.command.Plane;
-import mage.target.Target;
 import mage.util.CardUtil;
-import mage.watchers.common.PlanarRollWatcher;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author spjspj
@@ -36,20 +27,11 @@ public class TurriIslandPlane extends Plane {
         Ability ability = new SimpleStaticAbility(Zone.COMMAND, new TurriIslandEffect(2));
         this.getAbilities().add(ability);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, reveal the top three cards of your library. Put all creature cards revealed this way into your hand and the rest into your graveyard.
+        // Whenever chaos ensues, reveal the top three cards of your library. Put all creature cards revealed this way into your hand and the rest into your graveyard.
         Effect chaosEffect = new RevealLibraryPutIntoHandEffect(3, new FilterCreatureCard("creature cards"), Zone.GRAVEYARD);
-        Target chaosTarget = null;
 
-        List<Effect> chaosEffects = new ArrayList<>();
-        chaosEffects.add(chaosEffect);
-        List<Target> chaosTargets = new ArrayList<>();
-        chaosTargets.add(chaosTarget);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
+        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
         this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
     }
 
     private TurriIslandPlane(final TurriIslandPlane plane) {

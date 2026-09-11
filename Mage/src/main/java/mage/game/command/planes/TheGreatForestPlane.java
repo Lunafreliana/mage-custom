@@ -1,26 +1,17 @@
 package mage.game.command.planes;
 
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.Effect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
 import mage.abilities.effects.common.continuous.BoostControlledEffect;
 import mage.abilities.effects.common.continuous.GainAbilityControlledEffect;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.abilities.keyword.TrampleAbility;
 import mage.constants.*;
 import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.game.command.Plane;
-import mage.target.Target;
-import mage.watchers.common.PlanarRollWatcher;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author spjspj
@@ -34,24 +25,12 @@ public class TheGreatForestPlane extends Plane {
         Ability ability = new SimpleStaticAbility(Zone.COMMAND, new TheGreatForestCombatDamageRuleEffect());
         this.getAbilities().add(ability);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, creatures you control get +0/+2 and gain trample until end of turn
+        // Whenever chaos ensues, creatures you control get +0/+2 and gain trample until end of turn
         Effect chaosEffect = new BoostControlledEffect(0, 2, Duration.EndOfTurn);
-        Target chaosTarget = null;
         Effect chaosEffect2 = new GainAbilityControlledEffect(TrampleAbility.getInstance(), Duration.EndOfTurn, StaticFilters.FILTER_PERMANENT_CREATURES);
-        Target chaosTarget2 = null;
-
-        List<Effect> chaosEffects = new ArrayList<>();
-        chaosEffects.add(chaosEffect);
-        chaosEffects.add(chaosEffect2);
-        List<Target> chaosTargets = new ArrayList<>();
-        chaosTargets.add(chaosTarget);
-        chaosTargets.add(chaosTarget2);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
+        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
+        chaosAbility.addEffect(chaosEffect2);
         this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
     }
 
     private TheGreatForestPlane(final TheGreatForestPlane plane) {

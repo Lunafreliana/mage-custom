@@ -396,6 +396,13 @@ assertGraveyardCount(playerB, "Grizzly Bears", 1);
 
 The framework's actual overloads allow turn/step scheduling and choices. The base normally supplies `playerA` and `playerB` (special multiplayer bases configure more players); `addPlayer` is not the ordinary card-test setup call in this checkout. Common tools include `addCard(zone, player, name, count)`, `castSpell`, `activateAbility`, `setChoice`, `setModeChoice`, `setTarget`, `passPhase`, `setStopAt`, and `execute`. Assertions include `assertPermanentCount`, `assertLife`, `assertGraveyardCount`, `assertHandCount`, `assertLibraryCount`, `assertExileCount`, `assertTapped`, `assertPowerToughness`, `assertCounterCount`, `assertAbility`, and `assertPlayerHasAbility`.
 
+Rules-provided special actions are stored separately from ordinary playable
+abilities. A test for one must enable the game option or state that installs the
+special action instead of adding an old card-local compatibility ability. The
+test player can select non-mana special actions through `activateAbility`; match
+the action's current generated rules text rather than a legacy wrapper's cost or
+wording.
+
 Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/abilities/oneshot/damage/LightningBoltTest.java) demonstrates direct damage; locate other cards/mechanics with `rg`. [`TestActivatedContinuousEffect.java`](../Mage.Tests/src/test/java/org/mage/test/serverside/cards/effects/TestActivatedContinuousEffect.java) demonstrates lower-level continuous-effect testing, while watcher tests cited above cover history. Tests should prove success, restriction/illegal case, timing, duration cleanup, multiplayer/controller behavior, and edge cases for any nontrivial implementation. Run the narrow Maven test first, then the appropriate module suite.
 
 ## 15. Common implementation mistakes

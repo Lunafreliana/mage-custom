@@ -1,15 +1,11 @@
 package mage.game.command.planes;
 
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.effects.ContinuousRuleModifyingEffectImpl;
 import mage.abilities.effects.Effect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
 import mage.abilities.effects.common.UntapAllControllerEffect;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.abilities.effects.common.counter.AddCountersTargetEffect;
 import mage.constants.*;
 import mage.counters.CounterType;
@@ -19,14 +15,9 @@ import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
-import mage.target.Target;
 import mage.target.targetpointer.FixedTarget;
-import mage.watchers.common.PlanarRollWatcher;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @author spjspj
@@ -40,20 +31,11 @@ public class EdgeOfMalacolPlane extends Plane {
         SimpleStaticAbility ability = new SimpleStaticAbility(Zone.COMMAND, new EdgeOfMalacolEffect());
         this.getAbilities().add(ability);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, untap each creature you control
+        // Whenever chaos ensues, untap each creature you control
         Effect chaosEffect = new UntapAllControllerEffect(new FilterControlledCreaturePermanent(), "untap each creature you control");
-        Target chaosTarget = null;
 
-        List<Effect> chaosEffects = new ArrayList<Effect>();
-        chaosEffects.add(chaosEffect);
-        List<Target> chaosTargets = new ArrayList<Target>();
-        chaosTargets.add(chaosTarget);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
+        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
         this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
     }
 
     private EdgeOfMalacolPlane(final EdgeOfMalacolPlane plane) {
@@ -97,13 +79,12 @@ class EdgeOfMalacolEffect extends ContinuousRuleModifyingEffectImpl {
                 return false;
             }
             Permanent permanent = game.getPermanent(event.getTargetId());
-            if (filter.match(permanent, game) && Objects.equals(permanent.getControllerId(), game.getActivePlayerId())) {
-                UUID oldController = source.getControllerId();
-                source.setControllerId(game.getActivePlayerId());
+            if (filter.match(permanent, game)
+                    && Objects.equals(source.getControllerId(), game.getActivePlayerId())
+                    && Objects.equals(permanent.getControllerId(), source.getControllerId())) {
                 Effect effect = new AddCountersTargetEffect(CounterType.P1P1.createInstance(2));
                 effect.setTargetPointer(new FixedTarget(permanent, game));
                 effect.apply(game, source);
-                source.setControllerId(oldController);
                 return true;
             }
         }
