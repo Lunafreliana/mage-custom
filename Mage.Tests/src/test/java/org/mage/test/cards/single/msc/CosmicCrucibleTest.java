@@ -14,6 +14,7 @@ public class CosmicCrucibleTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Shock", 2);
 
         setChoiceAmount(playerA, 0, 4, 0, 0, 0);
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         checkManaPool("first main phase mana", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "U", 4);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Shock", playerB);
@@ -39,6 +40,7 @@ public class CosmicCrucibleTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Shock", 2);
 
         setChoiceAmount(playerA, 4, 0, 0, 0, 0);
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Bear Cub");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
 
