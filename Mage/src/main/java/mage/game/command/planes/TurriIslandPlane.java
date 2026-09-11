@@ -16,7 +16,7 @@ import mage.game.command.Plane;
 import mage.util.CardUtil;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class TurriIslandPlane extends Plane {
 

@@ -18,7 +18,7 @@ import mage.game.permanent.Permanent;
 import mage.target.targetpointer.FixedTarget;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class UndercityReachesPlane extends Plane {
 

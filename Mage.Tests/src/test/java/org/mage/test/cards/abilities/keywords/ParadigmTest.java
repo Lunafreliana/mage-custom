@@ -8,7 +8,7 @@ import org.mage.test.serverside.base.CardTestPlayerBase;
 /**
  * Tests for paradigm from Secrets of Strixhaven.
  *
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public class ParadigmTest extends CardTestPlayerBase {
 

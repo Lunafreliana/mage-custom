@@ -13,7 +13,7 @@ import mage.game.command.Plane;
 import mage.game.events.GameEvent;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class TheEonFogPlane extends Plane {
 

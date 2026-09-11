@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
 /**
- * @author muz
+ * @author VibecodingQueens
  */
 public class ReedRichardsSmartestManTest extends CardTestPlayerBase {
 

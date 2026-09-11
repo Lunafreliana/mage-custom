@@ -20,7 +20,7 @@ import mage.target.targetpointer.FixedTarget;
 import java.util.Objects;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class EdgeOfMalacolPlane extends Plane {
 

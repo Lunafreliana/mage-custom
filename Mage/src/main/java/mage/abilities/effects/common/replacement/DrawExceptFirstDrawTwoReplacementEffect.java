@@ -1,7 +1,7 @@
 package mage.abilities.effects.common.replacement;
 
 /**
- * @author muz
+ * @author VibecodingQueens
  */
 public class DrawExceptFirstDrawTwoReplacementEffect extends DrawExceptFirstDrawReplacementEffect {
 

@@ -32,7 +32,7 @@ import mage.target.common.TargetAnyTarget;
 import java.util.UUID;
 
 /**
- * @author Susucr
+ * @author VibecodingQueens
  */
 public final class TheWarDoctor extends CardImpl {
 

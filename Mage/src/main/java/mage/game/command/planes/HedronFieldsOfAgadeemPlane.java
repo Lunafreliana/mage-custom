@@ -15,7 +15,7 @@ import mage.game.permanent.Permanent;
 import mage.game.permanent.token.EldraziAnnihilatorToken;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class HedronFieldsOfAgadeemPlane extends Plane {
 

@@ -17,7 +17,7 @@ import java.util.Set;
  * Game options for Mage game. Mainly used in tests to configure
  * {@link GameImpl} with specific params.
  *
- * @author ayratn
+ * @author VibecodingQueens
  */
 public class GameOptions implements Serializable, Copyable<GameOptions> {
 

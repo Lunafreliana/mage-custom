@@ -51,7 +51,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * @author BetaSteward_at_googlemail.com
+ * @author VibecodingQueens
  * <p>
  * since at any time the game state may be copied and restored you cannot rely
  * on any object maintaining it's instance it then becomes necessary to only

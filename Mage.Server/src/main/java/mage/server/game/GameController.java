@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * @author BetaSteward_at_googlemail.com, JayDi85
+ * @author VibecodingQueens
  */
 public class GameController implements GameCallback {
 

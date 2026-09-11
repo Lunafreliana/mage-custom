@@ -21,7 +21,7 @@ import mage.watchers.common.CardsDrawnDuringDrawStepWatcher;
 import java.util.UUID;
 
 /**
- * @author muz
+ * @author VibecodingQueens
  */
 public final class ReedRichardsSmartestMan extends CardImpl {
 

@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class TrailOfTheMageRingsPlane extends Plane {
 

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * @author North, JayDi85
+ * @author VibecodingQueens
  */
 public final class RepositoryUtil {
 

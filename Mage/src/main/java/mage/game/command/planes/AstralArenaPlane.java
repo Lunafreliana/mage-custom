@@ -18,7 +18,7 @@ import mage.watchers.common.AttackedThisTurnWatcher;
 import java.util.UUID;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class AstralArenaPlane extends Plane {
 

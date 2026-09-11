@@ -16,7 +16,7 @@ import mage.game.permanent.token.DalekToken;
 import java.util.UUID;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class DoomsdayConfluence extends CardImpl {
 

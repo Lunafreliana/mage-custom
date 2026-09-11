@@ -19,7 +19,7 @@ import mage.constants.SuperType;
 import java.util.UUID;
 
 /**
- * @author Susucr
+ * @author VibecodingQueens
  */
 public final class KlawMasterOfSound extends CardImpl {
 

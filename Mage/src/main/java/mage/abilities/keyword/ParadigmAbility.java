@@ -22,7 +22,7 @@ import mage.players.Player;
  * exile and offers to cast that copy, rather than merely putting a spell copy
  * on the stack (casting is important for cast triggers such as magecraft).
  *
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public class ParadigmAbility extends SimpleStaticAbility {
 

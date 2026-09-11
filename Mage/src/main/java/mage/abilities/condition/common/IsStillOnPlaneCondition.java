@@ -6,7 +6,7 @@ import mage.abilities.condition.Condition;
 import mage.game.Game;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class IsStillOnPlaneCondition implements Condition {
 

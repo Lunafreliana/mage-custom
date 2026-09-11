@@ -9,7 +9,7 @@ import org.mage.test.serverside.base.CardTestPlayerBase;
 /**
  * {@link mage.cards.k.KlawMasterOfSound Klaw, Master of Sound}
  *
- * @author Susucr
+ * @author VibecodingQueens
  */
 public class KlawMasterOfSoundTest extends CardTestPlayerBase {
 

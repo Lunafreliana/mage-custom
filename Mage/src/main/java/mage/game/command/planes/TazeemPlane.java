@@ -17,7 +17,7 @@ import mage.game.command.Plane;
 import mage.game.permanent.Permanent;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class TazeemPlane extends Plane {
 

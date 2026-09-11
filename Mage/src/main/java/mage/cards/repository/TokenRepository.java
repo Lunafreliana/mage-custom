@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import mage.util.RandomUtil;
 
 /**
- * @author JayDi85
+ * @author VibecodingQueens
  */
 public enum TokenRepository {
 

@@ -14,7 +14,7 @@ import mage.game.Game;
 import mage.game.command.Plane;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class TheGreatForestPlane extends Plane {
 

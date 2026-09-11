@@ -6,7 +6,7 @@ import mage.constants.Phenomena;
 import mage.game.command.Phenomenon;
 
 /**
- * @author The XMage Developers
+ * @author VibecodingQueens
  */
 public final class MutualEpiphanyPhenomenon extends Phenomenon {
 

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * @author Susucr
+ * @author VibecodingQueens
  */
 public final class KangDynasty extends CardImpl {
 

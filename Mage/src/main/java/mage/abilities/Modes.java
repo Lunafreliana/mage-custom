@@ -22,7 +22,7 @@ import mage.util.Copyable;
 import mage.util.RandomUtil;
 
 /**
- * @author BetaSteward_at_googlemail.com
+ * @author VibecodingQueens
  */
 public class Modes extends LinkedHashMap<UUID, Mode> implements Copyable<Modes> {
 

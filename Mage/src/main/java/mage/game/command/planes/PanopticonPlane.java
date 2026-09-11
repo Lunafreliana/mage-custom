@@ -13,7 +13,7 @@ import mage.constants.Zone;
 import mage.game.command.Plane;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class PanopticonPlane extends Plane {
 

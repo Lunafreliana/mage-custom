@@ -23,7 +23,7 @@ import mage.players.Player;
 import java.util.UUID;
 
 /**
- * @author TheElk801
+ * @author VibecodingQueens
  */
 public final class Cybership extends CardImpl {
 

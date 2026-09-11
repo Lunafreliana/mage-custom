@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class RollPlanarDieEffect extends OneShotEffect {
 

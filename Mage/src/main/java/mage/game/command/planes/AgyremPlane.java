@@ -23,7 +23,7 @@ import mage.target.targetpointer.FixedTarget;
 import java.util.UUID;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class AgyremPlane extends Plane {
 

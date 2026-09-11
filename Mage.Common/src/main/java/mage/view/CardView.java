@@ -50,7 +50,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author BetaSteward_at_googlemail.com, JayDi85
+ * @author VibecodingQueens
  */
 public class CardView extends SimpleCardView {
 

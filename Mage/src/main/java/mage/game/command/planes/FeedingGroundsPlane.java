@@ -25,7 +25,7 @@ import mage.target.TargetPermanent;
 import mage.util.CardUtil;
 
 /**
- * @author spjspj
+ * @author VibecodingQueens
  */
 public class FeedingGroundsPlane extends Plane {
 
