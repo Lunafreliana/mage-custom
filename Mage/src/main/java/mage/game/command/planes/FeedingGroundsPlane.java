@@ -2,17 +2,13 @@ package mage.game.command.planes;
 
 import mage.MageObject;
 import mage.ObjectColor;
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
 import mage.abilities.SpellAbility;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.dynamicvalue.common.TargetManaValue;
 import mage.abilities.effects.Effect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
 import mage.abilities.effects.common.cost.CostModificationEffectImpl;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.abilities.effects.common.counter.AddCountersTargetEffect;
 import mage.cards.Card;
 import mage.constants.*;
@@ -27,10 +23,6 @@ import mage.game.stack.Spell;
 import mage.target.Target;
 import mage.target.TargetPermanent;
 import mage.util.CardUtil;
-import mage.watchers.common.PlanarRollWatcher;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author spjspj
@@ -46,20 +38,13 @@ public class FeedingGroundsPlane extends Plane {
         Ability ability = new SimpleStaticAbility(Zone.COMMAND, new FeedingGroundsEffect());
         this.getAbilities().add(ability);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, target red or green creature gets X +1/+1 counters
+        // Whenever chaos ensues, target red or green creature gets X +1/+1 counters
         Effect chaosEffect = new AddCountersTargetEffect(CounterType.P1P1.createInstance(), TargetManaValue.instance);
         Target chaosTarget = new TargetPermanent(StaticFilters.FILTER_PERMANENT_A_CREATURE);
 
-        List<Effect> chaosEffects = new ArrayList<>();
-        chaosEffects.add(chaosEffect);
-        List<Target> chaosTargets = new ArrayList<>();
-        chaosTargets.add(chaosTarget);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
+        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
+        chaosAbility.addTarget(chaosTarget);
         this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
     }
 
     private FeedingGroundsPlane(final FeedingGroundsPlane plane) {

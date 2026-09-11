@@ -1,29 +1,20 @@
 package mage.game.command.planes;
 
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
-import mage.abilities.common.ActivateIfConditionActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.condition.common.MainPhaseStackEmptyCondition;
-import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.effects.Effect;
 import mage.abilities.effects.RestrictionEffect;
 import mage.abilities.effects.common.DamageAllEffect;
-import mage.abilities.effects.common.RollPlanarDieEffect;
-import mage.abilities.effects.common.cost.PlanarDieRollCostIncreasingEffect;
 import mage.constants.Duration;
 import mage.constants.Planes;
-import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.permanent.Permanent;
-import mage.target.Target;
 import mage.watchers.common.AttackedThisTurnWatcher;
-import mage.watchers.common.PlanarRollWatcher;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,20 +33,11 @@ public class AstralArenaPlane extends Plane {
         this.getAbilities().add(ability);
         this.getAbilities().add(ability2);
 
-        // Active player can roll the planar die: Whenever you roll {CHAOS}, {this} deals 2 damage to each creature
+        // Whenever chaos ensues, {this} deals 2 damage to each creature
         Effect chaosEffect = new DamageAllEffect(2, new FilterCreaturePermanent());
-        Target chaosTarget = null;
 
-        List<Effect> chaosEffects = new ArrayList<Effect>();
-        chaosEffects.add(chaosEffect);
-        List<Target> chaosTargets = new ArrayList<Target>();
-        chaosTargets.add(chaosTarget);
-
-        ActivateIfConditionActivatedAbility chaosAbility = new ActivateIfConditionActivatedAbility(Zone.COMMAND, new RollPlanarDieEffect(chaosEffects, chaosTargets), new GenericManaCost(0), MainPhaseStackEmptyCondition.instance);
-        chaosAbility.addWatcher(new PlanarRollWatcher());
+        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
         this.getAbilities().add(chaosAbility);
-        chaosAbility.setMayActivate(TargetController.ANY);
-        this.getAbilities().add(new SimpleStaticAbility(Zone.ALL, new PlanarDieRollCostIncreasingEffect(chaosAbility.getOriginalId())));
     }
 
     private AstralArenaPlane(final AstralArenaPlane plane) {
