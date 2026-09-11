@@ -6,6 +6,7 @@ import mage.abilities.common.AttacksAllTriggeredAbility;
 import mage.abilities.common.AttacksTriggeredAbility;
 import mage.abilities.dynamicvalue.common.SourcePermanentPowerValue;
 import mage.abilities.dynamicvalue.common.StaticValue;
+import mage.abilities.effects.Effect;
 import mage.abilities.effects.common.DamageTargetEffect;
 import mage.abilities.effects.common.continuous.BoostTargetEffect;
 import mage.abilities.effects.common.continuous.GainAbilityTargetEffect;
@@ -85,7 +86,7 @@ public final class StormQueenOfWakanda extends CardImpl {
 
 class StormQueenOfWakandaTriggeredAbility extends AttacksAllTriggeredAbility {
 
-    StormQueenOfWakandaTriggeredAbility(DamageTargetEffect effect, FilterCreaturePermanent filter) {
+    StormQueenOfWakandaTriggeredAbility(Effect effect, FilterCreaturePermanent filter) {
         super(effect, false, filter, SetTargetPointer.PERMANENT, false);
         setTriggerPhrase("Whenever a creature with flying attacks you, ");
     }
