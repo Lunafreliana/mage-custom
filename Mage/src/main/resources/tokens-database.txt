@@ -188,6 +188,7 @@
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
+|PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
 |PLANE:MOC|Plane - Towashi||TowashiPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
 |PLANE:PCA|Plane - The Eon Fog||TheEonFogPlane|

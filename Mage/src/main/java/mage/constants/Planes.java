@@ -22,6 +22,7 @@ public enum Planes {
     PLANE_SELESNYA_LOFT_GARDENS("SelesnyaLoftGardensPlane", "Plane - Selesnya Loft Gardens"),
     PLANE_STAIRS_TO_INFINITY("StairsToInfinityPlane", "Plane - Stairs to Infinity"),
     PLANE_TAZEEM("TazeemPlane", "Plane - Tazeem"),
+    PLANE_TEN_WIZARDS_MOUNTAIN("TenWizardsMountainPlane", "Plane - Ten Wizards Mountain", "MOC"),
     PLANE_TOWASHI("TowashiPlane", "Plane - Towashi", "MOC"),
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
     PLANE_THE_EON_FOG("TheEonFogPlane", "Plane - The Eon Fog"),
