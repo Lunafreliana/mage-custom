@@ -417,6 +417,14 @@ test player can select non-mana special actions through `activateAbility`; match
 the action's current generated rules text rather than a legacy wrapper's cost or
 wording.
 
+Special actions may have no card source and therefore a null `sourceId`. Shared
+cost-modification effects must first reject ability kinds they do not modify and
+must compare identifiers null-safely; a spell-only modifier must not dereference
+the source ID of every activated ability or special action merely to decide that
+it does not apply. When changing cost-modification infrastructure, include a
+regression test that activates a source-less special action while the modifier is
+active.
+
 Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/abilities/oneshot/damage/LightningBoltTest.java) demonstrates direct damage; locate other cards/mechanics with `rg`. [`TestActivatedContinuousEffect.java`](../Mage.Tests/src/test/java/org/mage/test/serverside/cards/effects/TestActivatedContinuousEffect.java) demonstrates lower-level continuous-effect testing, while watcher tests cited above cover history. Tests should prove success, restriction/illegal case, timing, duration cleanup, multiplayer/controller behavior, and edge cases for any nontrivial implementation. Run the narrow Maven test first, then the appropriate module suite.
 
 ## 15. Common implementation mistakes

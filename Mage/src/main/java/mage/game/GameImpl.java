@@ -1588,6 +1588,27 @@ public abstract class GameImpl implements Game {
         return state.getSharedPlanarDeck();
     }
 
+    @Override
+    public boolean revealTopPlanarCard(UUID playerId, boolean mayPutOnBottom, Ability source) {
+        Player player = getPlayer(playerId);
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
+        if (player == null || deck == null) {
+            return false;
+        }
+        PlanarCard card = deck.draw();
+        if (card == null) {
+            return false;
+        }
+        informPlayers(player.getLogName() + " revealed " + card.getLogName());
+        if (mayPutOnBottom && player.chooseUse(
+                Outcome.Neutral, "Put " + card.getLogName() + " on the bottom of your planar deck?", source, this)) {
+            deck.putOnBottom(card);
+        } else {
+            deck.putOnTop(card);
+        }
+        return true;
+    }
+
     private boolean turnPlanarCardFaceUp(PlanarCard planarCard, UUID playerId, boolean emitEvents) {
         planarCard.setControllerId(state.getPlanarControllerId());
         planarCard.setFaceUp(true);
@@ -1616,6 +1637,7 @@ public abstract class GameImpl implements Game {
         newWatchers.add(new FirstStrikeWatcher()); // required for combat code
         newWatchers.add(new BlockedAttackerWatcher()); // BLOCKER_DECLARED
         newWatchers.add(new PlanarRollWatcher()); // needed for RollDiceTest (planechase code needs improves)
+        newWatchers.add(new PlaneswalkedWatcher()); // PLANESWALKED
         newWatchers.add(new AttackedThisTurnWatcher()); // ATTACKER_DECLARED
         newWatchers.add(new CardsDrawnThisTurnWatcher()); // DREW_CARD
         newWatchers.add(new ManaSpentToCastWatcher()); // SPELL_CAST
@@ -2243,17 +2265,79 @@ public abstract class GameImpl implements Game {
     @Override
     public boolean planeswalk(PlaneswalkContext context) {
         UUID playerId = context == null ? null : context.getPlaneswalkingPlayerId();
-        List<PlanarCard> faceUpPlanarCards = new ArrayList<>(state.getFaceUpPlanarCards());
-        if (faceUpPlanarCards.isEmpty() || getPlayer(playerId) == null
-                || getPlanarDeckForPlayer(playerId) == null
-                || state.getPlanarDeckMode() == PlanarDeckMode.INDIVIDUAL
-                && faceUpPlanarCards.stream().anyMatch(plane ->
-                state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId()) == null)) {
+        if (!canPlaneswalk(playerId)) {
+            return false;
+        }
+        bottomFaceUpPlanarCards();
+        return turnTopPlanarCardFaceUp(playerId);
+    }
+
+    @Override
+    public boolean planeswalkToNextPlanes(PlaneswalkContext context, int planeCount) {
+        UUID playerId = context == null ? null : context.getPlaneswalkingPlayerId();
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
+        if (!canPlaneswalk(playerId) || deck == null || planeCount < 1) {
+            return false;
+        }
+        List<PlanarCard> planes = new ArrayList<>();
+        List<PlanarCard> otherCards = new ArrayList<>();
+        int cardsToCheck = deck.size();
+        while (cardsToCheck-- > 0 && planes.size() < planeCount) {
+            PlanarCard card = deck.draw();
+            if (card == null) {
+                break;
+            }
+            informPlayers(getPlayer(playerId).getLogName() + " revealed " + card.getLogName());
+            if (card.getPlanarCardType() == CardType.PLANE) {
+                planes.add(card);
+            } else {
+                otherCards.add(card);
+            }
+        }
+        otherCards.forEach(deck::putOnBottom);
+        if (planes.size() != planeCount) {
+            planes.forEach(deck::putOnBottom);
+            return false;
+        }
+        return planeswalkToCards(context, planes);
+    }
+
+    private boolean planeswalkToCards(PlaneswalkContext context, List<PlanarCard> destinationCards) {
+        UUID playerId = context == null ? null : context.getPlaneswalkingPlayerId();
+        if (!canPlaneswalk(playerId) || destinationCards.isEmpty()) {
             return false;
         }
         for (PlanarCard plane : faceUpPlanarCards) {
             fireEvent(GameEvent.getEvent(
                     GameEvent.EventType.PLANESWALKED_AWAY, plane.getId(), null, playerId));
+        bottomFaceUpPlanarCards();
+        // All destinations must be face up before any planeswalk event is
+        // emitted: Spatial Merging planeswalks to its two Planes simultaneously.
+        for (PlanarCard destination : destinationCards) {
+            destination.setControllerId(state.getPlanarControllerId());
+            destination.setFaceUp(true);
+            state.addCommandObject(destination);
+        }
+        for (PlanarCard destination : destinationCards) {
+            if (destination.getPlanarCardType() == CardType.PHENOMENON) {
+                informPlayers(getPlayer(playerId).getLogName() + " encountered " + destination.getLogName());
+                fireEvent(new GameEvent(GameEvent.EventType.ENCOUNTERED_PHENOMENON,
+                        destination.getId(), (Ability) null, playerId, 0, true));
+                continue;
+            }
+            informPlayers("You have planeswalked to " + destination.getLogName());
+            GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK,
+                    destination.getId(), (Ability) null, playerId, 0, true);
+            if (!replaceEvent(event)) {
+                fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED,
+                        destination.getId(), (Ability) null, playerId, 0, true));
+            }
+        }
+        return true;
+    }
+
+    private void bottomFaceUpPlanarCards() {
+        for (PlanarCard plane : new ArrayList<>(state.getFaceUpPlanarCards())) {
             state.removeTriggersOfSourceId(plane.getId());
             state.getCommand().remove(plane);
             SharedPlanarDeck ownerDeck = state.getPlanarDeckMode() == PlanarDeckMode.SHARED
@@ -2261,7 +2345,16 @@ public abstract class GameImpl implements Game {
                     : state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId());
             ownerDeck.putOnBottom(plane);
         }
-        return turnTopPlanarCardFaceUp(playerId);
+    }
+
+    private boolean canPlaneswalk(UUID playerId) {
+        List<PlanarCard> faceUpPlanarCards = state.getFaceUpPlanarCards();
+        return !faceUpPlanarCards.isEmpty()
+                && getPlayer(playerId) != null
+                && getPlanarDeckForPlayer(playerId) != null
+                && (state.getPlanarDeckMode() != PlanarDeckMode.INDIVIDUAL
+                || faceUpPlanarCards.stream().noneMatch(card ->
+                state.getPlayerPlanarDeck(card.getPlanarDeckOwnerId()) == null));
     }
 
     @Override
