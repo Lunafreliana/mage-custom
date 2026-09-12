@@ -35,9 +35,10 @@ public class IndividualPlanarDeckValidatorTest {
         String duplicate = PlanarCardRegistry.getId(Planes.values()[0]);
         cards.add(duplicate);
         cards.add(duplicate);
-        Arrays.stream(Phenomena.values()).limit(3)
-                .map(PlanarCardRegistry::getId)
-                .forEach(cards::add);
+        String phenomenon = PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY);
+        cards.add(phenomenon);
+        cards.add(phenomenon);
+        cards.add(phenomenon);
 
         List<String> errors = IndividualPlanarDeckValidator.validate(cards);
         Assert.assertTrue(errors.stream().anyMatch(error -> error.contains("unique")));
