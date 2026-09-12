@@ -31,7 +31,7 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
         // The current Planechase test setup fires the planeswalk-to trigger when the starting plane is revealed.
         // Keep both cards on top for that surveil so the upkeep trigger below can be tested independently.
         addTarget(playerA, TestPlayer.TARGET_SKIP);
-        setChoice(playerA, "Grizzly Bears");
+        addTarget(playerA, "Grizzly Bears"); // order the cards remaining on top
         addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
 
         setStrictChooseMode(true);
