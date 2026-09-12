@@ -6,6 +6,7 @@ import mage.cards.decks.SupplementalDeckType;
 import mage.game.Game;
 import mage.game.GameException;
 import mage.game.GameInfo;
+import mage.game.command.IndividualPlanarDeckValidator;
 import mage.game.command.SupplementalDeckRuntimeHandlers;
 import mage.game.events.Listener;
 import mage.game.events.TableEvent;
@@ -21,6 +22,7 @@ import mage.util.ThreadUtils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author BetaSteward_at_googlemail.com
@@ -201,9 +203,28 @@ public abstract class MatchImpl implements Match {
         game.setTableId(this.tableId);
         addGame(); // raises only the number
         shufflePlayers();
+        this.players.stream()
+                .filter(matchPlayer -> !matchPlayer.hasQuit() && matchPlayer.getDeck() != null)
+                .forEach(matchPlayer -> matchPlayer.getDeck().partitionSupplementalDecks());
+        boolean useIndividualPlanarDecks = options.isPlaneChase()
+                && options.getSharedPlanarCardIds().isEmpty()
+                && this.players.stream()
+                .filter(matchPlayer -> !matchPlayer.hasQuit() && matchPlayer.getDeck() != null)
+                .anyMatch(matchPlayer -> !matchPlayer.getDeck()
+                        .getSupplementalDeck(SupplementalDeckType.PLANAR).isEmpty());
         for (MatchPlayer matchPlayer : this.players) {
             if (!matchPlayer.hasQuit() && matchPlayer.getDeck() != null) {
-                matchPlayer.getDeck().partitionSupplementalDecks();
+                if (useIndividualPlanarDecks) {
+                    List<String> planarIds = matchPlayer.getDeck().getSupplementalDeck(SupplementalDeckType.PLANAR)
+                            .stream()
+                            .map(SupplementalDeckCard::getSupplementalDeckId)
+                            .collect(Collectors.toList());
+                    List<String> errors = IndividualPlanarDeckValidator.validate(planarIds);
+                    if (!errors.isEmpty()) {
+                        throw new GameException("Invalid individual planar deck for "
+                                + matchPlayer.getPlayer().getName() + ": " + String.join(" ", errors));
+                    }
+                }
                 matchPlayer.getPlayer().init(game);
                 game.loadCards(matchPlayer.getDeck().getCards(), matchPlayer.getPlayer().getId());
                 game.loadCards(matchPlayer.getDeck().getSideboard(), matchPlayer.getPlayer().getId());

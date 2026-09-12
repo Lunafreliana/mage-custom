@@ -650,6 +650,15 @@ Required work:
 
 This phase is complete when individual planar decks are the normal supported Planechase flow and no merged/shared deck is required to start an ordinary game.
 
+Implementation note: when player deck files contribute planar cards, match
+initialization validates every participating player's planar deck separately
+and installs the independently shuffled decks as the individual rules mode. The
+starting player reveals from their own deck after opening-hand actions. The
+common planeswalk operation uses its explicit player argument to choose the next
+deck and returns each face-up planar card to the deck identified by that card's
+owner association. The legacy table-configured shared deck remains the fallback
+when no player contributes an individual planar deck.
+
 ### Phase 11 — Shared Mode and Variant-Ready Context
 
 Finish/harden the official single communal planar-deck alternative without changing individual-mode semantics.

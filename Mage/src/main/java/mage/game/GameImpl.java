@@ -1441,7 +1441,11 @@ public abstract class GameImpl implements Game {
         // 20180408 - 901.5
         if (gameOptions.planeChase) {
             state.setPlanarControllerId(startingPlayerId);
-            initializeSharedPlanarDeck();
+            if (state.getPlayerPlanarDecks().isEmpty()) {
+                initializeSharedPlanarDeck();
+            } else {
+                initializeIndividualPlanarDecks();
+            }
             turnStartingPlaneFaceUp(startingPlayerId);
             state.setPlaneChase(this, gameOptions.planeChase);
             for (Player player : getPlayers().values()) {
@@ -1511,6 +1515,19 @@ public abstract class GameImpl implements Game {
         state.getSharedPlanarDeck().setPlanes(planarCards, useDefaultDeck);
     }
 
+    private void initializeIndividualPlanarDecks() {
+        for (SharedPlanarDeck deck : state.getPlayerPlanarDecks().values()) {
+            List<PlanarCard> cards = new ArrayList<>();
+            PlanarCard card;
+            while ((card = deck.draw()) != null) {
+                initializePlanarObject(card);
+                cards.add(card);
+            }
+            // The runtime handler already shuffled each deck independently.
+            deck.setPlanes(cards, false);
+        }
+    }
+
     private void initializePlanarObject(PlanarCard plane) {
         plane.setSourceObjectAndInitImage();
         plane.setControllerId(state.getPlanarControllerId());
@@ -1522,9 +1539,13 @@ public abstract class GameImpl implements Game {
     }
 
     private boolean turnStartingPlaneFaceUp(UUID startingPlayerId) {
-        int cardsToCheck = state.getSharedPlanarDeck().size();
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(startingPlayerId);
+        if (deck == null) {
+            return false;
+        }
+        int cardsToCheck = deck.size();
         while (cardsToCheck-- > 0) {
-            PlanarCard planarCard = state.getSharedPlanarDeck().draw();
+            PlanarCard planarCard = deck.draw();
             if (planarCard == null) {
                 return false;
             }
@@ -1534,17 +1555,25 @@ public abstract class GameImpl implements Game {
             // 103.7/901.5: turn setup phenomena face up, but suppress all
             // triggers, then turn them face down on the bottom.
             planarCard.setFaceUp(true);
-            state.getSharedPlanarDeck().putOnBottom(planarCard);
+            deck.putOnBottom(planarCard);
         }
         return false;
     }
 
     private boolean turnTopPlanarCardFaceUp(UUID planeswalkingPlayerId) {
-        PlanarCard planarCard = state.getSharedPlanarDeck().draw();
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(planeswalkingPlayerId);
+        PlanarCard planarCard = deck == null ? null : deck.draw();
         if (planarCard == null) {
             return false;
         }
         return turnPlanarCardFaceUp(planarCard, planeswalkingPlayerId, true);
+    }
+
+    private SharedPlanarDeck getPlanarDeckForPlayer(UUID playerId) {
+        if (!state.getPlayerPlanarDecks().isEmpty()) {
+            return state.getPlayerPlanarDeck(playerId);
+        }
+        return state.getSharedPlanarDeck();
     }
 
     private boolean turnPlanarCardFaceUp(PlanarCard planarCard, UUID playerId, boolean emitEvents) {
@@ -2157,7 +2186,7 @@ public abstract class GameImpl implements Game {
 
     /**
      * @param plane
-     * @param toPlayerId controller and shared-deck owner of the plane
+     * @param toPlayerId controller and planar-deck owner of the plane
      * @return boolean - whether the plane was added successfully or not
      */
     @Override
@@ -2170,7 +2199,11 @@ public abstract class GameImpl implements Game {
         }
         initializePlanarObject(newPlane);
         newPlane.setPlanarDeckOwnerId(toPlayerId);
-        state.getSharedPlanarDeck().putOnBottom(newPlane);
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(toPlayerId);
+        if (deck == null) {
+            return false;
+        }
+        deck.putOnBottom(newPlane);
         return turnTopPlanarCardFaceUp(toPlayerId);
     }
 
@@ -2182,20 +2215,29 @@ public abstract class GameImpl implements Game {
         }
         initializePlanarObject(newPhenomenon);
         newPhenomenon.setPlanarDeckOwnerId(toPlayerId);
-        state.getSharedPlanarDeck().putOnBottom(newPhenomenon);
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(toPlayerId);
+        if (deck == null) {
+            return false;
+        }
+        deck.putOnBottom(newPhenomenon);
         return turnTopPlanarCardFaceUp(toPlayerId);
     }
 
     @Override
     public boolean planeswalk(UUID playerId) {
         List<PlanarCard> faceUpPlanarCards = new ArrayList<>(state.getFaceUpPlanarCards());
-        if (faceUpPlanarCards.isEmpty() || !Objects.equals(playerId, state.getPlanarControllerId())) {
+        if (faceUpPlanarCards.isEmpty() || getPlayer(playerId) == null
+                || getPlanarDeckForPlayer(playerId) == null) {
             return false;
         }
         for (PlanarCard plane : faceUpPlanarCards) {
             state.removeTriggersOfSourceId(plane.getId());
             state.getCommand().remove(plane);
-            state.getSharedPlanarDeck().putOnBottom(plane);
+            SharedPlanarDeck ownerDeck = state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId());
+            if (ownerDeck == null) {
+                ownerDeck = state.getSharedPlanarDeck();
+            }
+            ownerDeck.putOnBottom(plane);
         }
         return turnTopPlanarCardFaceUp(playerId);
     }
