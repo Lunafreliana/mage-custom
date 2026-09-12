@@ -34,15 +34,14 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
                         Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
                 )));
 
-        setChoice(playerA, true);
-        setChoice(playerB, false);
+        setChoice(playerB, true);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertPermanentCount(playerA, "Daxos of Meletis", 1);
-        assertCommandZoneCount(playerB, "Daxos of Meletis", 1);
+        assertCommandZoneCount(playerA, "Daxos of Meletis", 1);
+        assertPermanentCount(playerB, "Daxos of Meletis", 1);
     }
 
     @Test
@@ -50,14 +49,11 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         gameOptions.planeChase = true;
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
 
-        runCode("first planeswalk to The Command Zone", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
-                (info, player, game) -> Assert.assertTrue(info, game.addPlane(
-                        Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
-                )));
-        setChoice(playerA, true);
-        setChoice(playerB, false);
+        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 1);
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Daxos of Meletis");
 
-        runCode("second planeswalk to The Command Zone", 1, PhaseStep.POSTCOMBAT_MAIN, playerA,
+        runCode("planeswalk to The Command Zone", 1, PhaseStep.POSTCOMBAT_MAIN, playerA,
                 (info, player, game) -> Assert.assertTrue(info, game.addPlane(
                         Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
                 )));

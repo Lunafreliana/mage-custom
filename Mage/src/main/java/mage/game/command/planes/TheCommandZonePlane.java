@@ -76,6 +76,7 @@ class TheCommandZonePlaneswalkEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
+        UUID controllerId = source.getControllerId();
         for (UUID playerId : game.getPlayerList()) {
             Player player = game.getPlayer(playerId);
             if (player == null) {
@@ -91,11 +92,14 @@ class TheCommandZonePlaneswalkEffect extends OneShotEffect {
                     .anyMatch(playerId::equals);
             if (controlsCommander) {
                 player.drawCards(1, source, game);
+            }
+            if (playerId.equals(controllerId)) {
                 continue;
             }
-            Cards commanders = new CardsImpl(game.getCommanderCardsFromCommandZone(
+            Set<Card> commanderCards = game.getCommanderCardsFromCommandZone(
                     player, CommanderCardType.COMMANDER_OR_OATHBREAKER
-            ));
+            );
+            Cards commanders = new CardsImpl(commanderCards);
             if (commanders.isEmpty() || !player.chooseUse(
                     outcome, "Put your commander from the command zone onto the battlefield?", source, game
             )) {
@@ -103,7 +107,7 @@ class TheCommandZonePlaneswalkEffect extends OneShotEffect {
             }
             Card commander;
             if (commanders.size() == 1) {
-                commander = commanders.getRandom(game);
+                commander = commanderCards.iterator().next();
             } else {
                 TargetCard target = new TargetCard(Zone.COMMAND, new FilterCard("commander"));
                 player.choose(outcome, commanders, target, source, game);

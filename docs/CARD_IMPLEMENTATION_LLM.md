@@ -291,6 +291,13 @@ independently.
 
 Zone changes are events and generally produce a new game object identity/state. Use the engine move/exile/return effects and zone-change counters; do not keep a `Permanent`/`Card` reference and assume it represents the object after it moves. A blinked permanent is new. A card moved graveyard-to-battlefield is not the graveyard object for continuous tracking.
 
+Cards in the command zone are retrievable with `game.getCard(...)`, but are not
+ordinary game objects retrievable with `game.getObject(...)`. Consequently,
+helpers such as `CardsImpl.getRandom(game)` that resolve entries through
+`game.getObject(...)` can return null for a nonempty collection of command-zone
+cards. Select from the `Card` instances returned by command-zone APIs directly,
+or use a command-zone-aware choice flow.
+
 When a stable supplemental or command-zone runtime object is temporarily made
 inactive and may later become active again, do not call `discard()` on the
 continuous-effect templates stored in its printed abilities. Those templates
