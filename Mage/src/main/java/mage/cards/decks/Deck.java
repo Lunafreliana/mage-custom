@@ -9,7 +9,10 @@ import mage.util.Copyable;
 import mage.util.DeckUtil;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -27,6 +30,8 @@ public class Deck implements Serializable, Copyable<Deck> {
     private String name; // TODO: must rework somehow - tiny leaders use deck name to find commander card and hide it for a user
     private final Set<Card> cards = new LinkedHashSet<>();
     private final Set<Card> sideboard = new LinkedHashSet<>();
+    private final Map<SupplementalDeckType, Set<Card>> supplementalDecks
+            = new EnumMap<>(SupplementalDeckType.class);
     private DeckCardLayout cardsLayout; // client side only
     private DeckCardLayout sideboardLayout; // client side only
 
@@ -38,6 +43,8 @@ public class Deck implements Serializable, Copyable<Deck> {
         this.name = deck.name;
         this.cards.addAll(deck.cards.stream().map(Card::copy).collect(Collectors.toList()));
         this.sideboard.addAll(deck.sideboard.stream().map(Card::copy).collect(Collectors.toList()));
+        deck.supplementalDecks.forEach((type, cards) -> this.supplementalDecks.put(type,
+                cards.stream().map(Card::copy).collect(Collectors.toCollection(LinkedHashSet::new))));
         this.cardsLayout = deck.cardsLayout == null ? null : deck.cardsLayout.copy();
         this.sideboardLayout = deck.sideboardLayout == null ? null : deck.sideboardLayout.copy();
     }
@@ -230,6 +237,30 @@ public class Deck implements Serializable, Copyable<Deck> {
 
     public Set<Card> getSideboard() {
         return sideboard;
+    }
+
+    /**
+     * Removes supplemental carriers from the pregame/sideboard staging area.
+     * This must happen before Commander/Companion validation and game loading.
+     */
+    public SupplementalDeckPartition partitionSupplementalDecks() {
+        SupplementalDeckPartition partition = SupplementalDeckPartition.create(cards, sideboard);
+        for (SupplementalDeckType type : SupplementalDeckType.values()) {
+            Set<Card> extracted = partition.get(type).stream()
+                    .map(Card.class::cast)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            if (!extracted.isEmpty()) {
+                supplementalDecks.computeIfAbsent(type, key -> new LinkedHashSet<>()).addAll(extracted);
+                sideboard.removeAll(extracted);
+            }
+        }
+        return partition;
+    }
+
+    public List<SupplementalDeckCard> getSupplementalDeck(SupplementalDeckType type) {
+        return supplementalDecks.getOrDefault(type, Collections.emptySet()).stream()
+                .map(SupplementalDeckCard.class::cast)
+                .collect(Collectors.toList());
     }
 
     public Card findSideboardCard(UUID cardId) {

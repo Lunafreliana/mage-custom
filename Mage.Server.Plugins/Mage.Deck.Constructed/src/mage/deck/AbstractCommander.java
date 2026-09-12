@@ -12,6 +12,8 @@ import mage.cards.Card;
 import mage.cards.decks.Constructed;
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckValidatorErrorType;
+import mage.cards.decks.SupplementalDeckCard;
+import mage.cards.decks.SupplementalDeckPartition;
 import mage.constants.CardType;
 import mage.constants.SubType;
 import mage.filter.FilterMana;
@@ -178,6 +180,12 @@ public abstract class AbstractCommander extends Constructed {
     public boolean validate(Deck deck) {
         boolean valid = true;
         errorsList.clear();
+        SupplementalDeckPartition supplemental = deck.partitionSupplementalDecks();
+        for (SupplementalDeckCard card : supplemental.getIllegalMain()) {
+            addError(DeckValidatorErrorType.OTHER, ((Card) card).getName(),
+                    "Supplemental cards cannot be placed in the main deck", true);
+            valid = false;
+        }
         FilterMana colorIdentity = new FilterMana();
         Set<Card> commanders = new HashSet<>();
         Card companion;
