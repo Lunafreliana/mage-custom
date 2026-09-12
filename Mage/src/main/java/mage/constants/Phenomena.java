@@ -2,6 +2,7 @@ package mage.constants;
 
 /** Implemented Planechase phenomenon cards. */
 public enum Phenomena {
+    INTERPLANAR_TUNNEL("InterplanarTunnelPhenomenon", "Phenomenon - Interplanar Tunnel"),
     MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany"),
     SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging");
 

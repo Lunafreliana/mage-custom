@@ -8,6 +8,7 @@ import mage.constants.Zone;
 import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.stack.StackObject;
@@ -15,8 +16,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class PhenomenonTest extends CardTestPlayerBase {
 
@@ -141,6 +145,77 @@ public class PhenomenonTest extends CardTestPlayerBase {
             Assert.assertEquals(info, "Plane - Agyrem", game.getState().getFaceUpPlanes().get(1).getName());
             Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
         });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testInterplanarTunnelChoosesTheNextPlane() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 20);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 20);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarCardIds = Arrays.asList(
+                PlanarCardRegistry.getId(Planes.PLANE_FIELDS_OF_SUMMER),
+                PlanarCardRegistry.getId(Planes.PLANE_AGYREM),
+                PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY),
+                PlanarCardRegistry.getId(Planes.PLANE_AKOUM),
+                PlanarCardRegistry.getId(Planes.PLANE_ASTRAL_ARENA),
+                PlanarCardRegistry.getId(Planes.PLANE_BANT),
+                PlanarCardRegistry.getId(Planes.PLANE_EDGE_OF_MALACOL));
+
+        setChoice(playerA, "Plane - Bant");
+        runCode("encounter Interplanar Tunnel", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            List<PlanarCard> planarDeck = new ArrayList<>();
+            PlanarCard card;
+            while ((card = game.getState().getSharedPlanarDeck().draw()) != null) {
+                planarDeck.add(card);
+            }
+            Assert.assertTrue(info, game.addPhenomenon(new InterplanarTunnelPhenomenon(), player.getId()));
+            planarDeck.forEach(game.getState().getSharedPlanarDeck()::putOnBottom);
+            game.checkStateAndTriggered();
+            Assert.assertEquals(info, 1, game.getStack().size());
+            game.getStack().resolve(game);
+            game.checkStateAndTriggered();
+
+            Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+            Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
+            Assert.assertEquals(info, "Plane - Bant", game.getState().getFaceUpPlanes().get(0).getName());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testInterplanarTunnelPreservesDeckWhenItCannotRevealFivePlanes() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 20);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 20);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Arrays.asList(
+                Planes.PLANE_FIELDS_OF_SUMMER,
+                Planes.PLANE_AGYREM,
+                Planes.PLANE_AKOUM,
+                Planes.PLANE_ASTRAL_ARENA,
+                Planes.PLANE_BANT);
+
+        runCode("encounter Interplanar Tunnel with only four planes left", 1, PhaseStep.PRECOMBAT_MAIN,
+                playerA, (info, player, game) -> {
+                    List<PlanarCard> planarDeck = new ArrayList<>();
+                    PlanarCard card;
+                    while ((card = game.getState().getSharedPlanarDeck().draw()) != null) {
+                        planarDeck.add(card);
+                    }
+                    Assert.assertTrue(info,
+                            game.addPhenomenon(new InterplanarTunnelPhenomenon(), player.getId()));
+                    planarDeck.forEach(game.getState().getSharedPlanarDeck()::putOnBottom);
+                    List<UUID> originalOrder = game.getState().getSharedPlanarDeck().getOrder();
+
+                    game.checkStateAndTriggered();
+                    Assert.assertEquals(info, 1, game.getStack().size());
+                    game.getStack().resolve(game);
+
+                    Assert.assertEquals(info, originalOrder,
+                            game.getState().getSharedPlanarDeck().getOrder());
+                });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
     }
