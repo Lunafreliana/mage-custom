@@ -303,7 +303,10 @@ Plane cards with “planeswalk away from” triggers need a distinct departure
 lifecycle event emitted while the departing planar object's command-zone
 trigger is still registered. Do not model this as a generic zone change: planar
 cards remain associated with the command zone while moving between face-up play
-and their planar decks.
+and their planar decks. Mark the triggered ability as a leave-source trigger so
+the queued ability remains valid after its planar source is removed from the
+face-up command objects; otherwise the event may match but the ability will not
+resolve after the planeswalk operation finishes.
 
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A

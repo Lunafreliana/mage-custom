@@ -11,6 +11,7 @@ public class PlaneswalkAwayFromSourceTriggeredAbility extends TriggeredAbilityIm
 
     public PlaneswalkAwayFromSourceTriggeredAbility(Effect effect) {
         super(Zone.COMMAND, effect);
+        setLeavesTheBattlefieldTrigger(true);
         setTriggerPhrase("When you planeswalk away from {this}, ");
     }
 

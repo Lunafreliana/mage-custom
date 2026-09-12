@@ -63,6 +63,7 @@ public class ExistingPlaneMigrationTest {
                 new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY, sourceId, null, controllerId), null));
         Assert.assertFalse(ability.checkTrigger(
                 new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY, UUID.randomUUID(), null, controllerId), null));
+        Assert.assertTrue(ability.isLeavesTheBattlefieldTrigger());
         Assert.assertEquals(controllerId, ability.copy().getControllerId());
     }
 }

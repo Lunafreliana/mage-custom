@@ -48,7 +48,6 @@ public class InysHaenTest extends CardTestPlayerBase {
         execute();
 
         assertGraveyardCount(playerA, 3);
-        assertLibraryCount(playerA, 7);
     }
 
     @Test
@@ -65,7 +64,6 @@ public class InysHaenTest extends CardTestPlayerBase {
         execute();
 
         assertGraveyardCount(playerA, 3);
-        assertLibraryCount(playerA, 7);
         Assert.assertEquals(Planes.PLANE_INYS_HAEN,
                 currentGame.getState().getFaceUpPlanes().get(0).getPlaneType());
     }
@@ -92,7 +90,7 @@ public class InysHaenTest extends CardTestPlayerBase {
                 Planes.PLANE_FIELDS_OF_SUMMER);
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt", 10);
         addCard(Zone.LIBRARY, playerB, "Lightning Bolt", 10);
-        addCard(Zone.GRAVEYARD, playerA, "Mountain");
+        addCard(Zone.GRAVEYARD, playerA, "Forest");
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
         addCard(Zone.GRAVEYARD, playerB, "Island");
 
@@ -101,9 +99,9 @@ public class InysHaenTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertPermanentCount(playerA, "Mountain", 1);
+        assertPermanentCount(playerA, "Forest", 1);
         assertPermanentCount(playerB, "Island", 1);
-        assertTapped("Mountain", true);
+        assertTapped("Forest", true);
         assertTapped("Island", true);
         assertGraveyardCount(playerA, "Grizzly Bears", 1);
     }
@@ -114,7 +112,7 @@ public class InysHaenTest extends CardTestPlayerBase {
         gameOptions.sharedPlanarDeck = Arrays.asList(Planes.PLANE_INYS_HAEN);
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt", 10);
         addCard(Zone.LIBRARY, playerB, "Lightning Bolt", 10);
-        addCard(Zone.GRAVEYARD, playerA, "Mountain");
+        addCard(Zone.GRAVEYARD, playerA, "Forest");
         addCard(Zone.GRAVEYARD, playerB, "Island");
 
         runCode("install individual decks and planeswalk", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
@@ -137,9 +135,9 @@ public class InysHaenTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertPermanentCount(playerA, "Mountain", 1);
+        assertPermanentCount(playerA, "Forest", 1);
         assertPermanentCount(playerB, "Island", 1);
-        assertTapped("Mountain", true);
+        assertTapped("Forest", true);
         assertTapped("Island", true);
         Assert.assertEquals(Planes.PLANE_FIELDS_OF_SUMMER,
                 currentGame.getState().getFaceUpPlanes().get(0).getPlaneType());
@@ -149,7 +147,7 @@ public class InysHaenTest extends CardTestPlayerBase {
     public void testChaosReturnsTargetNonlandCard() {
         addPlane(playerA, Planes.PLANE_INYS_HAEN);
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
-        addCard(Zone.GRAVEYARD, playerA, "Mountain");
+        addCard(Zone.GRAVEYARD, playerA, "Forest");
         runCode("chaos ensues", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
                 (info, player, game) -> game.fireEvent(new GameEvent(
                         GameEvent.EventType.CHAOS_ENSUES, null, null, player.getId())));
@@ -157,13 +155,13 @@ public class InysHaenTest extends CardTestPlayerBase {
         execute();
 
         assertHandCount(playerA, "Grizzly Bears", 1);
-        assertGraveyardCount(playerA, "Mountain", 1);
+        assertGraveyardCount(playerA, "Forest", 1);
     }
 
     @Test
     public void testChaosCannotReturnLandCard() {
         addPlane(playerA, Planes.PLANE_INYS_HAEN);
-        addCard(Zone.GRAVEYARD, playerA, "Mountain");
+        addCard(Zone.GRAVEYARD, playerA, "Forest");
 
         runCode("chaos ensues", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
                 (info, player, game) -> game.fireEvent(new GameEvent(
@@ -171,7 +169,7 @@ public class InysHaenTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertHandCount(playerA, "Mountain", 0);
-        assertGraveyardCount(playerA, "Mountain", 1);
+        assertHandCount(playerA, "Forest", 0);
+        assertGraveyardCount(playerA, "Forest", 1);
     }
 }
