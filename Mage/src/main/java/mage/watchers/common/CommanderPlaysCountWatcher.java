@@ -72,4 +72,9 @@ public class CommanderPlaysCountWatcher extends Watcher {
     public int getPlayerCount(UUID playerId) {
         return this.playerCount.getOrDefault(playerId, 0);
     }
+
+    public void resetCounts() {
+        playsCount.clear();
+        playerCount.clear();
+    }
 }

@@ -28,7 +28,7 @@ public final class PlanarCardRegistry {
         Map<String, Entry> entries = new LinkedHashMap<>();
         for (Planes plane : Planes.values()) {
             register(entries, id(CardType.PLANE, plane.name()), CardType.PLANE,
-                    displayName(plane.getFullName()), plane.getFullName(), "PCA", () -> Plane.createPlane(plane));
+                    displayName(plane.getFullName()), plane.getFullName(), setCode(plane), () -> Plane.createPlane(plane));
         }
         for (Phenomena phenomenon : Phenomena.values()) {
             register(entries, id(CardType.PHENOMENON, phenomenon.name()), CardType.PHENOMENON,
@@ -54,6 +54,10 @@ public final class PlanarCardRegistry {
     private static String displayName(String fullName) {
         int separator = fullName.indexOf(" - ");
         return separator < 0 ? fullName : fullName.substring(separator + 3);
+    }
+
+    private static String setCode(Planes plane) {
+        return plane == Planes.PLANE_THE_COMMAND_ZONE ? "PUNK" : "PCA";
     }
 
     public static List<Metadata> getAvailableCards() {

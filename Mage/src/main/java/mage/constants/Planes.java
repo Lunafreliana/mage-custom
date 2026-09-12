@@ -24,7 +24,8 @@ public enum Planes {
     PLANE_TRUGA_JUNGLE("TrugaJunglePlane", "Plane - Truga Jungle"),
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
     PLANE_TURRI_ISLAND("TurriIslandPlane", "Plane - Turri Island"),
-    PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches");
+    PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches"),
+    PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone");
 
     private final String className;
     private final String fullName;
