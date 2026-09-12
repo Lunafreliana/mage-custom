@@ -181,6 +181,7 @@
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Panopticon||PanopticonPlane|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
+|PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
 |PLANE:PCA|Plane - The Eon Fog||TheEonFogPlane|
