@@ -9,6 +9,7 @@ import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
+import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.stack.StackObject;
 import org.junit.Assert;
@@ -32,6 +33,42 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertTrue(copy.isFaceUp());
         copy.setFaceUp(false);
         Assert.assertEquals(1, copy.getZoneChangeCounter(currentGame));
+    }
+
+    @Test
+    public void testRealityShapingRegistryAndCopy() {
+        Phenomenon phenomenon = new RealityShapingPhenomenon();
+        Phenomenon copy = phenomenon.copy();
+
+        Assert.assertEquals("Phenomenon - Reality Shaping", copy.getName());
+        Assert.assertEquals(CardType.PHENOMENON, copy.getPlanarCardType());
+        Assert.assertNotNull(PlanarCardRegistry.create(PlanarCardRegistry.getId(Phenomena.REALITY_SHAPING)));
+        Assert.assertEquals("Reality Shaping", PlanarCardRegistry
+                .getMetadata(PlanarCardRegistry.getId(Phenomena.REALITY_SHAPING)).getEnglishName());
+    }
+
+    @Test
+    public void testRealityShapingLetsEachPlayerPutOnePermanent() {
+        prepareStartedPlanechaseGame();
+        addCard(Zone.HAND, playerA, "Grizzly Bears");
+        addCard(Zone.HAND, playerA, "Lightning Bolt");
+        addCard(Zone.HAND, playerB, "Silvercoat Lion");
+        setChoice(playerA, true);
+        setChoice(playerA, "Grizzly Bears");
+        setChoice(playerB, true);
+        setChoice(playerB, "Silvercoat Lion");
+
+        runCode("encounter Reality Shaping", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(game.addPhenomenon(new RealityShapingPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertPermanentCount(playerA, "Grizzly Bears", 1);
+        assertPermanentCount(playerB, "Silvercoat Lion", 1);
+        assertHandCount(playerA, "Lightning Bolt", 1);
     }
 
     @Test
