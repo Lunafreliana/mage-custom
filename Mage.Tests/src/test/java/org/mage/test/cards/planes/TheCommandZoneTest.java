@@ -9,7 +9,6 @@ import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.Plane;
-import mage.game.command.PlanarDeckMode;
 import mage.watchers.common.CommanderPlaysCountWatcher;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,17 +30,9 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
 
         runCode("planeswalk to The Command Zone", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
-                (info, player, game) -> {
-                    Plane commandZone = Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE);
-                    commandZone.setPlanarDeckOwnerId(playerA.getId());
-                    game.getState().setPlayerPlanarDeck(
-                            playerA.getId(), Collections.singletonList(commandZone), false
-                    );
-                    game.getState().getFaceUpPlanarCards().forEach(card ->
-                            card.setPlanarDeckOwnerId(playerA.getId()));
-                    game.getState().setPlanarDeckMode(PlanarDeckMode.INDIVIDUAL);
-                    Assert.assertTrue(info, game.planeswalk(playerA.getId()));
-                });
+                (info, player, game) -> Assert.assertTrue(info, game.addPlane(
+                        Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
+                )));
 
         setChoice(playerA, true);
         setChoice(playerB, false);
