@@ -3,6 +3,7 @@ package mage.constants;
 /** Implemented Planechase phenomenon cards. */
 public enum Phenomena {
     MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany"),
+    SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging");
     REALITY_SHAPING("RealityShapingPhenomenon", "Phenomenon - Reality Shaping");
 
     private final String className;

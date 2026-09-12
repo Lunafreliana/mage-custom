@@ -6,8 +6,10 @@ import mage.constants.Phenomena;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.Phenomenon;
+import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
+import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.stack.StackObject;
 import org.junit.Assert;
@@ -143,6 +145,38 @@ public class PhenomenonTest extends CardTestPlayerBase {
 
             Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
             Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testSpatialMergingPlaneswalksToTwoPlanesSimultaneously() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 20);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 20);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Arrays.asList(
+                Planes.PLANE_FIELDS_OF_SUMMER,
+                Planes.PLANE_AKOUM,
+                Planes.PLANE_AGYREM);
+
+        runCode("encounter Spatial Merging", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            // Preserve the initialized, deterministic next two cards while the
+            // addPhenomenon test seam turns Spatial Merging face up.
+            PlanarCard first = game.getState().getSharedPlanarDeck().draw();
+            PlanarCard second = game.getState().getSharedPlanarDeck().draw();
+            Assert.assertTrue(info, game.addPhenomenon(new SpatialMergingPhenomenon(), player.getId()));
+            game.getState().getSharedPlanarDeck().putOnBottom(first);
+            game.getState().getSharedPlanarDeck().putOnBottom(second);
+
+            game.checkStateAndTriggered();
+            Assert.assertEquals(info, 1, game.getStack().size());
+            game.getStack().resolve(game);
+
+            Assert.assertEquals(info, 2, game.getState().getFaceUpPlanes().size());
+            Assert.assertEquals(info, "Plane - Akoum", game.getState().getFaceUpPlanes().get(0).getName());
+            Assert.assertEquals(info, "Plane - Agyrem", game.getState().getFaceUpPlanes().get(1).getName());
+            Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
         });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
