@@ -13,6 +13,8 @@ import mage.constants.Outcome;
 import mage.game.Game;
 import mage.util.CardUtil;
 
+import java.util.Objects;
+
 /**
  * @author LevelX2
  */
@@ -89,7 +91,8 @@ public class SpellCostReductionSourceEffect extends CostModificationEffectImpl {
 
     @Override
     public boolean applies(Ability abilityToModify, Ability source, Game game) {
-        if (abilityToModify.getSourceId().equals(source.getSourceId()) && (abilityToModify instanceof SpellAbility)) {
+        if (abilityToModify instanceof SpellAbility
+                && Objects.equals(abilityToModify.getSourceId(), source.getSourceId())) {
             // some conditions can works after put on stack, so skip it in get playable (allows user to put card on stack anyway)
             boolean skipCondition = game.inCheckPlayableState() && canWorksOnStackOnly();
             return condition == null || skipCondition || condition.apply(game, source);
