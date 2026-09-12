@@ -5,6 +5,16 @@ package mage.cards.decks;
  * Magic deck or sideboard.
  */
 public enum SupplementalDeckType {
-    PLANAR,
-    ATTRACTION
+    PLANAR("Planar Deck"),
+    ATTRACTION("Attraction Deck");
+
+    private final String displayName;
+
+    SupplementalDeckType(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 }

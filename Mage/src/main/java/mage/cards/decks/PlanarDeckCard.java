@@ -23,6 +23,21 @@ public final class PlanarDeckCard extends CardImpl implements SupplementalDeckCa
         this.extraDeckCard = true;
     }
 
+    /**
+     * Creates a planar carrier from its serialized set/card identity.
+     *
+     * The native deck format stores the stable registry id in the card-number
+     * field.  Keeping this lookup here avoids teaching the ordinary card
+     * repository how to instantiate non-castable runtime objects.
+     */
+    public static PlanarDeckCard create(String setCode, String registryId) {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(registryId);
+        if (metadata == null || !metadata.getSetCode().equals(setCode)) {
+            return null;
+        }
+        return new PlanarDeckCard(registryId);
+    }
+
     private PlanarDeckCard(final PlanarDeckCard card) {
         super(card);
         this.registryId = card.registryId;

@@ -617,6 +617,17 @@ Implement searchable Planes/Phenomena, automatic routing to Planar Deck, grouped
 
 Do not require a separate planar-deck file or assignment mapping.
 
+Implementation note: the normal card selector includes registry-backed Plane
+and Phenomenon carriers in name/type searches. Adding one routes it to the
+pregame area automatically, whose title reports ordinary sideboard and typed
+supplemental counts independently. Native `.dck` files store the stable planar
+registry id as the card number in an `SB:` entry, so save/load and text
+import/export use the player's existing deck file. The importer deliberately
+preserves an invalid non-`SB:` placement so server-side validation reports the
+main-deck error rather than silently correcting malformed input. Supplemental
+group labels come from `SupplementalDeckType`, allowing a future Attraction
+Deck group without Planechase-specific Commander or sideboard parsing.
+
 ### Phase 10 — Rules-Default Individual Planar Deck Gameplay
 
 Implement the normal Planechase model described in sections 3 and 4.

@@ -3,6 +3,10 @@ package mage.client.deckeditor;
 import mage.cards.Card;
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckCardLayout;
+import mage.cards.decks.PlanarDeckCard;
+import mage.cards.decks.SupplementalDeckCard;
+import mage.cards.decks.SupplementalDeckType;
+import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
 import mage.client.cards.BigCard;
 import mage.client.cards.CardEventSource;
@@ -109,7 +113,10 @@ public class DeckArea extends javax.swing.JPanel {
             public void duplicateCards(Collection<CardView> cards) {
                 sideboardList.deselectAll();
                 for (CardView blueprint : cards) {
-                    Card newCard = CardRepository.instance.findCard(blueprint.getExpansionSetCode(), blueprint.getCardNumber()).createMockCard();
+                    Card newCard = createEditorCard(blueprint);
+                    if (newCard == null) {
+                        continue;
+                    }
                     CardView newView = new CardView(newCard);
                     deckList.addCardView(newView, newCard, blueprint);
                 }
@@ -150,7 +157,10 @@ public class DeckArea extends javax.swing.JPanel {
             public void duplicateCards(Collection<CardView> cards) {
                 deckList.deselectAll();
                 for (CardView blueprint : cards) {
-                    Card newCard = CardRepository.instance.findCard(blueprint.getExpansionSetCode(), blueprint.getCardNumber()).createMockCard();
+                    Card newCard = createEditorCard(blueprint);
+                    if (newCard == null) {
+                        continue;
+                    }
                     CardView newView = new CardView(newCard);
                     sideboardList.addCardView(newView, newCard, blueprint);
                 }
@@ -179,6 +189,17 @@ public class DeckArea extends javax.swing.JPanel {
         settings.dividerLocationLimited = dividerLocationLimited;
         settings.dividerLocationNormal = dividerLocationNormal;
         return settings;
+    }
+
+    private static Card createEditorCard(CardView cardView) {
+        PlanarDeckCard planarCard = PlanarDeckCard.create(
+                cardView.getExpansionSetCode(), cardView.getCardNumber());
+        if (planarCard != null) {
+            return planarCard;
+        }
+        CardInfo cardInfo = CardRepository.instance.findCard(
+                cardView.getExpansionSetCode(), cardView.getCardNumber());
+        return cardInfo == null ? null : cardInfo.createMockCard();
     }
 
     public void loadSettings(Settings s, boolean isLimitedBuildingOrientation) {
@@ -245,6 +266,22 @@ public class DeckArea extends javax.swing.JPanel {
         return newSet;
     }
 
+    private Set<Card> groupPregameCards(Set<Card> cards) {
+        Set<Card> grouped = new LinkedHashSet<>();
+        cards.stream()
+                .filter(card -> !(card instanceof SupplementalDeckCard))
+                .filter(card -> !hiddenCards.contains(card.getId()))
+                .forEach(grouped::add);
+        for (SupplementalDeckType type : SupplementalDeckType.values()) {
+            cards.stream()
+                    .filter(SupplementalDeckCard.class::isInstance)
+                    .filter(card -> ((SupplementalDeckCard) card).getSupplementalDeckType() == type)
+                    .filter(card -> !hiddenCards.contains(card.getId()))
+                    .forEach(grouped::add);
+        }
+        return grouped;
+    }
+
     public void loadDeck(Deck deck, BigCard bigCard) {
         loadDeck(deck, false, bigCard);
     }
@@ -256,11 +293,29 @@ public class DeckArea extends javax.swing.JPanel {
                 new CardsView(filterHidden(lastDeck.getCards())),
                 useLayout ? deck.getCardsLayout() : null,
                 lastBigCard);
+        deckList.setBorder(BorderFactory.createTitledBorder(
+                "Main Deck (" + lastDeck.getCards().size() + ")"));
         if (sideboardList.isVisible()) {
+            Map<SupplementalDeckType, Long> supplementalCounts = new EnumMap<>(SupplementalDeckType.class);
+            long ordinaryPregame = lastDeck.getSideboard().stream()
+                    .filter(card -> {
+                        if (!(card instanceof SupplementalDeckCard)) {
+                            return true;
+                        }
+                        SupplementalDeckType type = ((SupplementalDeckCard) card).getSupplementalDeckType();
+                        supplementalCounts.put(type, supplementalCounts.getOrDefault(type, 0L) + 1);
+                        return false;
+                    })
+                    .count();
             sideboardList.setCards(
-                    new CardsView(filterHidden(lastDeck.getSideboard())),
+                    new CardsView(groupPregameCards(lastDeck.getSideboard())),
                     useLayout ? deck.getSideboardLayout() : null,
                     lastBigCard);
+            StringBuilder title = new StringBuilder("Pregame (Sideboard: ")
+                    .append(ordinaryPregame).append(')');
+            supplementalCounts.forEach((type, count) -> title.append(" | ")
+                    .append(type.getDisplayName()).append(": ").append(count));
+            sideboardList.setBorder(BorderFactory.createTitledBorder(title.toString()));
         }
     }
 

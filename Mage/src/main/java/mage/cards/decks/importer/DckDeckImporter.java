@@ -4,6 +4,7 @@ import mage.cards.decks.CardNameUtil;
 import mage.cards.decks.DeckCardInfo;
 import mage.cards.decks.DeckCardLayout;
 import mage.cards.decks.DeckCardLists;
+import mage.cards.decks.PlanarDeckCard;
 import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
 
@@ -21,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class DckDeckImporter extends PlainTextDeckImporter {
 
-    private static final Pattern pattern = Pattern.compile("(SB:)?\\s*(\\d*)\\s*\\[([^]:]+):([^]:]+)\\]\\s*(.*)\\s*$");
+    private static final Pattern pattern = Pattern.compile("(SB:)?\\s*(\\d*)\\s*\\[([^]:]+):(.+)]\\s*(.*)\\s*$");
 
     private static final Pattern layoutPattern = Pattern.compile("LAYOUT (\\w+):\\((\\d+),(\\d+)\\)([^|]+)\\|(.*)$");
 
@@ -81,8 +82,20 @@ public class DckDeckImporter extends PlainTextDeckImporter {
 
             DeckCardInfo deckCardInfo = null;
 
+            // Supplemental planar cards use their stable registry id as the
+            // native .dck card number and intentionally are not CardRepository
+            // entries. Placement is preserved so an explicitly malformed main
+            // entry reaches the normal deck validator instead of being fixed
+            // silently by the importer.
+            PlanarDeckCard planarCard = PlanarDeckCard.create(setCode, cardNum);
+            if (planarCard != null) {
+                deckCardInfo = new DeckCardInfo(planarCard.getName(), cardNum, setCode);
+            }
+
             // search by set/number
-            CardInfo foundedCard = CardRepository.instance.findCard(setCode, cardNum, true);
+            CardInfo foundedCard = deckCardInfo == null
+                    ? CardRepository.instance.findCard(setCode, cardNum, true)
+                    : null;
             boolean wasOutdated = false;
             if ((foundedCard != null) && !foundedCard.getName().equals(cardName)) {
                 sbMessage.append("Line ").append(lineCount).append(": ").append("found outdated card number or name, will try to replace: ").append(line).append('\n');
@@ -91,7 +104,7 @@ public class DckDeckImporter extends PlainTextDeckImporter {
             }
 
             // search by name
-            if (foundedCard == null) {
+            if (foundedCard == null && deckCardInfo == null) {
                 if (!wasOutdated) {
                     sbMessage.append("Line ").append(lineCount).append(": ").append("can't find card by number, will try to replace: ").append(line).append('\n');
                 }
@@ -124,7 +137,7 @@ public class DckDeckImporter extends PlainTextDeckImporter {
                 }
             }
 
-            if (foundedCard != null) {
+            if (foundedCard != null && deckCardInfo == null) {
                 deckCardInfo = new DeckCardInfo(foundedCard.getName(), foundedCard.getCardNumber(), foundedCard.getSetCode());
             }
             if (deckCardInfo != null) {
