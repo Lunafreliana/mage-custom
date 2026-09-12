@@ -18,6 +18,7 @@ public class TheMaelstromTest extends CardTestPlayerBase {
     public void upkeepRevealCanPutPermanentOntoBattlefield() {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
+        skipInitShuffling();
 
         setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         setChoice(playerA, true); // Reveal the top card.
@@ -34,10 +35,11 @@ public class TheMaelstromTest extends CardTestPlayerBase {
     public void revealedNonPermanentGoesToBottom() {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
+        skipInitShuffling();
 
         setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         setChoice(playerA, true); // Reveal the top card.
-        setChoice(playerA, false); // Do not reveal it again for the other trigger.
+        setChoice(playerA, false); // Do not reveal for the other trigger.
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.DRAW);
         execute();
@@ -51,11 +53,15 @@ public class TheMaelstromTest extends CardTestPlayerBase {
     public void chaosReturnsPermanentCardFromPlanarControllersGraveyard() {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
+        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
+        skipInitShuffling();
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
+        setChoice(playerA, false); // Do not reveal for either initial trigger.
+        setChoice(playerA, false);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Grizzly Bears");
         setStrictChooseMode(true);
