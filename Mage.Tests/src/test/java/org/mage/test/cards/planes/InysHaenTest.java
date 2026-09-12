@@ -39,7 +39,8 @@ public class InysHaenTest extends CardTestPlayerBase {
 
     @Test
     public void testUpkeepMillsPlanarController() {
-        addPlane(playerA, Planes.PLANE_INYS_HAEN);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Arrays.asList(Planes.PLANE_INYS_HAEN);
         addCard(Zone.LIBRARY, playerA, "Mountain", 10);
 
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
@@ -55,8 +56,8 @@ public class InysHaenTest extends CardTestPlayerBase {
         gameOptions.sharedPlanarDeck = Arrays.asList(
                 Planes.PLANE_INYS_HAEN,
                 Planes.PLANE_FIELDS_OF_SUMMER);
-        addCard(Zone.LIBRARY, playerA, "Forest", 10);
-        addCard(Zone.LIBRARY, playerB, "Forest", 10);
+        addCard(Zone.LIBRARY, playerA, "Lightning Bolt", 10);
+        addCard(Zone.LIBRARY, playerB, "Lightning Bolt", 10);
         addCard(Zone.GRAVEYARD, playerA, "Mountain");
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
         addCard(Zone.GRAVEYARD, playerB, "Island");
@@ -78,8 +79,6 @@ public class InysHaenTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_INYS_HAEN);
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
         addCard(Zone.GRAVEYARD, playerA, "Mountain");
-        addTarget(playerA, "Grizzly Bears");
-
         runCode("chaos ensues", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
                 (info, player, game) -> game.fireEvent(new GameEvent(
                         GameEvent.EventType.CHAOS_ENSUES, null, null, player.getId())));
