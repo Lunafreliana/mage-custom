@@ -11,6 +11,7 @@ import mage.game.command.PlanarCardRegistry;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.stack.StackObject;
+import mage.watchers.common.PlaneswalkedWatcher;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -41,6 +42,12 @@ public class PhenomenonTest extends CardTestPlayerBase {
         gameOptions.planeChase = true;
         gameOptions.sharedPlanarPhenomena = Collections.singletonList(Phenomena.MUTUAL_EPIPHANY);
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
+
+        runCode("verify phenomenon-free startup", 1, PhaseStep.UPKEEP, playerA, (info, player, game) -> {
+            Assert.assertTrue(info, game.getStack().isEmpty());
+            Assert.assertEquals(info, 0,
+                    game.getState().getWatcher(PlaneswalkedWatcher.class).getCount());
+        });
 
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
         execute();
