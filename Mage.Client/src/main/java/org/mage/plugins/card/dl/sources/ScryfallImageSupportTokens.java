@@ -417,6 +417,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Lethe Lake", "https://api.scryfall.com/cards/opca/47/en?format=image");
             put("PCA/Plane - Naya", "https://api.scryfall.com/cards/opca/55/en?format=image");
             put("PCA/Plane - Panopticon", "https://api.scryfall.com/cards/opca/62/en?format=image");
+            put("PCA/Plane - Selesnya Loft Gardens", "https://api.scryfall.com/cards/opca/69/en?format=image");
             put("PCA/Plane - Tazeem", "https://api.scryfall.com/cards/opca/78/en?format=image");
             put("PCA/Plane - The Dark Barony", "https://api.scryfall.com/cards/opca/19/en?format=image");
             put("PCA/Plane - The Eon Fog", "https://api.scryfall.com/cards/opca/22/en?format=image");
