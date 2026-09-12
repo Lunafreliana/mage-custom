@@ -30,6 +30,7 @@ public class WeHopeYouLikeSquirrelsTest extends CardTestPlayerBase {
     public void castingPlayerCreatesSquirrel() {
         addPlane(playerA, Planes.PLANE_WE_HOPE_YOU_LIKE_SQUIRRELS);
         addCard(Zone.HAND, playerA, "Grizzly Bears");
+        addCard(Zone.BATTLEFIELD, playerA, "Forest", 2);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears");
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -51,8 +52,8 @@ public class WeHopeYouLikeSquirrelsTest extends CardTestPlayerBase {
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertCounterCount(playerA, "Squirrel Token", CounterType.P1P1, 0);
-        assertCounterCount(playerB, "Squirrel Token", CounterType.P1P1, 1);
+        assertCounterCount(playerA, "Squirrel Token", CounterType.P1P1, 1);
+        assertCounterCount(playerB, "Squirrel Token", CounterType.P1P1, 0);
     }
 
     @Test
