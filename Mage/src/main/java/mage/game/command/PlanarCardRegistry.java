@@ -28,8 +28,7 @@ public final class PlanarCardRegistry {
         Map<String, Entry> entries = new LinkedHashMap<>();
         for (Planes plane : Planes.values()) {
             register(entries, id(CardType.PLANE, plane.name()), CardType.PLANE,
-                    displayName(plane.getFullName()), plane.getFullName(), plane.getSetCode(),
-                    () -> Plane.createPlane(plane));
+                    displayName(plane.getFullName()), plane.getFullName(), plane.getSetCode(), () -> Plane.createPlane(plane));
         }
         for (Phenomena phenomenon : Phenomena.values()) {
             register(entries, id(CardType.PHENOMENON, phenomenon.name()), CardType.PHENOMENON,

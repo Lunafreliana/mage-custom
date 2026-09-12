@@ -1,4 +1,4 @@
-name: Build and run tests (github)
+name: Build and run tests (self-hosted)
 
 on:
   push:
@@ -16,22 +16,55 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - java: '17'
-            distribution: 'temurin'
-            package: 'jdk'
+    # Run the full Maven suite on the local Windows runner instead of consuming
+    # GitHub-hosted Actions minutes.
+    runs-on: [self-hosted, windows, x64]
+
     steps:
     - uses: actions/checkout@v6
-    - name: Setup JDK ${{ matrix.java }}
+
+    - name: Setup JDK 17
       uses: actions/setup-java@v5
       with:
-        java-version: ${{ matrix.java }}
-        distribution: ${{ matrix.distribution }}
-        java-package: ${{ matrix.package }}
-        cache: maven
+        java-version: '17'
+        distribution: 'temurin'
+        java-package: 'jdk'
+
+    - name: Setup Maven 3.9.16
+      shell: powershell
+      run: |
+        $version = '3.9.16'
+        $mavenRoot = Join-Path $env:RUNNER_TOOL_CACHE "apache-maven\$version"
+        $mavenHome = Join-Path $mavenRoot "apache-maven-$version"
+        $mvnCmd = Join-Path $mavenHome 'bin\mvn.cmd'
+
+        if (-not (Test-Path $mvnCmd)) {
+          New-Item -ItemType Directory -Force -Path $mavenRoot | Out-Null
+          $zip = Join-Path $env:RUNNER_TEMP "apache-maven-$version-bin.zip"
+          $url = "https://dlcdn.apache.org/maven/maven-3/$version/binaries/apache-maven-$version-bin.zip"
+
+          Write-Host "Downloading Apache Maven $version..."
+          Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $zip
+          $checksumText = (Invoke-WebRequest -UseBasicParsing -Uri "$url.sha512").Content
+          $expected = [regex]::Match($checksumText, '[A-Fa-f0-9]{128}').Value.ToLowerInvariant()
+          $actual = (Get-FileHash -Path $zip -Algorithm SHA512).Hash.ToLowerInvariant()
+          if (-not $expected -or $actual -ne $expected) {
+            throw 'Apache Maven SHA-512 verification failed.'
+          }
+
+          Expand-Archive -Path $zip -DestinationPath $mavenRoot -Force
+          Remove-Item $zip -Force
+        }
+
+        "MAVEN_HOME=$mavenHome" >> $env:GITHUB_ENV
+        (Join-Path $mavenHome 'bin') >> $env:GITHUB_PATH
+
+    - name: Show Java and Maven versions
+      shell: cmd
+      run: |
+        java -version
+        mvn -version
+
     - name: Build and test
-      run: mvn test -B -Dxmage.dataCollectors.printGameLogs=false -Dlog4j.configuration=file:${GITHUB_WORKSPACE}/.travis/log4j.properties
+      shell: cmd
+      run: mvn test -B "-Dxmage.dataCollectors.printGameLogs=false" "-Dlog4j.configuration=file:%GITHUB_WORKSPACE%/.travis/log4j.properties"
