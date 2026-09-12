@@ -9,30 +9,45 @@ public enum Planes {
     PLANE_AKOUM("AkoumPlane", "Plane - Akoum"),
     PLANE_ASTRAL_ARENA("AstralArenaPlane", "Plane - Astral Arena"),
     PLANE_BANT("BantPlane", "Plane - Bant"),
+    PLANE_ELOREN_WILDS("ElorenWildsPlane", "Plane - Eloren Wilds"),
     PLANE_EDGE_OF_MALACOL("EdgeOfMalacolPlane", "Plane - Edge of Malacol"),
     PLANE_FEEDING_GROUNDS("FeedingGroundsPlane", "Plane - Feeding Grounds"),
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
+    PLANE_GAVONY("GavonyPlane", "Plane - Gavony"),
     PLANE_HEDRON_FIELDS_OF_AGADEEM("HedronFieldsOfAgadeemPlane", "Plane - Hedron Fields of Agadeem"),
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
+    PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
     PLANE_PANOPTICON("PanopticonPlane", "Plane - Panopticon"),
+    PLANE_SELESNYA_LOFT_GARDENS("SelesnyaLoftGardensPlane", "Plane - Selesnya Loft Gardens"),
+    PLANE_STAIRS_TO_INFINITY("StairsToInfinityPlane", "Plane - Stairs to Infinity"),
     PLANE_TAZEEM("TazeemPlane", "Plane - Tazeem"),
+    PLANE_TEN_WIZARDS_MOUNTAIN("TenWizardsMountainPlane", "Plane - Ten Wizards Mountain", "MOC"),
+    PLANE_TOWASHI("TowashiPlane", "Plane - Towashi", "MOC"),
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
     PLANE_THE_EON_FOG("TheEonFogPlane", "Plane - The Eon Fog"),
     PLANE_THE_GREAT_FOREST("TheGreatForestPlane", "Plane - The Great Forest"),
+    PLANE_THE_MAELSTROM("TheMaelstromPlane", "Plane - The Maelstrom"),
     PLANE_THE_ZEPHYR_MAZE_FOG("TheZephyrMazePlane", "Plane - The Zephyr Maze"),
     PLANE_TRUGA_JUNGLE("TrugaJunglePlane", "Plane - Truga Jungle"),
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
     PLANE_TURRI_ISLAND("TurriIslandPlane", "Plane - Turri Island"),
     PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches"),
     PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone");
+    PLANE_WE_HOPE_YOU_LIKE_SQUIRRELS("WeHopeYouLikeSquirrelsPlane", "Plane - We Hope You Like Squirrels");
 
     private final String className;
     private final String fullName;
+    private final String setCode;
 
     Planes(String className, String fullName) {
+        this(className, fullName, "PCA");
+    }
+
+    Planes(String className, String fullName, String setCode) {
         this.className = className;
         this.fullName = fullName;
+        this.setCode = setCode;
     }
 
     @Override
@@ -46,6 +61,10 @@ public enum Planes {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public String getSetCode() {
+        return setCode;
     }
 
     public static Planes fromFullName(String fullName) {

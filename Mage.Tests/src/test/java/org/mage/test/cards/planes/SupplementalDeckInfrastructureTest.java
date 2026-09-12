@@ -9,6 +9,7 @@ import mage.cards.decks.SupplementalDeckCard;
 import mage.cards.decks.SupplementalDeckPartition;
 import mage.cards.decks.SupplementalDeckType;
 import mage.constants.CardType;
+import mage.constants.Phenomena;
 import mage.constants.Planes;
 import mage.game.Game;
 import mage.game.GameState;
@@ -113,6 +114,95 @@ public class SupplementalDeckInfrastructureTest {
         Assert.assertEquals(1, state.getPlayerPlanarDeck(first).size());
         Assert.assertEquals(0, copy.getPlayerPlanarDeck(first).size());
         Assert.assertEquals(1, copy.getPlayerPlanarDeck(second).size());
+    }
+
+    @Test
+    public void planarCarrierRoundTripsStableRegistryIdentity() {
+        String registryId = PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY);
+
+        PlanarDeckCard card = PlanarDeckCard.create("PCA", registryId);
+
+        Assert.assertNotNull(card);
+        Assert.assertEquals(SupplementalDeckType.PLANAR, card.getSupplementalDeckType());
+        Assert.assertEquals(registryId, card.getSupplementalDeckId());
+        Assert.assertEquals(registryId, card.getCardNumber());
+        Assert.assertTrue(card.getCardTypeForDeckbuilding().contains(CardType.PHENOMENON));
+    }
+
+    @Test
+    public void planarCarrierRejectsWrongSetAndUnknownIdentity() {
+        String registryId = PlanarCardRegistry.getId(Planes.PLANE_AKOUM);
+
+        Assert.assertNull(PlanarDeckCard.create("NOT-PCA", registryId));
+        Assert.assertNull(PlanarDeckCard.create("PCA", "plane:not_registered"));
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> new PlanarDeckCard("plane:not_registered"));
+    }
+
+    @Test
+    public void planarCarrierCopyPreservesIdentityWithoutSharingObject() {
+        PlanarDeckCard original = new PlanarDeckCard(PlanarCardRegistry.getId(Planes.PLANE_AKOUM));
+
+        PlanarDeckCard copy = (PlanarDeckCard) original.copy();
+
+        Assert.assertNotSame(original, copy);
+        Assert.assertEquals(original.getId(), copy.getId());
+        Assert.assertEquals(original.getSupplementalDeckId(), copy.getSupplementalDeckId());
+    }
+
+    @Test
+    public void partitionViewsAreImmutable() {
+        PlanarDeckCard planar = new PlanarDeckCard(PlanarCardRegistry.getId(Planes.PLANE_AKOUM));
+        SupplementalDeckPartition partition = SupplementalDeckPartition.create(
+                Collections.singletonList(planar), Collections.singletonList(new OrdinaryPregameCard("Commander")));
+
+        Assert.assertThrows(UnsupportedOperationException.class,
+                () -> partition.getIllegalMain().clear());
+        Assert.assertThrows(UnsupportedOperationException.class,
+                () -> partition.getOrdinaryPregame().clear());
+        Assert.assertThrows(UnsupportedOperationException.class,
+                () -> partition.get(SupplementalDeckType.PLANAR).clear());
+    }
+
+    @Test
+    public void absentSupplementalTypeReturnsAnImmutableEmptyView() {
+        SupplementalDeckPartition partition = SupplementalDeckPartition.create(
+                Collections.emptyList(), Collections.emptyList());
+
+        Assert.assertTrue(partition.get(SupplementalDeckType.ATTRACTION).isEmpty());
+        Assert.assertThrows(UnsupportedOperationException.class,
+                () -> partition.get(SupplementalDeckType.ATTRACTION).add(
+                        new SyntheticSupplementalCard("attraction:test")));
+    }
+
+    @Test
+    public void gameStateExposesAnImmutablePlayerDeckMap() {
+        GameState state = new GameState();
+        UUID playerId = UUID.randomUUID();
+        state.setPlayerPlanarDeck(playerId, Collections.singletonList(
+                PlanarCardRegistry.create(PlanarCardRegistry.getId(Planes.PLANE_AKOUM))), false);
+
+        Assert.assertThrows(UnsupportedOperationException.class,
+                () -> state.getPlayerPlanarDecks().clear());
+    }
+
+    @Test
+    public void replacingOnePlayersDeckDoesNotAffectAnotherPlayersDeck() {
+        GameState state = new GameState();
+        UUID first = UUID.randomUUID();
+        UUID second = UUID.randomUUID();
+        state.setPlayerPlanarDeck(first, Collections.singletonList(
+                PlanarCardRegistry.create(PlanarCardRegistry.getId(Planes.PLANE_AKOUM))), false);
+        state.setPlayerPlanarDeck(second, Collections.singletonList(
+                PlanarCardRegistry.create(PlanarCardRegistry.getId(Planes.PLANE_BANT))), false);
+
+        state.setPlayerPlanarDeck(first, Collections.singletonList(
+                PlanarCardRegistry.create(PlanarCardRegistry.getId(Planes.PLANE_NAYA))), false);
+
+        Assert.assertEquals(1, state.getPlayerPlanarDeck(first).size());
+        Assert.assertEquals(1, state.getPlayerPlanarDeck(second).size());
+        Assert.assertNotEquals(state.getPlayerPlanarDeck(first).getOrder(),
+                state.getPlayerPlanarDeck(second).getOrder());
     }
 
     private static final class RecordingHandler implements SupplementalDeckRuntimeHandler {

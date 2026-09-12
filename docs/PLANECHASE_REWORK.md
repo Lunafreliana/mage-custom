@@ -696,6 +696,11 @@ Each card must:
 * preserve exact source/controller/planeswalking-player semantics;
 * avoid introducing card-local substitutes for common Planechase operations.
 
+Top-card inspection effects must resolve the planar controller's applicable
+individual or shared deck through the common game API. If the revealed card is
+not moved, restore that same object to the top without changing the hidden deck
+order; if it is moved to the bottom, preserve its existing deck association.
+
 Mechanically similar cards may share reusable tested infrastructure, but individual rules review remains required.
 
 ## 16. Testing requirements

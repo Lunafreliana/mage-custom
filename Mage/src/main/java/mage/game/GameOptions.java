@@ -87,11 +87,11 @@ public class GameOptions implements Serializable, Copyable<GameOptions> {
     public Collection<Phenomena> sharedPlanarPhenomena = Collections.emptyList();
     /** Stable registry ids in exact shared-deck order. Supersedes the migration seams above. */
     public Collection<String> sharedPlanarCardIds = Collections.emptyList();
-    // xmage uses increased by 1/3 chances (2/2/9) for chaos/planar result, see 1a9f12f5767ce0beeed26a8ff5c8a8f9490c9c47
-    // if you need combo support with 6-sides rolls then it can be reset to original values
-    public static final int PLANECHASE_PLANAR_DIE_CHAOS_SIDES = 2; // original: 1
-    public static final int PLANECHASE_PLANAR_DIE_PLANAR_SIDES = 2; // original: 1
-    public static final int PLANECHASE_PLANAR_DIE_TOTAL_SIDES = 9; // original: 6
+    // Rules 901.3 and 901.9: a six-sided planar die has one chaos face,
+    // one planeswalker face, and four blank faces.
+    public static final int PLANECHASE_PLANAR_DIE_CHAOS_SIDES = 1;
+    public static final int PLANECHASE_PLANAR_DIE_PLANAR_SIDES = 1;
+    public static final int PLANECHASE_PLANAR_DIE_TOTAL_SIDES = 6;
 
     public GameOptions() {
         super();

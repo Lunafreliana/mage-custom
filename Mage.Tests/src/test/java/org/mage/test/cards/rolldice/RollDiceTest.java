@@ -4,6 +4,8 @@ import mage.abilities.keyword.FlyingAbility;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
+import mage.game.GameOptions;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBaseWithAIHelps;
 
@@ -232,6 +234,21 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     }
 
     @Test
+    public void test_PlanarDieWithSpellCostReductionInHand() {
+        useHedronFieldsPlanechase();
+        addCard(Zone.HAND, playerA, "Nyxborn Behemoth");
+
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
+        setDieRollResult(playerA, 3);
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.END_TURN);
+        execute();
+
+        assertHandCount(playerA, "Nyxborn Behemoth", 1);
+    }
+
+    @Test
     public void test_PlanarDice_OneOrMoreDieRollTriggersMustWork() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
         useHedronFieldsPlanechase();
@@ -444,8 +461,7 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
 
     @Test
     public void test_PlanarDice_AdditionalRoll_WithBigIdea_MustIgnore() {
-        // see consts comments about planar die size
-        //Assert.assertEquals("Planar dice must be six sided", 6, GameOptions.PLANECHASE_PLANAR_DIE_TOTAL_SIDES);
+        Assert.assertEquals("Planar dice must be six sided", 6, GameOptions.PLANECHASE_PLANAR_DIE_TOTAL_SIDES);
 
         // {2}{B/R}{B/R}, {T}: Roll a six-sided dice. Create a number of 1/1 red Brainiac creature tokens equal to the result.
         // Tap three untapped Brainiacs you control: The next time you would roll a six-sided die,
