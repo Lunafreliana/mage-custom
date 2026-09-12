@@ -11,7 +11,6 @@ import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mage.test.player.TestPlayer;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
 import java.util.Collections;
@@ -22,24 +21,22 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
     public void testUpkeepSurveilsForPlanarController() {
         skipInitShuffling();
         removeAllCardsFromLibrary(playerA);
-        // Library additions go on top, so the seven Plains form the opening hand and leave these two cards.
-        addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
-        addCard(Zone.LIBRARY, playerA, "Silvercoat Lion");
-        addCard(Zone.LIBRARY, playerA, "Plains", 7);
+        // Seven are drawn for the opening hand, leaving three known cards.
+        addCard(Zone.LIBRARY, playerA, "Grizzly Bears", 10);
         usePyramidOfMarsDeck();
 
         // The current Planechase test setup fires the planeswalk-to trigger when the starting plane is revealed.
-        // Keep both cards on top for that surveil so the upkeep trigger below can be tested independently.
-        addTarget(playerA, TestPlayer.TARGET_SKIP);
-        addTarget(playerA, "Grizzly Bears"); // order the cards remaining on top
-        addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
+        // Move one of its two cards to the graveyard, avoiding an ordering prompt for the one card left on top.
+        addTarget(playerA, "Grizzly Bears");
+        // The upkeep trigger then sees the two remaining cards and moves both to the graveyard.
+        addTarget(playerA, "Grizzly Bears^Grizzly Bears");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.DRAW);
         execute();
 
-        assertGraveyardCount(playerA, "Grizzly Bears", 1);
-        assertGraveyardCount(playerA, "Silvercoat Lion", 1);
+        assertGraveyardCount(playerA, "Grizzly Bears", 3);
+        assertLibraryCount(playerA, 0);
     }
 
     @Test
