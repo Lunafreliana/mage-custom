@@ -46,6 +46,32 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
     }
 
     @Test
+    public void testPlaneswalkAbilityDrawsForPlayerControllingCommander() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
+
+        runCode("first planeswalk to The Command Zone", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> Assert.assertTrue(info, game.addPlane(
+                        Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
+                )));
+        setChoice(playerA, true);
+        setChoice(playerB, false);
+
+        runCode("second planeswalk to The Command Zone", 1, PhaseStep.POSTCOMBAT_MAIN, playerA,
+                (info, player, game) -> Assert.assertTrue(info, game.addPlane(
+                        Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
+                )));
+        setChoice(playerB, false);
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.END_TURN);
+        execute();
+
+        assertPermanentCount(playerA, "Daxos of Meletis", 1);
+        assertHandCount(playerA, 8);
+    }
+
+    @Test
     public void testCommanderAbilityTriggersAdditionalTimeDuringYourTurn() {
         addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
@@ -61,26 +87,48 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
     }
 
     @Test
+    public void testNonCommanderAbilityDoesNotTriggerAdditionalTime() {
+        removeAllCardsFromHand(playerA);
+        addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
+        addCard(Zone.BATTLEFIELD, playerA, "Thieving Magpie");
+
+        attack(1, playerA, "Thieving Magpie");
+
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertHandCount(playerA, 1);
+    }
+
+    @Test
     public void testChaosResetsCommanderTax() {
         addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 1);
+        addCard(Zone.BATTLEFIELD, playerB, "Plains", 2);
+        addCard(Zone.BATTLEFIELD, playerB, "Island", 1);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Daxos of Meletis");
+        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Daxos of Meletis");
 
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
-        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
+        castSpell(3, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
 
-        setStopAt(1, PhaseStep.END_TURN);
+        setStopAt(3, PhaseStep.END_TURN);
         execute();
 
-        UUID commanderId = currentGame.getCommandersIds(
+        UUID commanderAId = currentGame.getCommandersIds(
                 playerA, CommanderCardType.COMMANDER_OR_OATHBREAKER, false
+        ).iterator().next();
+        UUID commanderBId = currentGame.getCommandersIds(
+                playerB, CommanderCardType.COMMANDER_OR_OATHBREAKER, false
         ).iterator().next();
         CommanderPlaysCountWatcher watcher = currentGame.getState()
                 .getWatcher(CommanderPlaysCountWatcher.class);
-        Assert.assertEquals(0, watcher.getPlaysCount(commanderId));
+        Assert.assertEquals(0, watcher.getPlaysCount(commanderAId));
+        Assert.assertEquals(0, watcher.getPlaysCount(commanderBId));
         Assert.assertEquals(0, watcher.getPlayerCount(playerA.getId()));
+        Assert.assertEquals(0, watcher.getPlayerCount(playerB.getId()));
     }
 }
