@@ -410,6 +410,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Akoum", "https://api.scryfall.com/cards/opca/12/en?format=image");
             put("PCA/Plane - Astral Arena", "https://api.scryfall.com/cards/opca/14/en?format=image");
             put("PCA/Plane - Bant", "https://api.scryfall.com/cards/opca/15/en?format=image");
+            put("PCA/Plane - Eloren Wilds", "https://api.scryfall.com/cards/opca/21/en?format=image");
             put("PCA/Plane - Edge of Malacol", "https://api.scryfall.com/cards/opca/20/en?format=image");
             put("PCA/Plane - Feeding Grounds", "https://api.scryfall.com/cards/opca/23/en?format=image");
             put("PCA/Plane - Fields of Summer", "https://api.scryfall.com/cards/opca/24/en?format=image");

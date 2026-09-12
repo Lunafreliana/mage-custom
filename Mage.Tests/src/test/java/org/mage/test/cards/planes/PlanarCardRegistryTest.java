@@ -58,6 +58,8 @@ public class PlanarCardRegistryTest {
     public void testMetadataTypes() {
         Assert.assertEquals(CardType.PLANE,
                 PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Planes.PLANE_AKOUM)).getType());
+        Assert.assertEquals("Eloren Wilds",
+                PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Planes.PLANE_ELOREN_WILDS)).getEnglishName());
         Assert.assertEquals(CardType.PHENOMENON,
                 PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY)).getType());
     }
