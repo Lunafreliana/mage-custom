@@ -28,6 +28,7 @@ import mage.cards.*;
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckCardInfo;
 import mage.choices.Choice;
+import mage.choices.ChoiceHintType;
 import mage.choices.ChoiceImpl;
 import mage.collectors.DataCollectorServices;
 import mage.constants.*;
