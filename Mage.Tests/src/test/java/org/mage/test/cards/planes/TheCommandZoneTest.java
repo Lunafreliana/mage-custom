@@ -52,6 +52,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 1);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Daxos of Meletis");
+        setChoice(playerA, false); // Don't gain life from Fields of Summer
 
         runCode("planeswalk to The Command Zone", 1, PhaseStep.POSTCOMBAT_MAIN, playerA,
                 (info, player, game) -> Assert.assertTrue(info, game.addPlane(
@@ -99,6 +100,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
     @Test
     public void testChaosResetsCommanderTax() {
         addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
+        setChoice(playerB, false); // Don't put the other player's commander onto the battlefield
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 1);
         addCard(Zone.BATTLEFIELD, playerB, "Plains", 2);
