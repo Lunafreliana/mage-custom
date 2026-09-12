@@ -60,13 +60,11 @@ jobs:
         (Join-Path $mavenHome 'bin') >> $env:GITHUB_PATH
 
     - name: Show Java and Maven versions
-      shell: powershell
+      shell: cmd
       run: |
         java -version
         mvn -version
 
     - name: Build and test
-      shell: powershell
-      run: |
-        $log4j = (Join-Path $env:GITHUB_WORKSPACE ".travis\log4j.properties").Replace('\', '/')
-        mvn test -B -Dxmage.dataCollectors.printGameLogs=false "-Dlog4j.configuration=file:$log4j"
+      shell: cmd
+      run: mvn test -B -Dxmage.dataCollectors.printGameLogs=false -Dlog4j.configuration=file:%GITHUB_WORKSPACE%/.travis/log4j.properties
