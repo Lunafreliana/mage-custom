@@ -44,4 +44,27 @@ public class PlanechaseModeContextTest {
         Assert.assertEquals(PlaneswalkContext.Cause.SPELL_OR_ABILITY, context.getCause());
         Assert.assertEquals(sourceId, context.getSourceId());
     }
+
+    @Test
+    public void nullCauseFallsBackToOtherWithoutLosingIdentity() {
+        UUID playerId = UUID.randomUUID();
+        UUID sourceId = UUID.randomUUID();
+
+        PlaneswalkContext context = new PlaneswalkContext(playerId, null, sourceId);
+
+        Assert.assertEquals(playerId, context.getPlaneswalkingPlayerId());
+        Assert.assertEquals(PlaneswalkContext.Cause.OTHER, context.getCause());
+        Assert.assertEquals(sourceId, context.getSourceId());
+    }
+
+    @Test
+    public void convenienceContextDoesNotInventASource() {
+        UUID playerId = UUID.randomUUID();
+
+        PlaneswalkContext context = PlaneswalkContext.forPlayer(playerId);
+
+        Assert.assertEquals(playerId, context.getPlaneswalkingPlayerId());
+        Assert.assertEquals(PlaneswalkContext.Cause.OTHER, context.getCause());
+        Assert.assertNull(context.getSourceId());
+    }
 }

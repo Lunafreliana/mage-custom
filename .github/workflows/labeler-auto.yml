@@ -7,7 +7,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: [self-hosted, windows, x64]
+    runs-on: [self-hosted, windows, x64, xmage]
     steps:
       - id: label-the-PR
         uses: actions/labeler@v6

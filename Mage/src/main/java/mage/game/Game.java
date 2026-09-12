@@ -493,6 +493,14 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
 
     boolean planeswalk(PlaneswalkContext context);
 
+    /**
+     * Reveals cards from the planeswalking player's applicable planar deck
+     * until the requested number of Planes have been found, then planeswalks
+     * to all of those Planes simultaneously. Other revealed planar cards are
+     * put on the bottom of that same planar deck.
+     */
+    boolean planeswalkToNextPlanes(PlaneswalkContext context, int planeCount);
+
     void addCommander(Commander commander);
 
     Dungeon addDungeon(Dungeon dungeon, UUID playerId);
