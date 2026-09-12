@@ -9,6 +9,7 @@ public enum Planes {
     PLANE_AKOUM("AkoumPlane", "Plane - Akoum"),
     PLANE_ASTRAL_ARENA("AstralArenaPlane", "Plane - Astral Arena"),
     PLANE_BANT("BantPlane", "Plane - Bant"),
+    PLANE_ELOREN_WILDS("ElorenWildsPlane", "Plane - Eloren Wilds"),
     PLANE_EDGE_OF_MALACOL("EdgeOfMalacolPlane", "Plane - Edge of Malacol"),
     PLANE_FEEDING_GROUNDS("FeedingGroundsPlane", "Plane - Feeding Grounds"),
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
