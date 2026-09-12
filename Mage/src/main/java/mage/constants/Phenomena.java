@@ -4,6 +4,7 @@ package mage.constants;
 public enum Phenomena {
     INTERPLANAR_TUNNEL("InterplanarTunnelPhenomenon", "Phenomenon - Interplanar Tunnel"),
     MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany"),
+    REALITY_SHAPING("RealityShapingPhenomenon", "Phenomenon - Reality Shaping"),
     SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging");
 
     private final String className;

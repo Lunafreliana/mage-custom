@@ -432,6 +432,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Turri Island", "https://api.scryfall.com/cards/opca/82/en?format=image");
             put("PCA/Plane - Undercity Reaches", "https://api.scryfall.com/cards/opca/83/en?format=image");
             put("PCA/Plane - We Hope You Like Squirrels", "https://api.scryfall.com/cards/pssc/10/en?format=image");
+            put("WHO/Plane - Besieged Viking Village", "https://api.scryfall.com/cards/who/570/en?format=image");
 
             // C20
             put("C20/Angel", "https://api.scryfall.com/cards/tc20/1/en?format=image");
