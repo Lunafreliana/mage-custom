@@ -179,6 +179,7 @@
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
+|PLANE:MOC|Plane - Inys Haen||InysHaenPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|

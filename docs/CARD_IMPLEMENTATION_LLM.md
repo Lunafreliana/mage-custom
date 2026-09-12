@@ -299,6 +299,12 @@ runtime object from restoring its printed effects when it becomes active again.
 Deactivate or remove the registered runtime copies, and preserve the printed
 ability graph.
 
+Plane cards with “planeswalk away from” triggers need a distinct departure
+lifecycle event emitted while the departing planar object's command-zone
+trigger is still registered. Do not model this as a generic zone change: planar
+cards remain associated with the command zone while moving between face-up play
+and their planar decks.
+
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A
 battlefield ability that has not yet triggered can still have

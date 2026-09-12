@@ -2307,6 +2307,10 @@ public abstract class GameImpl implements Game {
         if (!canPlaneswalk(playerId) || destinationCards.isEmpty()) {
             return false;
         }
+        for (PlanarCard plane : new ArrayList<>(state.getFaceUpPlanarCards())) {
+            fireEvent(GameEvent.getEvent(
+                    GameEvent.EventType.PLANESWALKED_AWAY, plane.getId(), null, playerId));
+        }
         bottomFaceUpPlanarCards();
         // All destinations must be face up before any planeswalk event is
         // emitted: Spatial Merging planeswalks to its two Planes simultaneously.

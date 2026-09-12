@@ -417,6 +417,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Gavony", "https://api.scryfall.com/cards/opca/27/en?format=image");
             put("PCA/Plane - Stairs to Infinity", "https://api.scryfall.com/cards/opca/73/en?format=image");
             put("PCA/Plane - Hedron Fields of Agadeem", "https://api.scryfall.com/cards/opca/35/en?format=image");
+            put("MOC/Plane - Inys Haen", "https://api.scryfall.com/cards/moc/54/en?format=image");
             put("PCA/Plane - Lethe Lake", "https://api.scryfall.com/cards/opca/47/en?format=image");
             put("PCA/Plane - Naya", "https://api.scryfall.com/cards/opca/55/en?format=image");
             put("PCA/Plane - Nephalia", "https://api.scryfall.com/cards/opca/56/en?format=image");
