@@ -20,9 +20,10 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
     @Test
     public void testUpkeepSurveilsForPlanarController() {
         removeAllCardsFromLibrary(playerA);
-        // Seven Bears are drawn for the opening hand, leaving these two cards to surveil.
-        addCard(Zone.LIBRARY, playerA, "Grizzly Bears", 8);
+        // Library additions go on top, so the seven Plains form the opening hand and leave these two cards.
+        addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
         addCard(Zone.LIBRARY, playerA, "Silvercoat Lion");
+        addCard(Zone.LIBRARY, playerA, "Plains", 7);
         usePyramidOfMarsDeck();
 
         addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
