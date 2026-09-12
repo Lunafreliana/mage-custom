@@ -171,6 +171,7 @@
 |PLANE:PCA|Plane - Academy at Tolaria West||AcademyAtTolariaWestPlane|
 |PLANE:PCA|Plane - Agyrem||AgyremPlane|
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
+|PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
