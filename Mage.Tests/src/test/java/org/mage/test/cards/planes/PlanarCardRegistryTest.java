@@ -23,7 +23,9 @@ public class PlanarCardRegistryTest {
             PlanarCard card = PlanarCardRegistry.create(metadata.getId());
             Assert.assertNotNull(metadata.getId(), card);
             Assert.assertEquals(metadata.getType(), card.getPlanarCardType());
-            Assert.assertEquals("PCA", metadata.getSetCode());
+            String expectedSetCode = metadata.getId().equals(
+                    PlanarCardRegistry.getId(Planes.PLANE_THE_PYRAMID_OF_MARS)) ? "WHO" : "PCA";
+            Assert.assertEquals(expectedSetCode, metadata.getSetCode());
             Assert.assertEquals(card.getName(), metadata.getImageName());
             Assert.assertFalse(metadata.getEnglishName().startsWith("Plane - "));
             Assert.assertFalse(metadata.getEnglishName().startsWith("Phenomenon - "));

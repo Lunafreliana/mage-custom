@@ -12,6 +12,9 @@ import mage.game.command.PlanarCardRegistry;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
+import org.mage.test.player.TestPlayer;
+
+import java.util.Collections;
 
 public class ThePyramidOfMarsTest extends CardTestPlayerBase {
 
@@ -20,7 +23,7 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
         removeAllCardsFromLibrary(playerA);
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
         addCard(Zone.LIBRARY, playerA, "Silvercoat Lion");
-        addPlane(playerA, Planes.PLANE_THE_PYRAMID_OF_MARS);
+        usePyramidOfMarsDeck();
 
         addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
 
@@ -34,14 +37,16 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
 
     @Test
     public void testChaosReturnsCreatureFromPlanarControllersGraveyard() {
-        addPlane(playerA, Planes.PLANE_THE_PYRAMID_OF_MARS);
+        usePyramidOfMarsDeck();
         addCard(Zone.GRAVEYARD, playerB, "Grizzly Bears");
 
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerB, causeChaos, null, CardType.SORCERY);
 
+        addTarget(playerA, TestPlayer.TARGET_SKIP); // turn 1 upkeep surveil
         castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Cause Chaos");
+        addTarget(playerB, TestPlayer.TARGET_SKIP); // turn 2 upkeep surveil
         addTarget(playerB, "Grizzly Bears");
 
         setStrictChooseMode(true);
@@ -63,5 +68,10 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
         Assert.assertEquals("WHO", metadata.getSetCode());
         Assert.assertNotNull(card);
         Assert.assertEquals("Plane - The Pyramid of Mars", card.getName());
+    }
+
+    private void usePyramidOfMarsDeck() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_THE_PYRAMID_OF_MARS);
     }
 }
