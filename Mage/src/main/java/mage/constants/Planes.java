@@ -24,14 +24,21 @@ public enum Planes {
     PLANE_TRUGA_JUNGLE("TrugaJunglePlane", "Plane - Truga Jungle"),
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
     PLANE_TURRI_ISLAND("TurriIslandPlane", "Plane - Turri Island"),
-    PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches");
+    PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches"),
+    PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone", "PUNK");
 
     private final String className;
     private final String fullName;
+    private final String setCode;
 
     Planes(String className, String fullName) {
+        this(className, fullName, "PCA");
+    }
+
+    Planes(String className, String fullName, String setCode) {
         this.className = className;
         this.fullName = fullName;
+        this.setCode = setCode;
     }
 
     @Override
@@ -45,6 +52,10 @@ public enum Planes {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public String getSetCode() {
+        return setCode;
     }
 
     public static Planes fromFullName(String fullName) {

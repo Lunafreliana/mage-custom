@@ -5,6 +5,7 @@ import mage.constants.Phenomena;
 import mage.constants.Planes;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.command.Plane;
 import mage.game.command.SharedPlanarDeckValidator;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +24,9 @@ public class PlanarCardRegistryTest {
             PlanarCard card = PlanarCardRegistry.create(metadata.getId());
             Assert.assertNotNull(metadata.getId(), card);
             Assert.assertEquals(metadata.getType(), card.getPlanarCardType());
-            Assert.assertEquals("PCA", metadata.getSetCode());
+            if (!metadata.getId().equals(PlanarCardRegistry.getId(Planes.PLANE_THE_COMMAND_ZONE))) {
+                Assert.assertEquals("PCA", metadata.getSetCode());
+            }
             Assert.assertEquals(card.getName(), metadata.getImageName());
             Assert.assertFalse(metadata.getEnglishName().startsWith("Plane - "));
             Assert.assertFalse(metadata.getEnglishName().startsWith("Phenomenon - "));
@@ -56,5 +59,18 @@ public class PlanarCardRegistryTest {
                 PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Planes.PLANE_AKOUM)).getType());
         Assert.assertEquals(CardType.PHENOMENON,
                 PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY)).getType());
+    }
+
+    @Test
+    public void testTheCommandZoneMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Planes.PLANE_THE_COMMAND_ZONE)
+        );
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals("The Command Zone", metadata.getEnglishName());
+        Assert.assertEquals("PUNK", metadata.getSetCode());
+        Assert.assertEquals(Planes.PLANE_THE_COMMAND_ZONE,
+                ((Plane) PlanarCardRegistry.create(metadata.getId())).getPlaneType());
     }
 }
