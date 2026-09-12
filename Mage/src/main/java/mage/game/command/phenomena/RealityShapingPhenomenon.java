@@ -78,7 +78,7 @@ class RealityShapingEffect extends OneShotEffect {
         TargetCardInHand target = new TargetCardInHand(StaticFilters.FILTER_CARD_PERMANENT);
         if (target.canChoose(player.getId(), source, game)
                 && player.chooseUse(outcome, "Put a permanent card from your hand onto the battlefield?", source, game)
-                && player.chooseTarget(outcome, target, source, game)) {
+                && target.chooseTarget(outcome, player.getId(), source, game)) {
             Card card = game.getCard(target.getFirstTarget());
             if (card != null) {
                 player.moveCards(card, Zone.BATTLEFIELD, source, game);

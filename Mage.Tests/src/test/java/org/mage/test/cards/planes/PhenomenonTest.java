@@ -153,9 +153,7 @@ public class PhenomenonTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerB, "Grizzly Bears");
 
         setChoice(playerA, true);
-        setChoice(playerA, "Soul Warden");
         setChoice(playerB, true);
-        setChoice(playerB, "Grizzly Bears");
         runCode("encounter Reality Shaping", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
             Assert.assertTrue(info, game.addPhenomenon(new RealityShapingPhenomenon(), player.getId()));
             game.checkStateAndTriggered();
