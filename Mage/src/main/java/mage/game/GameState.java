@@ -90,6 +90,7 @@ public class GameState implements Serializable, Copyable<GameState> {
     private boolean isPlaneChase;
     private UUID planarControllerId;
     private SharedPlanarDeck sharedPlanarDeck = new SharedPlanarDeck();
+    private Map<UUID, SharedPlanarDeck> playerPlanarDecks = new HashMap<>();
     private List<Designation> designations = new ArrayList<>();
     private List<Emblem> helperEmblems = new ArrayList<>(); // fake emblems for inner usage like better UX
     private Exile exile;
@@ -164,6 +165,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.isPlaneChase = state.isPlaneChase;
         this.planarControllerId = state.planarControllerId;
         this.sharedPlanarDeck = state.sharedPlanarDeck.copy();
+        state.playerPlanarDecks.forEach((playerId, deck) -> playerPlanarDecks.put(playerId, deck.copy()));
         this.designations.addAll(state.designations);
         this.helperEmblems = CardUtil.deepCopyObject(state.helperEmblems);
         this.exile = state.exile.copy();
@@ -215,6 +217,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         designations.clear();
         helperEmblems.clear();
         sharedPlanarDeck.clear();
+        playerPlanarDecks.clear();
         isPlaneChase = false;
         planarControllerId = null;
         revealed.clear();
@@ -256,6 +259,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.isPlaneChase = state.isPlaneChase;
         this.planarControllerId = state.planarControllerId;
         this.sharedPlanarDeck = state.sharedPlanarDeck;
+        this.playerPlanarDecks = state.playerPlanarDecks;
         this.designations = state.designations;
         this.helperEmblems = state.helperEmblems;
         this.exile = state.exile;
@@ -564,6 +568,20 @@ public class GameState implements Serializable, Copyable<GameState> {
 
     public SharedPlanarDeck getSharedPlanarDeck() {
         return sharedPlanarDeck;
+    }
+
+    public SharedPlanarDeck getPlayerPlanarDeck(UUID playerId) {
+        return playerPlanarDecks.get(playerId);
+    }
+
+    public Map<UUID, SharedPlanarDeck> getPlayerPlanarDecks() {
+        return Collections.unmodifiableMap(playerPlanarDecks);
+    }
+
+    public void setPlayerPlanarDeck(UUID playerId, Collection<? extends PlanarCard> cards, boolean shuffle) {
+        SharedPlanarDeck deck = new SharedPlanarDeck();
+        deck.setPlanes(cards, shuffle);
+        playerPlanarDecks.put(playerId, deck);
     }
 
     public boolean isPlaneChase() {

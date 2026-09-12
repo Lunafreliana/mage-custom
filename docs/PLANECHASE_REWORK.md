@@ -597,6 +597,18 @@ Implement:
 
 Acceptance tests must include malformed main placement, Commander + Companion + Planar coexistence, many Planar entries in pregame storage, no Planar cards leaking into ordinary sideboard gameplay, and a synthetic second supplemental type proving the generic layer is not Planechase-cast-specific.
 
+Implementation note: the generic boundary uses `SupplementalDeckCard` for the
+stable type/id contract, `SupplementalDeckPartition` to separate supplemental
+entries before format-specific pregame validation, and typed
+`SupplementalDeckRuntimeHandler` dispatch. `PlanarDeckCard` is the non-castable
+registry-backed carrier. Runtime PLANAR dispatch constructs a separately
+shuffled planar deck for each contributing player; `ATTRACTION` is reserved as
+an extension type and has no gameplay handler until Attraction support is
+implemented. Illegal main-deck placement is reported through the existing
+`DeckValidator` error list so callers retain the normal invalid-deck message and
+card-specific diagnostics; runtime partitioning does not introduce a parallel
+legality-error path.
+
 ### Phase 9 — Deck Editor UX and `.dck` Persistence
 
 Make the normal deck editor the primary authoring surface.

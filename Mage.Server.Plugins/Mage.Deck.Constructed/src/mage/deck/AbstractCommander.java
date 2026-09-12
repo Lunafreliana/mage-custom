@@ -178,6 +178,7 @@ public abstract class AbstractCommander extends Constructed {
     public boolean validate(Deck deck) {
         boolean valid = true;
         errorsList.clear();
+        valid = validateSupplementalDeckPlacement(deck);
         FilterMana colorIdentity = new FilterMana();
         Set<Card> commanders = new HashSet<>();
         Card companion;

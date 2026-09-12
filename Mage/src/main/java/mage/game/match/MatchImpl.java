@@ -1,9 +1,12 @@
 package mage.game.match;
 
 import mage.cards.decks.Deck;
+import mage.cards.decks.SupplementalDeckCard;
+import mage.cards.decks.SupplementalDeckType;
 import mage.game.Game;
 import mage.game.GameException;
 import mage.game.GameInfo;
+import mage.game.command.SupplementalDeckRuntimeHandlers;
 import mage.game.events.Listener;
 import mage.game.events.TableEvent;
 import mage.game.events.TableEvent.EventType;
@@ -23,6 +26,9 @@ import java.util.*;
  * @author BetaSteward_at_googlemail.com
  */
 public abstract class MatchImpl implements Match {
+
+    private static final SupplementalDeckRuntimeHandlers SUPPLEMENTAL_HANDLERS
+            = new SupplementalDeckRuntimeHandlers();
 
     private static final Logger logger = Logger.getLogger(MatchImpl.class);
 
@@ -197,9 +203,16 @@ public abstract class MatchImpl implements Match {
         shufflePlayers();
         for (MatchPlayer matchPlayer : this.players) {
             if (!matchPlayer.hasQuit() && matchPlayer.getDeck() != null) {
+                matchPlayer.getDeck().partitionSupplementalDecks();
                 matchPlayer.getPlayer().init(game);
                 game.loadCards(matchPlayer.getDeck().getCards(), matchPlayer.getPlayer().getId());
                 game.loadCards(matchPlayer.getDeck().getSideboard(), matchPlayer.getPlayer().getId());
+                for (SupplementalDeckType type : SupplementalDeckType.values()) {
+                    List<SupplementalDeckCard> entries = matchPlayer.getDeck().getSupplementalDeck(type);
+                    if (!entries.isEmpty()) {
+                        SUPPLEMENTAL_HANDLERS.initialize(type, matchPlayer.getPlayer().getId(), entries, game);
+                    }
+                }
                 game.addPlayer(matchPlayer.getPlayer(), matchPlayer.getDeck()); // TODO: keeps old player?!
                 // time limits
                 matchPlayer.getPlayer().setBufferTimeLeft(options.getMatchBufferTime().getBufferSecs());

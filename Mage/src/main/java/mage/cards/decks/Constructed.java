@@ -226,6 +226,7 @@ public class Constructed extends DeckValidator {
     public boolean validate(Deck deck) {
         boolean valid = true;
         errorsList.clear();
+        valid = validateSupplementalDeckPlacement(deck);
         //20091005 - 100.2a
         if (deck.getMaindeckCards().size() < getDeckMinSize()) {
             addError(DeckValidatorErrorType.DECK_SIZE, "Deck", "Must contain at least " + getDeckMinSize() + " cards: has only " + deck.getMaindeckCards().size() + " cards");
