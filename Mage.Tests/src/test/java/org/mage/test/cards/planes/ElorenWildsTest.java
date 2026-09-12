@@ -26,6 +26,7 @@ public class ElorenWildsTest extends CardTestPlayerBase {
     public void testChaosStopsTargetCastingOnlyUntilPlaneswalk() {
         addPlane(playerA, Planes.PLANE_ELOREN_WILDS);
         addCard(Zone.HAND, playerB, "Memnite", 2);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 2);
         addCard(Zone.BATTLEFIELD, playerB, "Vedalken Orrery");
 
         runCode("chaos ensues", 1, PhaseStep.UPKEEP, playerA, (info, player, game) -> {
