@@ -2,6 +2,7 @@ package org.mage.test.cards.planes;
 
 import mage.cards.Card;
 import mage.cards.CardImpl;
+import mage.cards.decks.Constructed;
 import mage.cards.decks.Deck;
 import mage.cards.decks.PlanarDeckCard;
 import mage.cards.decks.SupplementalDeckCard;
@@ -38,6 +39,19 @@ public class SupplementalDeckInfrastructureTest {
         Assert.assertTrue(deck.getSideboard().isEmpty());
         Assert.assertEquals(Collections.singletonList(legal),
                 deck.getSupplementalDeck(SupplementalDeckType.PLANAR));
+    }
+
+    @Test
+    public void illegalMainPlacementUsesNormalDeckValidatorErrors() {
+        Deck deck = new Deck();
+        PlanarDeckCard illegal = new PlanarDeckCard(PlanarCardRegistry.getId(Planes.PLANE_AKOUM));
+        deck.getCards().add(illegal);
+        Constructed validator = new EmptyConstructedValidator();
+
+        Assert.assertFalse(validator.validate(deck));
+        Assert.assertTrue(validator.errorsListContainsGroup(illegal.getName()));
+        Assert.assertTrue(validator.getErrorsListInfo()
+                .contains("Supplemental cards cannot be placed in the main deck"));
     }
 
     @Test
@@ -112,6 +126,17 @@ public class SupplementalDeckInfrastructureTest {
         @Override
         public void initialize(UUID playerId, List<SupplementalDeckCard> cards, Game game) {
             this.cards = cards;
+        }
+    }
+
+    private static final class EmptyConstructedValidator extends Constructed {
+        private EmptyConstructedValidator() {
+            super("Supplemental test");
+        }
+
+        @Override
+        public int getDeckMinSize() {
+            return 0;
         }
     }
 

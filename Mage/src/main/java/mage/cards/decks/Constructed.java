@@ -226,12 +226,7 @@ public class Constructed extends DeckValidator {
     public boolean validate(Deck deck) {
         boolean valid = true;
         errorsList.clear();
-        SupplementalDeckPartition supplemental = deck.partitionSupplementalDecks();
-        for (SupplementalDeckCard card : supplemental.getIllegalMain()) {
-            addError(DeckValidatorErrorType.OTHER, ((Card) card).getName(),
-                    "Supplemental cards cannot be placed in the main deck", true);
-            valid = false;
-        }
+        valid = validateSupplementalDeckPlacement(deck);
         //20091005 - 100.2a
         if (deck.getMaindeckCards().size() < getDeckMinSize()) {
             addError(DeckValidatorErrorType.DECK_SIZE, "Deck", "Must contain at least " + getDeckMinSize() + " cards: has only " + deck.getMaindeckCards().size() + " cards");

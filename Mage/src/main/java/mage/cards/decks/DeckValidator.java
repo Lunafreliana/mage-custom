@@ -174,6 +174,20 @@ public abstract class DeckValidator implements Serializable {
         }
     }
 
+    /**
+     * Partitions pregame supplemental cards and reports illegal main-deck
+     * placement through the normal deck-validator error channel.
+     */
+    protected boolean validateSupplementalDeckPlacement(Deck deck) {
+        SupplementalDeckPartition supplemental = deck.partitionSupplementalDecks();
+        for (SupplementalDeckCard supplementalCard : supplemental.getIllegalMain()) {
+            Card card = (Card) supplementalCard;
+            addError(DeckValidatorErrorType.OTHER, card.getName(),
+                    "Supplemental cards cannot be placed in the main deck", true);
+        }
+        return !supplemental.hasIllegalMainPlacement();
+    }
+
     public int getEdhPowerLevel(Deck deck, List<String> foundPowerCards, List<String> foundInfo) {
         return 0;
     }

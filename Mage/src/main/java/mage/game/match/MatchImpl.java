@@ -2,7 +2,6 @@ package mage.game.match;
 
 import mage.cards.decks.Deck;
 import mage.cards.decks.SupplementalDeckCard;
-import mage.cards.decks.SupplementalDeckPartition;
 import mage.cards.decks.SupplementalDeckType;
 import mage.game.Game;
 import mage.game.GameException;
@@ -204,10 +203,7 @@ public abstract class MatchImpl implements Match {
         shufflePlayers();
         for (MatchPlayer matchPlayer : this.players) {
             if (!matchPlayer.hasQuit() && matchPlayer.getDeck() != null) {
-                SupplementalDeckPartition supplemental = matchPlayer.getDeck().partitionSupplementalDecks();
-                if (supplemental.hasIllegalMainPlacement()) {
-                    throw new GameException("Supplemental cards cannot be placed in the main deck");
-                }
+                matchPlayer.getDeck().partitionSupplementalDecks();
                 matchPlayer.getPlayer().init(game);
                 game.loadCards(matchPlayer.getDeck().getCards(), matchPlayer.getPlayer().getId());
                 game.loadCards(matchPlayer.getDeck().getSideboard(), matchPlayer.getPlayer().getId());

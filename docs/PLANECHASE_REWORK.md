@@ -604,7 +604,10 @@ entries before format-specific pregame validation, and typed
 registry-backed carrier. Runtime PLANAR dispatch constructs a separately
 shuffled planar deck for each contributing player; `ATTRACTION` is reserved as
 an extension type and has no gameplay handler until Attraction support is
-implemented.
+implemented. Illegal main-deck placement is reported through the existing
+`DeckValidator` error list so callers retain the normal invalid-deck message and
+card-specific diagnostics; runtime partitioning does not introduce a parallel
+legality-error path.
 
 ### Phase 9 — Deck Editor UX and `.dck` Persistence
 
