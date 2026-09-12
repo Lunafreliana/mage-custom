@@ -501,6 +501,13 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
      */
     boolean planeswalkToNextPlanes(PlaneswalkContext context, int planeCount);
 
+    /**
+     * Reveals the requested number of Planes from the applicable planar deck,
+     * lets the planeswalking player choose one to leave on top, and puts all
+     * other revealed planar cards on the bottom in a random order.
+     */
+    boolean chooseNextPlane(PlaneswalkContext context, int planeCount);
+
     void addCommander(Commander commander);
 
     Dungeon addDungeon(Dungeon dungeon, UUID playerId);
