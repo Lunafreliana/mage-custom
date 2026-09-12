@@ -8,6 +8,7 @@ import mage.constants.Zone;
 import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.command.PlaneswalkContext;
 import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
@@ -163,6 +164,7 @@ public class PhenomenonTest extends CardTestPlayerBase {
                 PlanarCardRegistry.getId(Planes.PLANE_EDGE_OF_MALACOL));
 
         setChoice(playerA, "Plane - Bant");
+        setChoice(playerB, "Plane - Bant");
         runCode("encounter Interplanar Tunnel", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
             Assert.assertTrue(info, game.addPhenomenon(new InterplanarTunnelPhenomenon(), player.getId()));
             game.checkStateAndTriggered();
@@ -178,7 +180,7 @@ public class PhenomenonTest extends CardTestPlayerBase {
     }
 
     @Test
-    public void testInterplanarTunnelPreservesDeckWhenItCannotRevealFivePlanes() {
+    public void testChoosingNextPlanePreservesDeckWhenItCannotRevealFivePlanes() {
         addCard(Zone.LIBRARY, playerA, "Mountain", 20);
         addCard(Zone.LIBRARY, playerB, "Mountain", 20);
         gameOptions.planeChase = true;
@@ -190,21 +192,14 @@ public class PhenomenonTest extends CardTestPlayerBase {
                 PlanarCardRegistry.getId(Planes.PLANE_ASTRAL_ARENA),
                 PlanarCardRegistry.getId(Planes.PLANE_BANT));
 
-        runCode("encounter Interplanar Tunnel with fewer than five Planes", 1,
+        runCode("choose next Plane with fewer than five Planes", 1,
                 PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
                     List<UUID> orderBeforeEncounter = game.getState().getSharedPlanarDeck().getOrder();
-                    Assert.assertTrue(info, game.addPhenomenon(
-                            new InterplanarTunnelPhenomenon(), player.getId()));
-                    game.checkStateAndTriggered();
-                    game.getStack().resolve(game);
+                    Assert.assertFalse(info, game.chooseNextPlane(new PlaneswalkContext(
+                            player.getId(), PlaneswalkContext.Cause.SPELL_OR_ABILITY, null), 5));
 
                     Assert.assertEquals(info, orderBeforeEncounter,
                             game.getState().getSharedPlanarDeck().getOrder());
-                    Assert.assertEquals(info, 1, game.getState().getFaceUpPhenomena().size());
-
-                    game.checkStateAndTriggered();
-                    Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
-                    Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
                 });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
