@@ -23,6 +23,8 @@ The remaining work is primarily about making that runtime a clean product surfac
 
 Where this document says **must**, it describes either a rules requirement or a repository architecture decision.
 
+Rules references in this document follow the current Planechase rules model, especially Comprehensive Rules 103.7, 701.31, and 901.3-901.15. In particular, rule 901.3 gives each player a supplementary planar deck by default; rule 901.5 establishes the starting Plane only after opening hands/mulligans/opening-hand actions are complete; rule 701.31b uses the planeswalking player's planar deck for the new planar card while returning walked-away planar cards to their owners' planar decks; and rule 901.15 defines the single communal planar deck as an alternative option.
+
 ## 2. Current baseline
 
 ### 2.1 Runtime planar cards
