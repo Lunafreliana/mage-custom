@@ -78,7 +78,7 @@ public class InysHaenTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_INYS_HAEN);
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
         addCard(Zone.GRAVEYARD, playerA, "Mountain");
-        setTarget(playerA, "Grizzly Bears");
+        addTarget(playerA, "Grizzly Bears");
 
         runCode("chaos ensues", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
                 (info, player, game) -> game.fireEvent(new GameEvent(
