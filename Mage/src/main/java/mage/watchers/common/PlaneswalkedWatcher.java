@@ -14,11 +14,6 @@ public class PlaneswalkedWatcher extends Watcher {
         super(WatcherScope.GAME);
     }
 
-    private PlaneswalkedWatcher(final PlaneswalkedWatcher watcher) {
-        super(watcher);
-        this.count = watcher.count;
-    }
-
     @Override
     public void watch(GameEvent event, Game game) {
         if (event.getType() == GameEvent.EventType.PLANESWALKED) {
@@ -28,10 +23,5 @@ public class PlaneswalkedWatcher extends Watcher {
 
     public int getCount() {
         return count;
-    }
-
-    @Override
-    public PlaneswalkedWatcher copy() {
-        return new PlaneswalkedWatcher(this);
     }
 }
