@@ -245,12 +245,12 @@
     </Component>
     <Component class="javax.swing.JLabel" name="planechaseDescriptionLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;Shared planar deck of all implemented planes.&lt;br&gt;Uses a 9-sided planar die with 2 planeswalk sides and 2 chaos sides.&lt;br&gt;Some ability text may be incorrect.&lt;br&gt;Some rules details (such as who controls plane abilities) may be incorrect."/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Choose individual planar decks or a single shared planar deck.&lt;br&gt;Individual decks and merged shared decks use planar cards from each player's deck sideboard.&lt;br&gt;A table-configured shared deck can be selected here."/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
       <AccessibilityProperties>
         <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Planechase Description"/>
-        <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="Shared planar deck of all implemented planes.&#xa;Uses a 9-sided planar die with 2 planeswalk sides and 2 chaos sides.&#xa;Some ability text may be incorrect.&#xa;Some rules details (such as who controls plane abilities) may be incorrect."/>
+        <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="Choose individual planar decks or a single shared planar deck.&#xa;Individual decks and merged shared decks use planar cards from each player's deck sideboard.&#xa;A table-configured shared deck can be selected here."/>
         <Property name="AccessibleContext.accessibleParent" type="javax.accessibility.Accessible" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="chkPlaneChase"/>
         </Property>

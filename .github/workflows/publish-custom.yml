@@ -76,36 +76,35 @@ jobs:
         shell: powershell
         run: |
           $path = Join-Path $env:GITHUB_WORKSPACE 'Mage.Server\release\config\config.xml'
-          $text = [System.IO.File]::ReadAllText($path)
-          $match = [regex]::Match($text, '<server\b.*?/>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
-          if (-not $match.Success) {
-            throw 'Could not find <server ... /> in config.xml'
+
+          $doc = New-Object System.Xml.XmlDocument
+          $doc.PreserveWhitespace = $true
+          $doc.Load($path)
+
+          $server = $doc.SelectSingleNode('/config/server')
+          if ($null -eq $server) {
+            throw 'Could not find /config/server in config.xml'
           }
 
-          $block = $match.Value
-          $values = [ordered]@{
-            serverAddress = 'megerk.de'
-            port = '17171'
-            secondaryBindPort = '17172'
-          }
+          $server.SetAttribute('serverAddress', 'megerk.de')
+          $server.SetAttribute('port', '17171')
+          $server.SetAttribute('secondaryBindPort', '17172')
 
-          foreach ($entry in $values.GetEnumerator()) {
-            $pattern = [regex]::Escape($entry.Key) + '="[^"]*"'
-            if (-not [regex]::IsMatch($block, $pattern)) {
-              throw "Could not update $($entry.Key) in <server>"
-            }
-            $replacement = "$($entry.Key)=`"$($entry.Value)`""
-            $block = [regex]::Replace($block, $pattern, $replacement, 1)
-          }
+          $settings = New-Object System.Xml.XmlWriterSettings
+          $settings.Encoding = New-Object System.Text.UTF8Encoding($false)
+          $settings.Indent = $false
 
-          $updated = $text.Substring(0, $match.Index) + $block + $text.Substring($match.Index + $match.Length)
-          $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-          [System.IO.File]::WriteAllText($path, $updated, $utf8NoBom)
+          $writer = [System.Xml.XmlWriter]::Create($path, $settings)
+          try {
+            $doc.Save($writer)
+          } finally {
+            $writer.Dispose()
+          }
 
           Write-Host 'Forced server config values:'
-          foreach ($entry in $values.GetEnumerator()) {
-            Write-Host "  $($entry.Key)=$($entry.Value)"
-          }
+          Write-Host "  serverAddress=$($server.GetAttribute('serverAddress'))"
+          Write-Host "  port=$($server.GetAttribute('port'))"
+          Write-Host "  secondaryBindPort=$($server.GetAttribute('secondaryBindPort'))"
 
       - name: Build server package
         working-directory: Mage.Server

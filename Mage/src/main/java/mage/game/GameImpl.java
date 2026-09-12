@@ -1590,6 +1590,27 @@ public abstract class GameImpl implements Game {
         return state.getSharedPlanarDeck();
     }
 
+    @Override
+    public boolean revealTopPlanarCard(UUID playerId, boolean mayPutOnBottom, Ability source) {
+        Player player = getPlayer(playerId);
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
+        if (player == null || deck == null) {
+            return false;
+        }
+        PlanarCard card = deck.draw();
+        if (card == null) {
+            return false;
+        }
+        informPlayers(player.getLogName() + " revealed " + card.getLogName());
+        if (mayPutOnBottom && player.chooseUse(
+                Outcome.Neutral, "Put " + card.getLogName() + " on the bottom of your planar deck?", source, this)) {
+            deck.putOnBottom(card);
+        } else {
+            deck.putOnTop(card);
+        }
+        return true;
+    }
+
     private boolean turnPlanarCardFaceUp(PlanarCard planarCard, UUID playerId, boolean emitEvents) {
         planarCard.setControllerId(state.getPlanarControllerId());
         planarCard.setFaceUp(true);
