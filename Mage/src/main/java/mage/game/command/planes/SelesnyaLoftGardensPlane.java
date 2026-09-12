@@ -4,22 +4,21 @@ import mage.abilities.Ability;
 import mage.abilities.Mode;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.common.TapForManaAllTriggeredManaAbility;
 import mage.abilities.effects.ReplacementEffectImpl;
-import mage.abilities.effects.common.continuous.GainAbilityControllerEffect;
+import mage.abilities.effects.common.CreateDelayedTriggeredAbilityEffect;
 import mage.abilities.effects.mana.AddManaOfAnyTypeProducedEffect;
-import mage.abilities.effects.mana.ManaEffect;
+import mage.abilities.mana.DelayedTriggeredManaAbility;
 import mage.constants.Duration;
 import mage.constants.Outcome;
 import mage.constants.Planes;
-import mage.constants.SetTargetPointer;
 import mage.constants.Zone;
-import mage.filter.common.FilterControlledLandPermanent;
 import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.events.CreateTokenEvent;
 import mage.game.events.GameEvent;
+import mage.game.events.TappedForManaEvent;
 import mage.game.permanent.Permanent;
+import mage.target.targetpointer.FixedTarget;
 import mage.util.CardUtil;
 
 /**
@@ -39,15 +38,8 @@ public class SelesnyaLoftGardensPlane extends Plane {
                 Zone.COMMAND, new SelesnyaLoftGardensCounterEffect()));
 
         // Whenever chaos ensues, until end of turn, whenever you tap a land for mana, add one mana of any type that land produced.
-        ManaEffect manaEffect = new AddManaOfAnyTypeProducedEffect();
-        manaEffect.setText("add one mana of any type that land produced");
-        Ability manaAbility = new TapForManaAllTriggeredManaAbility(
-                manaEffect,
-                new FilterControlledLandPermanent("you tap a land"),
-                SetTargetPointer.PERMANENT
-        );
         this.getAbilities().add(new ChaosEnsuesTriggeredAbility(
-                new GainAbilityControllerEffect(manaAbility, Duration.EndOfTurn).setText(
+                new CreateDelayedTriggeredAbilityEffect(new SelesnyaLoftGardensManaAbility()).setText(
                         "until end of turn, whenever you tap a land for mana, "
                                 + "add one mana of any type that land produced"
                 ), false));
@@ -60,6 +52,45 @@ public class SelesnyaLoftGardensPlane extends Plane {
     @Override
     public SelesnyaLoftGardensPlane copy() {
         return new SelesnyaLoftGardensPlane(this);
+    }
+}
+
+class SelesnyaLoftGardensManaAbility extends DelayedTriggeredManaAbility {
+
+    SelesnyaLoftGardensManaAbility() {
+        super(new AddManaOfAnyTypeProducedEffect(), Duration.EndOfTurn, false);
+        this.usesStack = false;
+    }
+
+    private SelesnyaLoftGardensManaAbility(final SelesnyaLoftGardensManaAbility ability) {
+        super(ability);
+    }
+
+    @Override
+    public boolean checkEventType(GameEvent event, Game game) {
+        return event.getType() == GameEvent.EventType.TAPPED_FOR_MANA;
+    }
+
+    @Override
+    public boolean checkTrigger(GameEvent event, Game game) {
+        TappedForManaEvent manaEvent = (TappedForManaEvent) event;
+        Permanent permanent = manaEvent.getPermanent();
+        if (permanent == null
+                || !permanent.isLand(game)
+                || !permanent.isControlledBy(getControllerId())) {
+            return false;
+        }
+        getEffects().setValue("mana", manaEvent.getMana());
+        getEffects().setValue("tappedPermanent", permanent);
+        getEffects().setTargetPointer(new FixedTarget(
+                permanent.getId(), permanent.getZoneChangeCounter(game)
+        ));
+        return true;
+    }
+
+    @Override
+    public SelesnyaLoftGardensManaAbility copy() {
+        return new SelesnyaLoftGardensManaAbility(this);
     }
 }
 
