@@ -1440,8 +1440,9 @@ public abstract class GameImpl implements Game {
 
         // 20180408 - 901.5
         if (gameOptions.planeChase) {
+            state.setPlanarDeckMode(gameOptions.planarDeckMode);
             state.setPlanarControllerId(startingPlayerId);
-            if (state.getPlayerPlanarDecks().isEmpty()) {
+            if (state.getPlanarDeckMode() == PlanarDeckMode.SHARED) {
                 initializeSharedPlanarDeck();
             } else {
                 initializeIndividualPlanarDecks();
@@ -1483,6 +1484,17 @@ public abstract class GameImpl implements Game {
     }
 
     private void initializeSharedPlanarDeck() {
+        if (!state.getSharedPlanarDeck().isEmpty()) {
+            List<PlanarCard> mergedCards = new ArrayList<>();
+            PlanarCard card;
+            while ((card = state.getSharedPlanarDeck().draw()) != null) {
+                initializePlanarObject(card);
+                mergedCards.add(card);
+            }
+            // Merged contributions were already shuffled once during match initialization.
+            state.getSharedPlanarDeck().setPlanes(mergedCards, false);
+            return;
+        }
         if (!gameOptions.sharedPlanarCardIds.isEmpty()) {
             List<PlanarCard> configuredCards = gameOptions.sharedPlanarCardIds.stream()
                     .map(PlanarCardRegistry::create)
@@ -1570,7 +1582,7 @@ public abstract class GameImpl implements Game {
     }
 
     private SharedPlanarDeck getPlanarDeckForPlayer(UUID playerId) {
-        if (!state.getPlayerPlanarDecks().isEmpty()) {
+        if (state.getPlanarDeckMode() == PlanarDeckMode.INDIVIDUAL) {
             return state.getPlayerPlanarDeck(playerId);
         }
         return state.getSharedPlanarDeck();
@@ -2225,18 +2237,26 @@ public abstract class GameImpl implements Game {
 
     @Override
     public boolean planeswalk(UUID playerId) {
+        return planeswalk(PlaneswalkContext.forPlayer(playerId));
+    }
+
+    @Override
+    public boolean planeswalk(PlaneswalkContext context) {
+        UUID playerId = context == null ? null : context.getPlaneswalkingPlayerId();
         List<PlanarCard> faceUpPlanarCards = new ArrayList<>(state.getFaceUpPlanarCards());
         if (faceUpPlanarCards.isEmpty() || getPlayer(playerId) == null
-                || getPlanarDeckForPlayer(playerId) == null) {
+                || getPlanarDeckForPlayer(playerId) == null
+                || state.getPlanarDeckMode() == PlanarDeckMode.INDIVIDUAL
+                && faceUpPlanarCards.stream().anyMatch(plane ->
+                state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId()) == null)) {
             return false;
         }
         for (PlanarCard plane : faceUpPlanarCards) {
             state.removeTriggersOfSourceId(plane.getId());
             state.getCommand().remove(plane);
-            SharedPlanarDeck ownerDeck = state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId());
-            if (ownerDeck == null) {
-                ownerDeck = state.getSharedPlanarDeck();
-            }
+            SharedPlanarDeck ownerDeck = state.getPlanarDeckMode() == PlanarDeckMode.SHARED
+                    ? state.getSharedPlanarDeck()
+                    : state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId());
             ownerDeck.putOnBottom(plane);
         }
         return turnTopPlanarCardFaceUp(playerId);
@@ -2565,7 +2585,8 @@ public abstract class GameImpl implements Game {
                     || state.getPlayers().keySet().stream()
                     .flatMap(playerId -> state.getTriggered(playerId).stream())
                     .anyMatch(ability -> phenomenon.getId().equals(ability.getSourceId()));
-            if (!sourceTriggerPending && planeswalk(state.getPlanarControllerId())) {
+            if (!sourceTriggerPending && planeswalk(new PlaneswalkContext(state.getPlanarControllerId(),
+                    PlaneswalkContext.Cause.PHENOMENON_STATE_BASED_ACTION, phenomenon.getId()))) {
                 somethingHappened = true;
                 break;
             }

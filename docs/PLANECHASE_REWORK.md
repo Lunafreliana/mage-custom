@@ -672,6 +672,14 @@ Both sources feed the same `SHARED` runtime rules mode.
 
 Also harden context APIs required by later Planechase formats so planar control, ownership, planeswalking player, deck selection, and departure are not represented by one overloaded global UUID.
 
+Implementation note: `PlanarDeckMode` now makes `INDIVIDUAL` versus `SHARED`
+an explicit rules choice, while `SharedPlanarDeckSource` independently selects
+the table-configured or merged-contribution construction path. Both shared
+sources populate the same runtime `SharedPlanarDeck`; player contributions are
+merged, communally validated, and shuffled exactly once. `PlaneswalkContext`
+keeps the planeswalking player and cause/source metadata explicit without
+changing the ownership association used to return cards to individual decks.
+
 ### Phase 12 — Incremental Plane and Phenomenon Content
 
 Only after the deck-building, individual gameplay, shared alternative, and supplemental infrastructure are stable should broad content implementation become the focus.

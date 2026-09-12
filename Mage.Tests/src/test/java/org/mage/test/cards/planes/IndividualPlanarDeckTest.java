@@ -4,6 +4,7 @@ import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.Plane;
+import mage.game.command.PlanarDeckMode;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -18,6 +19,7 @@ public class IndividualPlanarDeckTest extends CardTestPlayerBase {
         addCard(Zone.LIBRARY, playerA, "Mountain", 20);
         addCard(Zone.LIBRARY, playerB, "Mountain", 20);
         gameOptions.planeChase = true;
+        gameOptions.planarDeckMode = PlanarDeckMode.INDIVIDUAL;
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
 
         runCode("install individual planar decks", 1, PhaseStep.PRECOMBAT_MAIN, playerA,

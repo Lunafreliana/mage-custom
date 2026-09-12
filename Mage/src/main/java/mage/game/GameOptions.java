@@ -4,6 +4,8 @@ import mage.cards.decks.DeckCardInfo;
 import mage.constants.PhaseStep;
 import mage.constants.Phenomena;
 import mage.constants.Planes;
+import mage.game.command.PlanarDeckMode;
+import mage.game.command.SharedPlanarDeckSource;
 import mage.util.Copyable;
 
 import java.io.Serializable;
@@ -70,6 +72,8 @@ public class GameOptions implements Serializable, Copyable<GameOptions> {
 
     // PLANECHASE game mode
     public boolean planeChase = false;
+    public PlanarDeckMode planarDeckMode = PlanarDeckMode.SHARED;
+    public SharedPlanarDeckSource sharedPlanarDeckSource = SharedPlanarDeckSource.TABLE_CONFIGURED;
     /**
      * Optional known-order shared planar deck, primarily for deterministic tests.
      * An empty collection uses all implemented planes in shuffled order.
@@ -101,6 +105,8 @@ public class GameOptions implements Serializable, Copyable<GameOptions> {
         this.rollbackTurnsAllowed = options.rollbackTurnsAllowed;
         this.bannedUsers.addAll(options.bannedUsers);
         this.planeChase = options.planeChase;
+        this.planarDeckMode = options.planarDeckMode;
+        this.sharedPlanarDeckSource = options.sharedPlanarDeckSource;
         this.sharedPlanarDeck = new ArrayList<>(options.sharedPlanarDeck);
         this.sharedPlanarPhenomena = new ArrayList<>(options.sharedPlanarPhenomena);
         this.sharedPlanarCardIds = new ArrayList<>(options.sharedPlanarCardIds);

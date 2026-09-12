@@ -491,6 +491,8 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
 
     boolean planeswalk(UUID playerId);
 
+    boolean planeswalk(PlaneswalkContext context);
+
     void addCommander(Commander commander);
 
     Dungeon addDungeon(Dungeon dungeon, UUID playerId);

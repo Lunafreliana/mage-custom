@@ -7,6 +7,8 @@ import mage.client.MageFrame;
 import mage.game.GameException;
 import mage.game.match.MatchOptions;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.command.PlanarDeckMode;
+import mage.game.command.SharedPlanarDeckSource;
 import mage.game.command.SharedPlanarDeckValidator;
 import mage.game.mulligan.MulliganType;
 import org.apache.log4j.Logger;
@@ -93,6 +95,8 @@ public class CustomOptionsDialog extends MageDialog {
     private final JFileChooser fcSelectEmblemCardsPerPlayer;
     private final JFileChooser fcSelectEmblemCardsStartingPlayer;
     private final List<String> sharedPlanarCardIds = new ArrayList<>();
+    private PlanarDeckMode planarDeckMode = PlanarDeckMode.INDIVIDUAL;
+    private SharedPlanarDeckSource sharedPlanarDeckSource = SharedPlanarDeckSource.TABLE_CONFIGURED;
 
     /**
      * Creates new form NewTableDialog
@@ -408,7 +412,8 @@ public class CustomOptionsDialog extends MageDialog {
     }//GEN-LAST:event_btnPreviousConfigurationActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        if (chkPlaneChase.isSelected()) {
+        if (chkPlaneChase.isSelected() && planarDeckMode == PlanarDeckMode.SHARED
+                && sharedPlanarDeckSource == SharedPlanarDeckSource.TABLE_CONFIGURED) {
             List<String> errors = SharedPlanarDeckValidator.validate(sharedPlanarCardIds, 4);
             if (!errors.isEmpty()) {
                 JOptionPane.showMessageDialog(this, String.join("\n", errors),
@@ -429,7 +434,23 @@ public class CustomOptionsDialog extends MageDialog {
 
     private void chkPlaneChaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPlaneChaseActionPerformed
         if (chkPlaneChase.isSelected()) {
-            editSharedPlanarDeck();
+            String[] choices = {"Individual planar decks", "Shared: table-configured deck",
+                    "Shared: merge player contributions"};
+            int choice = JOptionPane.showOptionDialog(this, "Choose the Planechase planar deck mode.",
+                    "Planechase mode", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, choices, choices[0]);
+            if (choice < 0) {
+                chkPlaneChase.setSelected(false);
+            } else if (choice == 0) {
+                planarDeckMode = PlanarDeckMode.INDIVIDUAL;
+            } else {
+                planarDeckMode = PlanarDeckMode.SHARED;
+                sharedPlanarDeckSource = choice == 1 ? SharedPlanarDeckSource.TABLE_CONFIGURED
+                        : SharedPlanarDeckSource.MERGED_PLAYER_CONTRIBUTIONS;
+                if (sharedPlanarDeckSource == SharedPlanarDeckSource.TABLE_CONFIGURED) {
+                    editSharedPlanarDeck();
+                }
+            }
         }
         updateActiveCount();
     }//GEN-LAST:event_chkPlaneChaseActionPerformed
@@ -567,7 +588,11 @@ public class CustomOptionsDialog extends MageDialog {
         options.setCustomStartHandSizeEnabled(checkStartingHandSize.isSelected());
         options.setCustomStartHandSize((Integer) spnCustomStartingHand.getValue());
         options.setPlaneChase(chkPlaneChase.isSelected());
+        options.setPlanarDeckMode(planarDeckMode);
+        options.setSharedPlanarDeckSource(sharedPlanarDeckSource);
         options.setSharedPlanarCardIds(chkPlaneChase.isSelected()
+                && planarDeckMode == PlanarDeckMode.SHARED
+                && sharedPlanarDeckSource == SharedPlanarDeckSource.TABLE_CONFIGURED
                 ? sharedPlanarCardIds : Collections.emptyList());
         if (chkEmblemCards.isSelected()) {
             if (!txtEmblemCardsPerPlayer.getText().isEmpty()) {
