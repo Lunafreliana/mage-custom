@@ -12,7 +12,9 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    # Keep publishing off GitHub-hosted runners. This job is intentionally sent
+    # to the lightweight local runner that also handles the labeler workflows.
+    runs-on: [self-hosted, windows, x64, xmage]
     timeout-minutes: 60
 
     steps:
@@ -26,93 +28,136 @@ jobs:
           distribution: temurin
           cache: maven
 
+      - name: Setup Maven 3.9.16
+        shell: powershell
+        run: |
+          $version = '3.9.16'
+          $mavenRoot = Join-Path $env:RUNNER_TOOL_CACHE "apache-maven\$version"
+          $mavenHome = Join-Path $mavenRoot "apache-maven-$version"
+          $mvnCmd = Join-Path $mavenHome 'bin\mvn.cmd'
+
+          if (-not (Test-Path $mvnCmd)) {
+            New-Item -ItemType Directory -Force -Path $mavenRoot | Out-Null
+            $zip = Join-Path $env:RUNNER_TEMP "apache-maven-$version-bin.zip"
+            $url = "https://dlcdn.apache.org/maven/maven-3/$version/binaries/apache-maven-$version-bin.zip"
+
+            Write-Host "Downloading Apache Maven $version..."
+            Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $zip
+            $checksumText = (Invoke-WebRequest -UseBasicParsing -Uri "$url.sha512").Content
+            $expected = [regex]::Match($checksumText, '[A-Fa-f0-9]{128}').Value.ToLowerInvariant()
+            $actual = (Get-FileHash -Path $zip -Algorithm SHA512).Hash.ToLowerInvariant()
+            if (-not $expected -or $actual -ne $expected) {
+              throw 'Apache Maven SHA-512 verification failed.'
+            }
+
+            Expand-Archive -Path $zip -DestinationPath $mavenRoot -Force
+            Remove-Item $zip -Force
+          }
+
+          "MAVEN_HOME=$mavenHome" >> $env:GITHUB_ENV
+          (Join-Path $mavenHome 'bin') >> $env:GITHUB_PATH
+
+      - name: Show Java and Maven versions
+        shell: cmd
+        run: |
+          java -version
+          mvn -version
+
       - name: Build XMage
-        run: mvn -B clean install -DskipTests
+        shell: cmd
+        run: mvn -B clean install "-DskipTests"
 
       - name: Build client package
         working-directory: Mage.Client
-        run: mvn -B package assembly:single -DskipTests
+        shell: cmd
+        run: mvn -B package assembly:single "-DskipTests"
 
       - name: Force custom server configuration
-        shell: bash
+        shell: powershell
         run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          path = Path("Mage.Server/release/config/config.xml")
-          text = path.read_text(encoding="utf-8")
-
-          match = re.search(r"<server\b.*?/>", text, flags=re.DOTALL)
-          if match is None:
-              raise SystemExit("Could not find <server ... /> in config.xml")
-
-          block = match.group(0)
-          values = {
-              "serverAddress": "megerk.de",
-              "port": "17171",
-              "secondaryBindPort": "17172",
+          $path = Join-Path $env:GITHUB_WORKSPACE 'Mage.Server\release\config\config.xml'
+          $text = [System.IO.File]::ReadAllText($path)
+          $match = [regex]::Match($text, '<server\b.*?/>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+          if (-not $match.Success) {
+            throw 'Could not find <server ... /> in config.xml'
           }
 
-          for key, value in values.items():
-              pattern = rf'({re.escape(key)}=")[^"]*(")'
-              block, count = re.subn(pattern, rf"\g<1>{value}\g<2>", block, count=1)
-              if count != 1:
-                  raise SystemExit(f"Could not update {key} in <server>")
+          $block = $match.Value
+          $values = [ordered]@{
+            serverAddress = 'megerk.de'
+            port = '17171'
+            secondaryBindPort = '17172'
+          }
 
-          path.write_text(
-              text[:match.start()] + block + text[match.end():],
-              encoding="utf-8",
-          )
+          foreach ($entry in $values.GetEnumerator()) {
+            $pattern = [regex]::Escape($entry.Key) + '="[^"]*"'
+            if (-not [regex]::IsMatch($block, $pattern)) {
+              throw "Could not update $($entry.Key) in <server>"
+            }
+            $replacement = "$($entry.Key)=`"$($entry.Value)`""
+            $block = [regex]::Replace($block, $pattern, $replacement, 1)
+          }
 
-          print("Forced server config values:")
-          for key, value in values.items():
-              print(f"  {key}={value}")
-          PY
+          $updated = $text.Substring(0, $match.Index) + $block + $text.Substring($match.Index + $match.Length)
+          $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+          [System.IO.File]::WriteAllText($path, $updated, $utf8NoBom)
+
+          Write-Host 'Forced server config values:'
+          foreach ($entry in $values.GetEnumerator()) {
+            Write-Host "  $($entry.Key)=$($entry.Value)"
+          }
 
       - name: Build server package
         working-directory: Mage.Server
-        run: mvn -B package assembly:single -DskipTests
+        shell: cmd
+        run: mvn -B package assembly:single "-DskipTests"
 
       - name: Create mage-bundle.zip
-        shell: bash
+        shell: powershell
         run: |
-          set -euo pipefail
-          rm -rf bundle-temp mage-bundle.zip
-          mkdir -p bundle-temp/mage-client bundle-temp/mage-server
-          unzip -q Mage.Client/target/mage-client.zip -d bundle-temp/mage-client
-          unzip -q Mage.Server/target/mage-server.zip -d bundle-temp/mage-server
-          cd bundle-temp
-          zip -qr ../mage-bundle.zip mage-client mage-server
-          cd ..
-          ls -lh mage-bundle.zip
+          $bundleTemp = Join-Path $env:GITHUB_WORKSPACE 'bundle-temp'
+          $bundleZip = Join-Path $env:GITHUB_WORKSPACE 'mage-bundle.zip'
+          Remove-Item $bundleTemp -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item $bundleZip -Force -ErrorAction SilentlyContinue
+
+          $clientDir = Join-Path $bundleTemp 'mage-client'
+          $serverDir = Join-Path $bundleTemp 'mage-server'
+          New-Item -ItemType Directory -Force -Path $clientDir, $serverDir | Out-Null
+
+          Expand-Archive -Path (Join-Path $env:GITHUB_WORKSPACE 'Mage.Client\target\mage-client.zip') -DestinationPath $clientDir -Force
+          Expand-Archive -Path (Join-Path $env:GITHUB_WORKSPACE 'Mage.Server\target\mage-server.zip') -DestinationPath $serverDir -Force
+          Compress-Archive -Path (Join-Path $bundleTemp '*') -DestinationPath $bundleZip -CompressionLevel Optimal
+          Get-Item $bundleZip | Format-List Name, Length, LastWriteTime
 
       - name: Prepare release metadata
         id: meta
-        shell: bash
+        shell: powershell
         run: |
-          set -euo pipefail
-          STAMP="$(date -u +%Y%m%dT%H%M%S)"
-          BASE_VERSION="$(mvn -q -Dstyle.color=never -DforceStdout help:evaluate -Dexpression=project.version | tail -n 1 | tr -d '\r')"
-          XMAGE_VERSION="${BASE_VERSION}-dev (${STAMP})"
-          ASSET_URL="https://github.com/Lunafreliana/xmage-custom-builds/releases/download/${STAMP}/mage-bundle.zip"
-          echo "stamp=${STAMP}" >> "$GITHUB_OUTPUT"
-          echo "xmage_version=${XMAGE_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "asset_url=${ASSET_URL}" >> "$GITHUB_OUTPUT"
+          [xml]$pom = Get-Content (Join-Path $env:GITHUB_WORKSPACE 'pom.xml')
+          $baseVersion = [string]$pom.project.version
+          if (-not $baseVersion) {
+            throw 'Could not read project.version from pom.xml'
+          }
+
+          $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmss')
+          $xmageVersion = "$baseVersion-dev ($stamp)"
+          $assetUrl = "https://github.com/Lunafreliana/xmage-custom-builds/releases/download/$stamp/mage-bundle.zip"
+
+          "stamp=$stamp" >> $env:GITHUB_OUTPUT
+          "xmage_version=$xmageVersion" >> $env:GITHUB_OUTPUT
+          "asset_url=$assetUrl" >> $env:GITHUB_OUTPUT
 
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ secrets.XMAGE_PUBLISH_TOKEN }}
           STAMP: ${{ steps.meta.outputs.stamp }}
-        shell: bash
+        shell: powershell
         run: |
-          set -euo pipefail
-          SHORT_SHA="${GITHUB_SHA::7}"
-          gh release create "$STAMP" mage-bundle.zip \
-            --repo Lunafreliana/xmage-custom-builds \
-            --title "XMage Custom $STAMP" \
-            --notes "Automatic custom XMage build from Lunafreliana/mage-custom@$SHORT_SHA."
+          $shortSha = $env:GITHUB_SHA.Substring(0, 7)
+          gh release create $env:STAMP mage-bundle.zip `
+            --repo Lunafreliana/xmage-custom-builds `
+            --title "XMage Custom $env:STAMP" `
+            --notes "Automatic custom XMage build from Lunafreliana/mage-custom@$shortSha."
 
       - name: Checkout launcher feed repository
         uses: actions/checkout@v6
@@ -127,27 +172,30 @@ jobs:
           XMAGE_VERSION: ${{ steps.meta.outputs.xmage_version }}
           ASSET_URL: ${{ steps.meta.outputs.asset_url }}
           STAMP: ${{ steps.meta.outputs.stamp }}
-        shell: bash
+        shell: powershell
         run: |
-          set -euo pipefail
-          cd publish-repo
+          Set-Location (Join-Path $env:GITHUB_WORKSPACE 'publish-repo')
 
-          jq --arg version "$XMAGE_VERSION" --arg url "$ASSET_URL" \
-            '.XMage.version = $version | .XMage.location = $url | .XMage.full = $url' \
-            config.json > config.json.tmp
-          mv config.json.tmp config.json
+          $configPath = Join-Path (Get-Location) 'config.json'
+          $config = Get-Content $configPath -Raw | ConvertFrom-Json
+          $config.XMage.version = $env:XMAGE_VERSION
+          $config.XMage.location = $env:ASSET_URL
+          $config.XMage.full = $env:ASSET_URL
+          $json = $config | ConvertTo-Json -Depth 100
+          $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+          [System.IO.File]::WriteAllText($configPath, $json + [Environment]::NewLine, $utf8NoBom)
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add config.json
-          git commit -m "Publish XMage custom build $STAMP"
+          git commit -m "Publish XMage custom build $env:STAMP"
           git push
 
       - name: Publish summary
-        shell: bash
+        shell: powershell
         run: |
-          echo "## XMage custom build published" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Version: ${{ steps.meta.outputs.xmage_version }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Release: https://github.com/Lunafreliana/xmage-custom-builds/releases/tag/${{ steps.meta.outputs.stamp }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Launcher home stays: https://lunafreliana.github.io/xmage-custom-builds/" >> "$GITHUB_STEP_SUMMARY"
+          "## XMage custom build published" >> $env:GITHUB_STEP_SUMMARY
+          "" >> $env:GITHUB_STEP_SUMMARY
+          "- Version: ${{ steps.meta.outputs.xmage_version }}" >> $env:GITHUB_STEP_SUMMARY
+          "- Release: https://github.com/Lunafreliana/xmage-custom-builds/releases/tag/${{ steps.meta.outputs.stamp }}" >> $env:GITHUB_STEP_SUMMARY
+          "- Launcher home stays: https://lunafreliana.github.io/xmage-custom-builds/" >> $env:GITHUB_STEP_SUMMARY
