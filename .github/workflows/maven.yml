@@ -30,6 +30,35 @@ jobs:
         distribution: 'temurin'
         java-package: 'jdk'
 
+    - name: Setup Maven 3.9.16
+      shell: powershell
+      run: |
+        $version = '3.9.16'
+        $mavenRoot = Join-Path $env:RUNNER_TOOL_CACHE "apache-maven\$version"
+        $mavenHome = Join-Path $mavenRoot "apache-maven-$version"
+        $mvnCmd = Join-Path $mavenHome 'bin\mvn.cmd'
+
+        if (-not (Test-Path $mvnCmd)) {
+          New-Item -ItemType Directory -Force -Path $mavenRoot | Out-Null
+          $zip = Join-Path $env:RUNNER_TEMP "apache-maven-$version-bin.zip"
+          $url = "https://dlcdn.apache.org/maven/maven-3/$version/binaries/apache-maven-$version-bin.zip"
+
+          Write-Host "Downloading Apache Maven $version..."
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          $checksumText = (Invoke-WebRequest -Uri "$url.sha512").Content
+          $expected = [regex]::Match($checksumText, '[A-Fa-f0-9]{128}').Value.ToLowerInvariant()
+          $actual = (Get-FileHash -Path $zip -Algorithm SHA512).Hash.ToLowerInvariant()
+          if (-not $expected -or $actual -ne $expected) {
+            throw 'Apache Maven SHA-512 verification failed.'
+          }
+
+          Expand-Archive -Path $zip -DestinationPath $mavenRoot -Force
+          Remove-Item $zip -Force
+        }
+
+        "MAVEN_HOME=$mavenHome" >> $env:GITHUB_ENV
+        (Join-Path $mavenHome 'bin') >> $env:GITHUB_PATH
+
     - name: Show Java and Maven versions
       shell: powershell
       run: |
