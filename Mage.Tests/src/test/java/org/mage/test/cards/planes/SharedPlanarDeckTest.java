@@ -5,6 +5,7 @@ import mage.game.GameState;
 import mage.game.command.Plane;
 import mage.game.command.SharedPlanarDeck;
 import mage.game.command.planes.AgyremPlane;
+import mage.game.command.planes.AstralArenaPlane;
 import mage.game.command.planes.FieldsOfSummerPlane;
 import mage.game.command.planes.PanopticonPlane;
 import mage.util.RandomUtil;
