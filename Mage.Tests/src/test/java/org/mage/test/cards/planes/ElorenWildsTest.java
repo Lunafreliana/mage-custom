@@ -35,7 +35,7 @@ public class ElorenWildsTest extends CardTestPlayerBase {
             game.getStack().resolve(game);
         });
         setChoice(playerA, playerB.getName());
-        checkPlayableAbility("casting is prohibited", 1, PhaseStep.PRECOMBAT_MAIN, playerB,
+        checkPlayableAbility("casting is prohibited", 1, PhaseStep.DRAW, playerB,
                 "Cast Memnite", false);
         runCode("a player planeswalks", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) ->
                 game.fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED,
