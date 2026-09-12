@@ -2246,12 +2246,8 @@ public abstract class GameImpl implements Game {
         if (!canPlaneswalk(playerId)) {
             return false;
         }
-        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
-        PlanarCard planarCard = deck == null ? null : deck.draw();
-        if (planarCard == null) {
-            return false;
-        }
-        return planeswalkToCards(context, Collections.singletonList(planarCard));
+        bottomFaceUpPlanarCards();
+        return turnTopPlanarCardFaceUp(playerId);
     }
 
     @Override
@@ -2286,18 +2282,10 @@ public abstract class GameImpl implements Game {
 
     private boolean planeswalkToCards(PlaneswalkContext context, List<PlanarCard> destinationCards) {
         UUID playerId = context == null ? null : context.getPlaneswalkingPlayerId();
-        List<PlanarCard> faceUpPlanarCards = new ArrayList<>(state.getFaceUpPlanarCards());
         if (!canPlaneswalk(playerId) || destinationCards.isEmpty()) {
             return false;
         }
-        for (PlanarCard plane : faceUpPlanarCards) {
-            state.removeTriggersOfSourceId(plane.getId());
-            state.getCommand().remove(plane);
-            SharedPlanarDeck ownerDeck = state.getPlanarDeckMode() == PlanarDeckMode.SHARED
-                    ? state.getSharedPlanarDeck()
-                    : state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId());
-            ownerDeck.putOnBottom(plane);
-        }
+        bottomFaceUpPlanarCards();
         // All destinations must be face up before any planeswalk event is
         // emitted: Spatial Merging planeswalks to its two Planes simultaneously.
         for (PlanarCard destination : destinationCards) {
@@ -2321,6 +2309,17 @@ public abstract class GameImpl implements Game {
             }
         }
         return true;
+    }
+
+    private void bottomFaceUpPlanarCards() {
+        for (PlanarCard plane : new ArrayList<>(state.getFaceUpPlanarCards())) {
+            state.removeTriggersOfSourceId(plane.getId());
+            state.getCommand().remove(plane);
+            SharedPlanarDeck ownerDeck = state.getPlanarDeckMode() == PlanarDeckMode.SHARED
+                    ? state.getSharedPlanarDeck()
+                    : state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId());
+            ownerDeck.putOnBottom(plane);
+        }
     }
 
     private boolean canPlaneswalk(UUID playerId) {
