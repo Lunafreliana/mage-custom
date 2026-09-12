@@ -192,7 +192,7 @@ public class CustomOptionsDialog extends MageDialog {
             }
         });
 
-        planechaseDescriptionLabel.setText("<html>Shared planar deck of all implemented planes.<br>Uses a 9-sided planar die with 2 planeswalk sides and 2 chaos sides.<br>Some ability text may be incorrect.<br>Some rules details (such as who controls plane abilities) may be incorrect.");
+        planechaseDescriptionLabel.setText("<html>Choose individual planar decks or a single shared planar deck.<br>Individual decks and merged shared decks use planar cards from each player's deck sideboard.<br>A table-configured shared deck can be selected here.");
         planechaseDescriptionLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         btnOK.setText("OK");
@@ -394,7 +394,7 @@ public class CustomOptionsDialog extends MageDialog {
         spnFreeMulligans.getAccessibleContext().setAccessibleParent(lblFreeMulligans);
         chkPlaneChase.getAccessibleContext().setAccessibleParent(lblVariantOptions);
         planechaseDescriptionLabel.getAccessibleContext().setAccessibleName("Planechase Description");
-        planechaseDescriptionLabel.getAccessibleContext().setAccessibleDescription("Shared planar deck of all implemented planes.\nUses a 9-sided planar die with 2 planeswalk sides and 2 chaos sides.\nSome ability text may be incorrect.\nSome rules details (such as who controls plane abilities) may be incorrect.");
+        planechaseDescriptionLabel.getAccessibleContext().setAccessibleDescription("Choose individual planar decks or a single shared planar deck.\nIndividual decks and merged shared decks use planar cards from each player's deck sideboard.\nA table-configured shared deck can be selected here.");
         planechaseDescriptionLabel.getAccessibleContext().setAccessibleParent(chkPlaneChase);
         lblEmblemCardsPerPlayer.getAccessibleContext().setAccessibleParent(chkEmblemCards);
         txtEmblemCardsStartingPlayer.getAccessibleContext().setAccessibleDescription("");

@@ -173,21 +173,32 @@
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
+|PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
 |PLANE:PCA|Plane - Feeding Grounds||FeedingGroundsPlane|
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
+|PLANE:PCA|Plane - Gavony||GavonyPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
+|PLANE:PCA|Plane - Nephalia||NephaliaPlane|
 |PLANE:PCA|Plane - Panopticon||PanopticonPlane|
+|PLANE:PCA|Plane - Selesnya Loft Gardens||SelesnyaLoftGardensPlane|
+|PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
+|PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
+|PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
+|PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
+|PLANE:MOC|Plane - Towashi||TowashiPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
 |PLANE:PCA|Plane - The Eon Fog||TheEonFogPlane|
 |PLANE:PCA|Plane - The Great Forest||TheGreatForestPlane|
+|PLANE:PCA|Plane - The Maelstrom||TheMaelstromPlane|
 |PLANE:PCA|Plane - Truga Jungle||TrugaJunglePlane|
 |PLANE:PCA|Plane - Turri Island||TurriIslandPlane|
 |PLANE:PCA|Plane - Undercity Reaches||UndercityReachesPlane|
+|PLANE:PCA|Plane - We Hope You Like Squirrels||WeHopeYouLikeSquirrelsPlane|
 |PLANE:PCA|Plane - The Zephyr Maze||TheZephyrMazePlane|
 |PLANE:PCA|Plane - Trail of the Mage-Rings||TrailOfTheMageRingsPlane|
 
