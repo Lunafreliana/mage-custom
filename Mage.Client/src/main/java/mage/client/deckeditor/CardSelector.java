@@ -6,6 +6,7 @@ import mage.cards.Card;
 import mage.cards.ExpansionSet;
 import mage.cards.Sets;
 import mage.cards.decks.PennyDreadfulLegalityUtil;
+import mage.cards.decks.PlanarDeckCard;
 import mage.cards.repository.*;
 import mage.client.MageFrame;
 import mage.client.cards.*;
@@ -25,6 +26,7 @@ import mage.filter.predicate.mageobject.ColorPredicate;
 import mage.filter.predicate.mageobject.ColorlessPredicate;
 import mage.filter.predicate.card.CardTextPredicate;
 import mage.filter.predicate.card.ExpansionSetPredicate;
+import mage.game.command.PlanarCardRegistry;
 import mage.game.events.Listener;
 import mage.view.CardView;
 import mage.view.CardsView;
@@ -489,6 +491,17 @@ public class CardSelector extends javax.swing.JPanel implements ComponentListene
                     }
                     // found
                     filteredCards.add(card);
+                }
+
+                // Planes and Phenomena are non-castable registry-backed
+                // carriers, so they do not live in CardRepository. Include
+                // them in the same searchable catalog and let the normal
+                // FilterCard UI handle name and type queries.
+                for (PlanarCardRegistry.Metadata metadata : PlanarCardRegistry.getAvailableCards()) {
+                    Card card = new PlanarDeckCard(metadata.getId());
+                    if (filter.match(card, null)) {
+                        filteredCards.add(card);
+                    }
                 }
             }
 

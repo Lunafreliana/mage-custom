@@ -441,7 +441,12 @@ public class DeckEditorPanel extends javax.swing.JPanel {
                                 List<MageObject> info = (List<MageObject>) event.getSource();
                                 SimpleCardView newView = (SimpleCardView) info.get(0);
                                 Card newCard = (Card) info.get(1);
-                                deck.getCards().add(retrieveTemporaryCard(newView, newCard));
+                                Card card = retrieveTemporaryCard(newView, newCard);
+                                if (card instanceof SupplementalDeckCard) {
+                                    deck.getSideboard().add(card);
+                                } else {
+                                    deck.getCards().add(card);
+                                }
                                 break;
                             }
                         }
@@ -507,8 +512,10 @@ public class DeckEditorPanel extends javax.swing.JPanel {
 
                                 if (event.isMouseAltDown()) {
                                     // ALT + double click: MOVE card from one deck to another
-                                    deck.getSideboard().remove(card);
-                                    deck.getCards().add(card);
+                                    if (!(card instanceof SupplementalDeckCard)) {
+                                        deck.getSideboard().remove(card);
+                                        deck.getCards().add(card);
+                                    }
                                 } else {
                                     // double click: DELETE card from deck
                                     deck.getSideboard().remove(card);
@@ -633,9 +640,11 @@ public class DeckEditorPanel extends javax.swing.JPanel {
         }
         if (toDelete.isEmpty()) {
             // add cards
-            CardInfo cardInfo = CardRepository.instance.findCard(cardView.getExpansionSetCode(), cardView.getCardNumber());
             for (int i = cardsFound; i < numberToSet; i++) {
-                cards.add(cardInfo.createMockCard());
+                Card card = createEditorCard(cardView);
+                if (card != null) {
+                    cards.add(card);
+                }
             }
         } else {
             // remove cards
@@ -661,12 +670,18 @@ public class DeckEditorPanel extends javax.swing.JPanel {
             }
         } else {
             // editor: create mock card
-            CardInfo cardInfo = CardRepository.instance.findCard(cardView.getExpansionSetCode(), cardView.getCardNumber());
-            card = cardInfo != null ? cardInfo.createMockCard() : null;
+            card = createEditorCard(cardView);
         }
 
         if (card != null) {
-            deck.getCards().add(card);
+            // Supplemental cards are authored in the normal editor but are
+            // never legal main-deck cards. Route them to pregame storage even
+            // for the ordinary double-click/add-to-main interaction.
+            if (card instanceof SupplementalDeckCard) {
+                deck.getSideboard().add(card);
+            } else {
+                deck.getCards().add(card);
+            }
             if (gameMode) {
                 // game: move card from another board
                 deck.getSideboard().remove(card);
@@ -689,8 +704,7 @@ public class DeckEditorPanel extends javax.swing.JPanel {
         }
 
         SimpleCardView cardView = (SimpleCardView) event.getSource();
-        CardInfo cardInfo = CardRepository.instance.findCard(cardView.getExpansionSetCode(), cardView.getCardNumber());
-        Card card = cardInfo != null ? cardInfo.createMockCard() : null;
+        Card card = createEditorCard(cardView);
         if (card != null) {
             deck.getSideboard().add(card);
         }
@@ -700,6 +714,17 @@ public class DeckEditorPanel extends javax.swing.JPanel {
             ((CardInfoPane) cardInfoPane).setCard(new CardView(card), null);
         }
         hidePopup();
+    }
+
+    private static Card createEditorCard(SimpleCardView cardView) {
+        PlanarDeckCard planarCard = PlanarDeckCard.create(
+                cardView.getExpansionSetCode(), cardView.getCardNumber());
+        if (planarCard != null) {
+            return planarCard;
+        }
+        CardInfo cardInfo = CardRepository.instance.findCard(
+                cardView.getExpansionSetCode(), cardView.getCardNumber());
+        return cardInfo == null ? null : cardInfo.createMockCard();
     }
 
     private void hidePopup() {

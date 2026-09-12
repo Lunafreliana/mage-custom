@@ -65,6 +65,9 @@ public class Deck implements Serializable, Copyable<Deck> {
         sourceDeck.getSideboard().forEach(card -> {
             newDeck.sideboard.add(card.copy());
         });
+        sourceDeck.supplementalDecks.forEach((type, cards) -> newDeck.supplementalDecks
+                .computeIfAbsent(type, key -> new LinkedHashSet<>())
+                .addAll(cards.stream().map(Card::copy).collect(Collectors.toList())));
         return newDeck;
     }
 
@@ -148,6 +151,12 @@ public class Deck implements Serializable, Copyable<Deck> {
     }
 
     private static Card createCard(DeckCardInfo deckCardInfo, boolean mockCards, Map<String, CardInfo> cardInfoCache) {
+        PlanarDeckCard planarCard = PlanarDeckCard.create(
+                deckCardInfo.getSetCode(), deckCardInfo.getCardNumber());
+        if (planarCard != null) {
+            return planarCard;
+        }
+
         CardInfo cardInfo;
         if (cardInfoCache != null) {
             // from cache
@@ -188,6 +197,8 @@ public class Deck implements Serializable, Copyable<Deck> {
         for (Card card : sideboard) {
             deckCardLists.getSideboard().add(new DeckCardInfo(card.getName(), card.getCardNumber(), card.getExpansionSetCode()));
         }
+        supplementalDecks.values().forEach(cards -> cards.forEach(card -> deckCardLists.getSideboard()
+                .add(new DeckCardInfo(card.getName(), card.getCardNumber(), card.getExpansionSetCode()))));
 
         return deckCardLists;
     }
