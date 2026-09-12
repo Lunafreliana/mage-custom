@@ -19,6 +19,7 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
 
     @Test
     public void testUpkeepSurveilsForPlanarController() {
+        skipInitShuffling();
         removeAllCardsFromLibrary(playerA);
         // Library additions go on top, so the seven Plains form the opening hand and leave these two cards.
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
