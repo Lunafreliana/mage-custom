@@ -8,14 +8,16 @@ This document is the canonical forward-looking architecture and implementation p
 
 It assumes the **current `custom` branch Planechase implementation as the baseline**. It is not a migration diary and does not compare against abandoned or historical implementations. Future Planechase engine, server, client, deck-building, validation, UI, and card-content work should build from the architecture described here.
 
-The current system already provides the core Planechase runtime: semantic planar die handling, a game-level planar-roll special action, an ordered shared planar deck, a common `PlanarCard` runtime, multiple-face-up support, Phenomena infrastructure, stable planar-card registry IDs, shared-deck validation, and bootstrap shared-deck UI.
+The current system already provides the core Planechase runtime: semantic planar die handling, a game-level planar-roll special action, ordered planar-deck infrastructure, a common `PlanarCard` runtime, multiple-face-up support, Phenomena infrastructure, stable planar-card registry IDs, shared-deck validation, and bootstrap shared-deck UI.
 
 The remaining work is primarily about making that runtime a clean product surface:
 
 * storing planar packages with normal player deck files;
 * classifying pregame/supplemental cards generically;
 * keeping Commander/Companion logic separate from supplemental decks;
-* supporting shared and later individual planar-deck modes;
+* making **player-owned planar decks the target default mode** for this fork;
+* retaining table-owned shared and merged-shared planar decks as alternative modes;
+* making reveal/planeswalk operations explicitly carry the player whose action/effect caused the new planar card to be revealed;
 * making the same infrastructure reusable for future Attraction decks and a Junkyard;
 * and only after that adding more Plane and Phenomenon content.
 
@@ -29,7 +31,7 @@ Planechase runtime objects use the common `PlanarCard` abstraction and remain co
 
 `Plane` and `Phenomenon` therefore remain rules-engine objects. They are not converted into normal `CardImpl` objects merely so the deck editor can display them.
 
-A deck-building representation is allowed to be a lightweight card/proxy object, but that object exists only to carry stable metadata and supplemental-deck identity through the deck editor and `.dck` serialization. At game initialization it is consumed and converted into the correct variant runtime object.
+A deck-building representation may be a lightweight card/proxy object, but that object exists only to carry stable metadata and supplemental-deck identity through the deck editor and `.dck` serialization. At game initialization it is consumed and converted into the correct variant runtime object.
 
 ### 2.2 Planar die and Planechase rules core
 
@@ -52,17 +54,17 @@ Chaos is modeled semantically through `ChaosEnsuesEffect` / `ChaosEnsuesTriggere
 
 ### 2.3 Planar decks and command-zone association
 
-Plane and Phenomenon cards remain rules-wise associated with the command zone. The planar deck is an ordered supplemental structure over those runtime objects.
+Plane and Phenomenon cards remain rules-wise associated with the command zone. A planar deck is an ordered supplemental structure over those runtime objects.
 
 Do **not** introduce `Zone.PLANAR_DECK`.
 
-The current shared implementation uses `SharedPlanarDeck`, stable object identity, face-up planar-card collections, real top/bottom traversal, and game-state copy/rollback support.
+The current implementation already supplies the ordered-deck mechanics, stable object identity, face-up planar-card collections, real top/bottom traversal, and game-state copy/rollback behavior that later deck modes should reuse.
 
 ### 2.4 Planar controller
 
 Planar control is resolved centrally. Source-controller effects and triggers on face-up planar cards must use that central model rather than storing permanent per-card assumptions about the active player.
 
-The current shared-mode controller representation is sufficient for the supported shared mode, but future individual decks, team variants, or Grand Melee must be able to provide additional deck/controller context without replacing the public semantics again.
+Future player-owned decks, team variants, or Grand Melee must be able to provide additional deck/controller context without replacing the public semantics again.
 
 ### 2.5 Phenomena and multiple face-up cards
 
@@ -86,93 +88,180 @@ normal player .dck
 └── pregame / supplemental area
     ├── Commander(s)
     ├── optional Companion
-    └── Planar package
+    └── that player's Planar Deck
 ```
 
-The planar package therefore travels with the player's normal deck automatically.
+The planar deck therefore travels with the player's normal deck automatically.
 
-## 3. Rules invariants that future work must preserve
+## 3. Product planar-deck modes
 
-### 3.1 Planar card location
+The architecture must support three product modes without maintaining three separate Planechase rules engines.
+
+### 3.1 Mode A — Player-owned planar decks (target default)
+
+This is the **target default mode for this fork**.
+
+Each player brings an independently built planar deck in that player's `.dck`:
+
+```text
+Player A -> Planar Deck A
+Player B -> Planar Deck B
+Player C -> Planar Deck C
+Player D -> Planar Deck D
+```
+
+The decks remain separate throughout the game. They are not flattened or shuffled together.
+
+The operation that reveals a new Plane or Phenomenon must know the **causing player**. The next planar card is taken from that player's planar deck.
+
+Examples:
+
+* Player A rolls the planeswalker symbol and the inherent trigger resolves -> reveal from Player A's planar deck.
+* Player B resolves a spell/ability that instructs or causes a planeswalk -> reveal from the planar deck associated with Player B as the causing player for that instruction.
+* A chaos ability causes a planeswalk or explicitly causes another planar card to be revealed -> propagate the player responsible for that resolving ability into the reveal operation.
+* Merely causing `CHAOS_ENSUES` does not itself select a new deck unless the resulting rules text actually causes a new planar card to be revealed.
+* A Phenomenon's automatic follow-up planeswalk must retain enough attribution from the reveal that encountered it to choose the intended player deck instead of guessing from the current active player or current Plane.
+
+This requires the common planeswalk/reveal API to carry explicit context such as:
+
+```text
+PlanarRevealContext
+├── causingPlayerId
+├── sourceId / sourceAbilityId when applicable
+├── planarDeckOwnerId
+├── cause (PLANAR_DIE, SPELL_OR_ABILITY, PHENOMENON_SBA, OTHER)
+└── previousRevealContext when attribution must survive a Phenomenon
+```
+
+Exact class/field names are not mandatory. The important rule is: **deck selection must be explicit and deterministic, never inferred from whichever Plane is currently face up.**
+
+### 3.2 Mode B — Table-configured shared planar deck
+
+This preserves the current shared-deck product model as an alternative mode.
+
+One legal shared planar deck is selected/configured for the table, shuffled once through the game RNG, and used by all players.
+
+The current Phase-7 table editor may continue to provide this mode.
+
+### 3.3 Mode C — Merged shared contributions
+
+This is a third optional mode.
+
+Each player's `.dck` may contribute planar cards, then all contributions are merged, validated as one communal deck, and shuffled into one shared runtime deck.
+
+```text
+Player A contribution ─┐
+Player B contribution ─┤
+Player C contribution ─┼-> merged communal deck -> validate -> shuffle
+Player D contribution ─┘
+```
+
+This mode is useful, but it is **not the default architecture** and must not be used as the semantic basis for player-owned decks.
+
+## 4. Pregame starting-Plane procedure for player-owned mode
+
+The target default mode needs an explicit setup step because there is no single shared deck from which the starting Plane can simply be drawn.
+
+Timing:
+
+```text
+players/decks accepted
+        ↓
+play / turn / draw order determined
+        ↓
+starting-planar-deck chooser selected
+        ↓
+chooser selects whose planar deck supplies the starting Plane
+        ↓
+starting Plane setup completes
+        ↓
+mulligans
+```
+
+This selection therefore happens **after play/draw/turn order has been determined but before mulligans**.
+
+### 4.1 Choosing the chooser
+
+Select one eligible player randomly.
+
+The player who determined the play/draw/turn order for that game is excluded from this random chooser selection.
+
+The implementation must represent this as a distinct setup role/event rather than overloading `startingPlayerId` or planar controller.
+
+Suggested state naming:
+
+```text
+initialPlanarDeckChooserId
+initialPlanarDeckOwnerId
+```
+
+### 4.2 Choosing the starting planar deck
+
+The randomly selected chooser chooses one player's planar deck to supply the starting planar card.
+
+The chosen deck is shuffled normally before use.
+
+Beginning-of-game traversal then follows the established Planechase setup behavior for that chosen deck:
+
+* turn up the top planar card;
+* if it is a Phenomenon, bottom it without firing its encounter ability;
+* continue until a Plane is found;
+* make that Plane the starting face-up Plane.
+
+The selected starting deck does **not** become a global shared deck. It only supplies the initial Plane. Future reveals use the causing-player context described in section 3.1.
+
+## 5. Rules invariants that future work must preserve
+
+### 5.1 Planar card location
 
 Plane and Phenomenon cards remain in the command zone throughout the game, whether face down in a planar deck or face up.
 
 A planar deck is an ordering/association structure, not a separate Magic zone.
 
-### 3.2 Shared and individual planar decks
+### 5.2 Planar controller and deck ownership
 
-The architecture must support both:
+Dynamic planar control and underlying planar-deck ownership are separate concepts.
 
-```text
-SHARED
-all applicable planar contributions -> one communal deck
-```
+In player-owned mode, every planar card retains the player/deck association established at game start. Bottom placement returns a walked-away card to its associated owner deck.
 
-and later:
+In shared modes, shared-deck ownership semantics are handled by the shared-mode rules/context rather than by destroying the runtime object's stable deck association model.
 
-```text
-INDIVIDUAL
-Player A -> planar deck A
-Player B -> planar deck B
-Player C -> planar deck C
-Player D -> planar deck D
-```
-
-The current runtime may expose only shared mode in the product UI, but deck association and controller APIs must not make individual mode impossible.
-
-### 3.3 Planar controller and ownership
-
-Dynamic planar control and underlying deck association are separate concepts.
-
-Shared mode may apply shared-deck ownership semantics at rules-query boundaries. Individual mode must retain the player/deck association from game start.
-
-### 3.4 Voluntary roll
+### 5.3 Voluntary roll
 
 The inherent voluntary planar roll remains a special action available only under the correct timing conditions. Its escalating cost counts previous uses of that special action, not arbitrary planar die rolls caused by effects.
 
-### 3.5 Chaos
+### 5.4 Chaos
 
-A chaos result and card text that says chaos ensues must use the same semantic path.
+A chaos result and card text that says chaos ensues use the same semantic path.
 
-The architecture must also retain the ability to represent chaos ensues for a particular planar object.
+The architecture must retain the ability to represent chaos ensues for a particular planar object.
 
-### 3.6 Planeswalking
+If resolving chaos behavior causes a planeswalk or another planar reveal, the reveal operation must receive the player responsible for that result.
+
+### 5.5 Planeswalking and reveal attribution
 
 The common planeswalk operation is responsible for:
 
-1. identifying the correct planar/deck context;
-2. snapshotting applicable face-up planar cards;
-3. turning them face down and returning them to the proper deck bottoms;
-4. turning up the actual applicable deck top;
-5. preserving exact walked-away and walked-to identity;
-6. emitting the correct lifecycle events;
-7. allowing normal trigger/APNAP processing;
-8. continuing through normal priority and state-based actions.
+1. receiving an explicit `PlanarRevealContext` or equivalent;
+2. identifying the applicable planar deck from that context and the current mode;
+3. snapshotting applicable face-up planar cards;
+4. turning them face down and returning them to the proper associated deck bottoms;
+5. turning up the actual top card of the selected deck;
+6. preserving exact walked-away and walked-to identity;
+7. preserving the causing-player attribution if the newly revealed object is a Phenomenon;
+8. emitting the correct lifecycle events;
+9. allowing normal trigger/APNAP processing;
+10. continuing through normal priority and state-based actions.
 
-### 3.7 Hidden information
+### 5.6 Hidden information
 
-Planar deck order must remain hidden except where rules explicitly reveal information.
+Every planar deck order remains hidden except where rules explicitly reveal information.
 
-Player-facing gameplay must shuffle through the game RNG. Deterministic known order is a test/injection seam only.
+Player-facing gameplay shuffles through the game RNG. Deterministic known order is a test/injection seam only.
 
-## 4. Architecture boundaries
+## 6. Generic supplemental-deck architecture
 
-| Concern | Required architecture |
-|---|---|
-| Runtime Plane/Phenomenon | `PlanarCard` command-object runtime |
-| Deck-building Plane/Phenomenon | Supplemental deck-building carrier/proxy with stable ID |
-| Planar deck | Ordered supplemental structure, not a Magic zone |
-| Shared/individual modes | Same runtime abstractions with different deck association |
-| Commander deck file | Existing main + sideboard/pregame serialization |
-| Main-deck placement | Supplemental cards rejected as illegal |
-| Commander detection | Operates only on Commander/Companion partition |
-| Real gameplay sideboard | Must not contain supplemental cards after game setup |
-| Attraction compatibility | Same generic pregame classification/extraction, separate Attraction runtime handler |
-| Junkyard | Attraction-specific runtime concept, not a generic supplemental zone |
-
-## 5. Generic supplemental-deck model
-
-The deck-building and pregame layer should not be Planechase-specific.
+The deck-building and pregame layer must not be Planechase-specific.
 
 A conceptual contract is:
 
@@ -188,7 +277,7 @@ enum SupplementalDeckType {
 }
 ```
 
-Exact names may differ. The important boundary is that every supplemental deck-building entry has:
+Exact names may differ. Every supplemental deck-building entry needs:
 
 * a supplemental type;
 * a stable content identity;
@@ -196,8 +285,6 @@ Exact names may differ. The important boundary is that every supplemental deck-b
 * and a variant-specific runtime handler.
 
 The generic layer must **not** assume that all supplemental cards become command-zone objects.
-
-Conceptually:
 
 ```text
 .dck sideboard / pregame staging
@@ -207,7 +294,8 @@ Conceptually:
             └── Supplemental entries
                  ├── PLANAR
                  │    -> PlanechaseSupplementalHandler
-                 │    -> PlanarCard runtime / planar deck / command-zone association
+                 │    -> player planar deck / PlanarCard runtime
+                 │    -> command-zone association
                  │
                  └── ATTRACTION
                       -> AttractionSupplementalHandler
@@ -217,7 +305,9 @@ Conceptually:
 
 Planechase and Attractions may share serialization, deck-editor grouping, classification, and pregame extraction without sharing gameplay rules.
 
-## 6. `.dck` storage and pregame staging
+The generic layer ends at the typed handoff. Planechase decides command-zone/deck behavior. Attraction decides Attraction deck/Visit/Junkyard behavior.
+
+## 7. `.dck` storage and pregame staging
 
 Do not add a third planar-deck list to the deck file unless a concrete future blocker requires it.
 
@@ -233,7 +323,7 @@ Deck file
     └── future Attraction supplemental cards
 ```
 
-For Commander, this serialized sideboard should be treated as a **pregame staging container**, not as proof that every contained card belongs to the real in-game sideboard.
+For Commander, this serialized sideboard is a **pregame staging container**, not proof that every contained card belongs to the real in-game sideboard.
 
 Example:
 
@@ -254,11 +344,9 @@ Mutual Epiphany              [Planar / Phenomenon]
 
 No external mapping such as `Commander deck -> planar deck file` is required. The planar package travels with the `.dck`.
 
-## 7. Pregame classification and Commander integration
+## 8. Pregame classification and Commander integration
 
 Before Commander validation or game initialization interprets sideboard contents, partition the serialized pregame area.
-
-Conceptually:
 
 ```text
 PregameDeckContents
@@ -285,7 +373,7 @@ Their legality is handled by the Planechase supplemental validator.
 
 Future Attraction entries follow the same classification boundary, but use Attraction-specific validation and runtime construction.
 
-## 8. Main-deck legality
+## 9. Main-deck legality
 
 Supplemental cards may be serialized in the pregame/sideboard section, but they are illegal in the normal main deck.
 
@@ -299,11 +387,9 @@ Required behavior:
 
 `isExtraDeckCard()` may assist counts/rendering, but it is not the sole legality rule.
 
-## 9. Game initialization handoff
+## 10. Game initialization handoff
 
 Supplemental cards must be extracted before the real gameplay library/sideboard state is finalized.
-
-Conceptually:
 
 ```text
 submitted Deck
@@ -315,15 +401,15 @@ submitted Deck
       └── supplemental -> typed variant handlers
 ```
 
-For `PLANAR`, the handler resolves stable IDs through `PlanarCardRegistry` and constructs/associates runtime `PlanarCard` objects.
+For `PLANAR`, the handler resolves stable IDs through `PlanarCardRegistry`, constructs runtime `PlanarCard` objects, and associates them with the owning player's planar deck.
 
 For future `ATTRACTION`, the same generic layer hands identities/cards to the Attraction subsystem. That subsystem owns Attraction deck construction, Visit behavior, and future Junkyard transitions.
 
 The generic staging layer must not know Planechase or Attraction gameplay details beyond dispatch type.
 
-## 10. Deck editor UX
+## 11. Deck editor UX
 
-The normal deck editor should become the primary place to build the planar package associated with a Commander deck.
+The normal deck editor becomes the primary place to build the planar package associated with a Commander deck.
 
 Target UX:
 
@@ -362,91 +448,33 @@ Required UX behavior:
 * malformed imported decks remain visibly invalid until the user fixes them;
 * the grouping API is generic and does not hard-code exactly `COMMANDER` + `PLANAR`.
 
-The table-level shared-planar editor may remain as an advanced override/fallback path.
+## 12. Table UX and mode selection
 
-## 11. Shared planar-deck assembly
-
-For shared mode, player deck files contribute planar entries to the communal deck.
-
-Example four-player flow:
-
-```text
-Player A .dck -> PLANAR contribution A ─┐
-Player B .dck -> PLANAR contribution B ─┤
-Player C .dck -> PLANAR contribution C ─┼-> merge contributions
-Player D .dck -> PLANAR contribution D ─┘
-                                             │
-                                             ├-> validate communal deck
-                                             ├-> construct runtime PlanarCards
-                                             └-> shuffle -> SharedPlanarDeck
-```
-
-The final communal deck is validated as one shared deck. Per-player contributions are not individually required to satisfy shared-deck minimums.
-
-Cross-player duplicate English names that violate shared-deck legality make the final deck illegal and should produce actionable diagnostics identifying the conflicting card/contributions.
-
-A player may contribute zero planar cards if the final communal deck is legal.
-
-Gameplay order is always shuffled. Contribution order, `.dck` iteration order, registry order, or merge order must never define gameplay order.
-
-Suggested table UX:
+Once player-owned mode is implemented, the normal table UX should make the modes explicit:
 
 ```text
 [x] Planechase
 
 Planar deck mode:
-(o) Shared
-( ) Individual                 [disabled until supported]
-
-Shared deck source:
-(o) Combine planar cards from submitted decks
-( ) Use table-configured shared deck override
-
-Contributions:
-Player A   10
-Player B   10
-Player C   10
-Player D   10
-----------------
-Combined   40   ✓ legal
-Phenomena   4   ✓
+(o) Player-owned decks          [default]
+( ) Table shared deck
+( ) Merge player contributions into one shared deck
 ```
 
-If a table override is selected, it replaces the submitted-deck source. Do not silently merge both sources.
-
-Server validation runs after all submitted decks are known and before game start.
-
-## 12. Individual planar-deck mode
-
-Individual mode uses each player's own `PLANAR` package as that player's planar deck.
-
-Requirements:
-
-* validate each player's planar deck independently;
-* create one runtime planar deck per player;
-* retain original deck/owner association on every runtime planar card;
-* planeswalking resolves against the correct applicable deck context;
-* bottom placement returns walked-away planar cards to the correct owner deck;
-* player departure uses true owner/deck associations;
-* hidden order, rollback, reconnect, and visibility operate independently per deck;
-* controller APIs accept deck/context rather than assuming one global shared deck.
-
-Suggested UI once supported:
+For player-owned mode, the lobby/table can show only legality/status information:
 
 ```text
-[x] Planechase
-
-Planar deck mode:
-( ) Shared
-(o) Individual
-
 Player A   planar deck 10   ✓
 Player B   planar deck 10   ✓
 Player C   planar deck 10   ✓
 Player D   planar deck 10   ✓
 ```
 
-Shared and individual mode must use the same `PlanarCard` content registry and the same Planechase rules primitives. Only deck association/selection differs.
+The starting planar-deck chooser is selected only after game order is finalized, not in the lobby.
+
+For table-shared mode, expose the existing shared-deck editor/override.
+
+For merged-shared mode, show contribution totals and final communal legality. Do not silently merge table overrides with player contributions.
 
 ## 13. Future multiplayer Planechase variants
 
@@ -454,209 +482,239 @@ Do not bake four-player Commander assumptions into the Planechase engine.
 
 Future modes may require:
 
-* team-aware planar controller selection;
+* team-aware planar-controller selection;
 * several planar controllers at once;
 * several simultaneously applicable planar decks;
-* different ownership/departure contexts;
-* additional UI for deck/controller association.
+* different ownership/departure rules;
+* different definitions of the player responsible for a reveal;
+* different starting-planar-deck selection procedures.
 
-The rules-engine interfaces should therefore pass planar-card/deck context where needed instead of relying on a singleton global deck/controller forever.
+Therefore public Planechase operations should take a context object or resolver input rather than depending on a single global shared-deck UUID.
 
-Product UI may continue supporting only a narrow initial mode until those variants are implemented correctly.
+The player-owned default in this document is a product mode, not a justification to hard-code `causingPlayerId == activePlayerId` or `deckOwnerId == planarControllerId` throughout the engine.
 
-## 14. Attraction/Junkyard compatibility
+## 14. Attraction / Junkyard compatibility
 
-The supplemental-deck infrastructure introduced for Planechase must intentionally support future Attractions.
+The supplemental-deck infrastructure is intentionally reusable for Attractions.
 
-Shared infrastructure:
+Shared pieces:
 
-* deck editor discovery/search;
-* `.dck` pregame serialization;
-* supplemental type classification;
-* main-deck rejection;
-* per-group counts and validation diagnostics;
-* Commander/Companion partitioning;
-* pregame extraction;
-* typed handoff to a variant runtime handler.
+```text
+Card/deck-editor metadata
+.dck pregame serialization
+Supplemental type classification
+Main-deck rejection
+Commander-sideboard partitioning
+Pregame extraction
+Typed variant dispatch
+Per-group UI/counts/validation
+```
 
-Attraction-specific infrastructure remains separate:
+Not shared:
 
-* Attraction deck legality;
-* Attraction deck shuffling/order;
-* Visit rules;
-* Attraction ownership/control;
-* Junkyard lifecycle and visibility;
-* any command-zone interaction required by the rules.
+```text
+PLANAR
+-> PlanarCard runtime
+-> command-zone association
+-> planar-controller rules
+-> planeswalking
 
-Do not model Junkyard as a generic destination for all supplemental cards. It belongs to the Attraction subsystem.
+ATTRACTION
+-> Attraction card/runtime model
+-> Attraction deck
+-> Visit rules
+-> Junkyard
+```
 
-Likewise, do not force Attractions to use `PlanarCard`, `PlanarCardRegistry`, `SharedPlanarDeck`, or Planechase controller semantics.
+Do not create a generic zone such as `SUPPLEMENTAL` or assume every supplemental card belongs in command.
 
-## 15. Implementation roadmap
+The future Attraction implementation should be able to plug into the same `.dck`/deck-editor/pregame framework without modifying Commander parsing again.
 
-The current `custom` branch is the baseline. Phases below describe remaining forward work only.
+## 15. Implementation phases
+
+Phases 1-7 describe the Planechase foundation already implemented or represented by the current baseline. New work should build forward from that baseline rather than recreating migration steps.
 
 ### Phase 8 — Generic Supplemental Deck Infrastructure
 
-Build the reusable pregame/deck boundary for Planechase and future supplemental-deck types.
+Build the reusable deck/pregame boundary.
 
 Implement:
 
-* a generic supplemental-card classification contract;
-* `SupplementalDeckType` or equivalent;
-* a Planechase deck-building carrier/proxy backed by `PlanarCardRegistry` metadata;
-* authoritative main-vs-pregame classification;
-* server-side rejection of Planes/Phenomena in main;
-* Commander validation partitioning so supplemental entries are not treated as Commanders or normal sideboard cards;
-* game-init extraction before real `Player.sideboard` is finalized;
-* typed handoff from `PLANAR` entries into the Planechase runtime;
-* explicit extension points for future `ATTRACTION` entries.
+* `SupplementalDeckType` / equivalent typed classification;
+* stable supplemental identity contract;
+* Planechase deck-building proxy/carrier backed by `PlanarCardRegistry`;
+* explicit main-deck rejection;
+* pregame partitioning before Commander validation;
+* Commander/Companion validation on only their partition;
+* supplemental entries excluded from real `Player.sideboard`;
+* typed runtime handler dispatch;
+* PLANAR handler construction of **per-player planar decks**;
+* extension seam for future ATTRACTION without implementing Attraction gameplay.
 
-Acceptance tests must cover:
-
-* Plane/Phenomenon in main -> illegal;
-* Commander + Companion + many planar entries -> Commander classification still correct;
-* planar entries do not count toward the normal Commander deck size;
-* planar entries never become Wish-accessible real sideboard cards;
-* PLANAR IDs construct the expected runtime planar content;
-* generic classification works without assuming every supplemental type is Planechase.
+Acceptance tests must include malformed main placement, Commander + Companion + Planar coexistence, many Planar entries in pregame storage, no Planar cards leaking into ordinary sideboard gameplay, and a synthetic second supplemental type proving the generic layer is not Planechase-cast-specific.
 
 ### Phase 9 — Deck Editor UX and `.dck` Persistence
 
-Make deck-integrated supplemental construction the primary authoring flow.
+Make the normal deck editor the primary authoring surface.
 
-Implement:
+Implement searchable Planes/Phenomena, automatic routing to Planar Deck, grouped pregame rendering, separate counts, legality diagnostics, save/load/import/export round trips, explicit main-deck rejection, and generic supplemental grouping that can later display Attraction Deck.
 
-* searchable Plane/Phenomenon deck-building entries;
-* automatic routing to the Planar group;
-* main-deck drag/drop rejection;
-* generic pregame grouping in the deck editor;
-* separate Main/Commander/Planar counts;
-* per-group legality diagnostics;
-* save/load/import/export round-trip coverage;
-* preservation of stable supplemental identity;
-* support for future supplemental groups without redesigning the editor again.
+Do not require a separate planar-deck file or assignment mapping.
 
-The table-level editor remains an optional advanced override/fallback.
+### Phase 10 — Player-Owned Planar Deck Gameplay (target default)
 
-### Phase 10 — Shared Deck Assembly from Submitted Decks
+Implement the target default mode described in sections 3.1 and 4.
 
-Connect deck-integrated planar packages to shared Planechase.
+Required work:
 
-Implement:
+* retain one independently shuffled planar deck per player;
+* determine normal play/draw/turn order first;
+* before mulligans, randomly select the starting-planar-deck chooser from eligible players while excluding the player that determined the play/draw/turn order;
+* let that chooser select which player's planar deck supplies the starting Plane;
+* perform beginning-of-game Phenomenon skipping/bottoming on that selected deck until a Plane is found;
+* store explicit causing-player/deck-owner context for every later planeswalk or planar reveal;
+* reveal from the planar deck of the player who caused that reveal/planeswalk instruction;
+* propagate reveal attribution through a Phenomenon so its automatic follow-up planeswalk does not lose the intended deck source;
+* return walked-away cards to their proper associated owner deck bottoms;
+* preserve independent hidden order, rollback, reconnect, serialization, and player-departure behavior for every player deck;
+* add focused tests for planar-die planeswalks by each player and spell/ability-caused reveals by different players.
 
-* collecting PLANAR contributions from submitted decks;
-* merging contributions into one candidate communal deck;
-* authoritative shared-deck validation after all players are known;
-* duplicate-name diagnostics across contributors;
-* construction through `PlanarCardRegistry`;
-* mandatory gameplay shuffle;
-* clear source selection between submitted-deck contributions and a table override;
-* shared-mode contribution/status UI.
+This phase is complete only when the game no longer needs to merge player planar packages to provide the normal/default experience.
 
-Do not require every player to contribute the same number of cards unless an explicit product rule is later introduced.
+### Phase 11 — Alternative Shared Modes and Variant-Ready Context
 
-### Phase 11 — Individual Planar Deck Mode and Variant-Ready Context
+Add/finish the two shared alternatives without changing the player-owned semantics.
 
-Add individual planar decks using the same deck-integrated PLANAR package.
+#### 11A — Table shared deck
 
-Implement:
+Use one table-configured legal shared deck for all reveals. Reuse the existing bootstrap shared-deck UI and ordered runtime.
 
-* one planar deck per player;
-* independent legality validation;
-* owner/deck association throughout planeswalking;
-* correct bottom/top selection per deck;
-* player-departure behavior;
-* independent hidden-state/rollback/reconnect support;
-* mode UI for `Shared` vs `Individual`;
-* context-aware controller/deck APIs suitable for later team or multi-controller Planechase variants.
+#### 11B — Merged player contributions
 
-This phase should leave the engine ready to extend to additional Planechase formats without replacing the core runtime again.
+Merge PLANAR entries from submitted player decks, validate the final communal list, construct runtime PlanarCards, shuffle once, and use one shared deck.
+
+Cross-player duplicate-name conflicts and communal Phenomenon limits must produce actionable validation errors.
+
+Also harden the context APIs required by later Planechase formats so deck selection, planar control, causing-player attribution, ownership, and departure are not represented by one overloaded global UUID.
 
 ### Phase 12 — Incremental Plane and Phenomenon Content
 
-Only after the deck-building, shared/individual mode, and supplemental infrastructure are stable should broad new planar content be added.
+Only after the deck-building, player-owned gameplay, alternative modes, and supplemental infrastructure are stable should broad content implementation become the focus.
 
-Implement additional Planes and Phenomena one card at a time.
+Add additional Planes and Phenomena one card at a time.
 
 Each card must:
 
-* follow `docs/CARD_IMPLEMENTATION_LLM.md`;
-* verify current Oracle text, rules, release notes, and rulings where relevant;
-* use existing Planechase primitives rather than introducing card-local architecture;
-* register stable metadata in the planar registry;
-* include focused behavioral tests;
-* include deck-editor/registry construction coverage;
-* work in both shared and individual deck contexts where rules permit.
+* verify current Oracle text, Comprehensive Rules, official rulings/release notes where relevant, and current XMage mechanic patterns;
+* use the common `PlanarCard` runtime and registry;
+* have focused behavioral tests;
+* have registry/metadata/deck-editor coverage;
+* work in player-owned mode and both shared alternatives unless the card rules genuinely require a mode-specific restriction;
+* preserve exact source/controller/causing-player semantics;
+* avoid introducing card-local substitutes for common Planechase operations.
 
-Mechanically similar cards may share reusable tested infrastructure, but broad batch conversion should not replace card-by-card rules review.
+Mechanically similar cards may share reusable tested infrastructure, but individual rules review remains required.
 
-Phase 12 is intentionally the final roadmap phase so content growth does not drive foundational architecture.
-
-## 16. Testing strategy
+## 16. Testing requirements
 
 ### 16.1 General
 
-* Tests must be deterministic.
-* GitHub Actions is the authoritative Maven/JDK validation environment.
-* Do not download Maven dependencies in Codex Cloud solely for validation.
-* Hidden deck order must not leak through views, logs, reconnects, or serialization.
-* New state must support copy/rollback/restart where applicable.
-* Server-side legality validation is authoritative; client validation is UX.
+* Tests are deterministic.
+* Known deck order is a test seam only; gameplay paths shuffle.
+* Test server-side validation independently of UI prevention.
+* Every new state component supports copy/rollback/restart/reconnect where applicable.
+* Hidden planar order must not leak through views/logs.
+* Ordinary non-Planechase games remain unaffected.
+* GitHub Actions is the authoritative Maven/JDK validation environment. Do not download Maven dependencies in Codex Cloud solely for validation.
 
-### 16.2 Supplemental/deck tests
+### 16.2 Supplemental infrastructure
 
-At minimum cover:
+Test:
 
-* supplemental card in main -> illegal;
-* supplemental card in pregame -> accepted by the correct handler;
-* Commander and Companion recognition unaffected by supplemental entries;
-* supplemental entries excluded from normal Commander size/color/banned/singleton calculations;
-* supplemental entries absent from real `Player.sideboard` after setup;
-* `.dck` round trip preserves supplemental type and stable ID;
-* synthetic/future supplemental type can pass generic classification without Planechase casts;
-* table override precedence is explicit;
-* shared deck always shuffles for gameplay.
+* Plane in main -> illegal;
+* Plane in pregame -> classified PLANAR;
+* Commander remains Commander;
+* Companion remains Companion;
+* Planar cards do not inflate Commander deck count;
+* Planar cards are absent from real gameplay sideboard;
+* Attraction-like synthetic type follows the same generic classifier without Planechase casting;
+* `.dck` save/load preserves stable supplemental identity.
 
-### 16.3 Shared-mode tests
+### 16.3 Player-owned mode
 
-Cover communal minimum/uniqueness/Phenomenon cap, cross-player duplicate diagnostics, zero-card contributors, registry construction, shuffle, hidden order, rollback, reconnect, and departure behavior.
+Test:
 
-### 16.4 Individual-mode tests
+* all player planar decks are shuffled independently;
+* order is determined before the starting-planar chooser step;
+* chooser selection occurs before mulligans;
+* excluded order-determining player cannot be selected as chooser;
+* chooser can select any legal player's planar deck;
+* starting Phenomena are bottomed without encounter triggers;
+* starting setup stops on the first Plane from the selected deck;
+* Player A's planeswalker roll reveals from A's deck;
+* Player B's planeswalker roll reveals from B's deck;
+* a spell/ability-caused planeswalk uses the explicitly attributed causing player's deck;
+* a chaos ability that causes a reveal propagates the correct causing player;
+* ordinary chaos with no reveal does not consume a planar card;
+* a revealed Phenomenon's automatic follow-up preserves the reveal attribution needed for the next deck selection;
+* walked-away cards return to their associated owner decks;
+* one player's empty/invalid deck cannot silently fall back to another player's deck;
+* rollback/reconnect preserves all independent orders and attribution state;
+* player departure has deterministic documented behavior.
 
-Cover independent validation, per-player order, owner/deck association, planeswalk-to-correct-deck behavior, bottom placement, player departure, copy/rollback/reconnect, and controller-context correctness.
+### 16.4 Shared alternatives
 
-### 16.5 Attraction-compatibility tests
+Test table-shared and merged-shared modes separately. Neither mode may mutate or flatten the player-owned mode's runtime state model.
 
-The generic supplemental layer should have at least one synthetic/non-Planechase test proving that classification, grouping, extraction, and dispatch work without assuming `PlanarCard`, command-zone destination, or Planechase registry types.
+### 16.5 Attraction compatibility
 
-## 17. Non-goals and guardrails
+Before the generic supplemental layer is considered stable, prove that a future Attraction implementation can provide:
+
+```text
+ATTRACTION entry
+-> same .dck pregame storage
+-> same generic classification/extraction
+-> Attraction-specific handler
+-> AttractionDeck
+-> future Junkyard
+```
+
+without adding Attraction-specific branches to Commander parsing.
+
+## 17. Non-goals
 
 Do not:
 
-* introduce `Zone.PLANAR_DECK`;
-* convert runtime Plane/Phenomenon objects into ordinary castable cards just for deck editing;
-* use `.dck` sideboard presence as proof that a card is a real gameplay sideboard card;
-* let supplemental entries become Commander candidates;
-* silently discard illegal supplemental cards from main;
-* expose deterministic registry/list order as gameplay planar deck order;
-* hard-code the generic supplemental layer to Planechase;
-* make every supplemental runtime use the command zone;
-* model Attraction Junkyard as a generic supplemental destination;
-* add broad Plane/Phenomenon content before the remaining infrastructure phases are complete.
+* create `Zone.PLANAR_DECK`;
+* convert runtime Plane/Phenomenon objects into ordinary castable cards solely for deck-editor support;
+* treat all pregame/sideboard entries as real gameplay sideboard cards;
+* make Planar supplemental cards Commander candidates;
+* silently remove illegal Planar cards from main deck;
+* make merged-shared contributions the default player experience;
+* infer the next planar deck from the current face-up Plane when a causing-player context is available;
+* assume every supplemental deck uses the command zone;
+* implement Attraction gameplay inside Planechase classes;
+* use broad Plane/Phenomenon content work to bypass missing generic infrastructure.
 
-## 18. Open design questions
+## 18. Open implementation questions
 
-The responsible implementation phase should resolve these before code lands:
+The responsible phase must resolve these concretely before code lands:
 
 1. Exact Java shape of `SupplementalDeckCard` / `SupplementalDeckType`.
-2. Whether Planechase deck-building carriers are generated proxy cards, repository-backed mockable entries, or another lightweight searchable representation.
-3. The best point in the submitted-deck pipeline to partition pregame contents before `Player.useDeck` creates gameplay sideboard state.
-4. How deck validation APIs expose separate Commander, Planar, and future Attraction error groups without duplicating parsing.
-5. Exact serialization needed to preserve stable supplemental IDs while remaining compatible with existing `.dck` files.
-6. How table overrides are represented and how override-vs-submitted-deck precedence is communicated in protocol/UI.
-7. How shared-mode contribution diagnostics identify duplicate cards from different players without exposing hidden data that should remain private.
-8. Exact context object/API used by future individual/team/Grand-Melee planar controller resolution.
-9. Whether the historical planar die probability remains a labeled house rule or is replaced by the rules-correct distribution in a separate focused patch.
+2. How deck-building Planar proxies are registered in `CardRepository` without becoming normal spells.
+3. Whether pregame partitioning returns a value object or exposes typed deck views.
+4. The cleanest point to remove supplemental entries before `Player.sideboard` is populated.
+5. Exact legality-error representation for supplemental cards found in main.
+6. How grouped pregame sections serialize layout metadata while `.dck` remains compatible.
+7. Exact engine source for the player that "determined play/draw/turn order" and therefore must be excluded from initial planar chooser selection.
+8. Exact chooser UI/event and disconnect fallback before mulligans.
+9. Exact rules/engine mapping from a resolving spell or ability to the player considered responsible for a planar reveal.
+10. How reveal attribution is persisted on/through a Phenomenon so the 704.6f follow-up uses the intended deck.
+11. Player-departure behavior when face-up planar cards originated in the departing player's deck.
+12. Whether empty planar decks are rejected before game start or need an explicit runtime failure policy.
+13. How shared-mode ownership queries coexist with stable underlying player/deck association metadata.
+14. Exact protocol enum/naming for the three modes: player-owned, table-shared, and merged-shared.
+15. How future team/Grand Melee contexts provide causing-player and deck selection without overloading one UUID.
+16. How future Attraction deck legality and Junkyard views plug into the generic supplemental UI without Planechase assumptions.
 
-When resolving these questions, prefer the narrowest generic boundary that serves both Planechase and future supplemental systems without coupling their gameplay engines.
+Until a question is resolved, choose the narrowest reversible design consistent with the boundaries above.
