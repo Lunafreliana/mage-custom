@@ -410,14 +410,17 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Akoum", "https://api.scryfall.com/cards/opca/12/en?format=image");
             put("PCA/Plane - Astral Arena", "https://api.scryfall.com/cards/opca/14/en?format=image");
             put("PCA/Plane - Bant", "https://api.scryfall.com/cards/opca/15/en?format=image");
+            put("PCA/Plane - Eloren Wilds", "https://api.scryfall.com/cards/opca/21/en?format=image");
             put("PCA/Plane - Edge of Malacol", "https://api.scryfall.com/cards/opca/20/en?format=image");
             put("PCA/Plane - Feeding Grounds", "https://api.scryfall.com/cards/opca/23/en?format=image");
             put("PCA/Plane - Fields of Summer", "https://api.scryfall.com/cards/opca/24/en?format=image");
+            put("PCA/Plane - Gavony", "https://api.scryfall.com/cards/opca/27/en?format=image");
             put("PCA/Plane - Hedron Fields of Agadeem", "https://api.scryfall.com/cards/opca/35/en?format=image");
             put("PCA/Plane - Lethe Lake", "https://api.scryfall.com/cards/opca/47/en?format=image");
             put("PCA/Plane - Naya", "https://api.scryfall.com/cards/opca/55/en?format=image");
             put("PCA/Plane - Nephalia", "https://api.scryfall.com/cards/opca/56/en?format=image");
             put("PCA/Plane - Panopticon", "https://api.scryfall.com/cards/opca/62/en?format=image");
+            put("PCA/Plane - Selesnya Loft Gardens", "https://api.scryfall.com/cards/opca/69/en?format=image");
             put("PCA/Plane - Tazeem", "https://api.scryfall.com/cards/opca/78/en?format=image");
             put("PCA/Plane - The Dark Barony", "https://api.scryfall.com/cards/opca/19/en?format=image");
             put("PCA/Plane - The Eon Fog", "https://api.scryfall.com/cards/opca/22/en?format=image");
@@ -427,6 +430,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Trail of the Mage-Rings", "https://api.scryfall.com/cards/opca/80/en?format=image");
             put("PCA/Plane - Turri Island", "https://api.scryfall.com/cards/opca/82/en?format=image");
             put("PCA/Plane - Undercity Reaches", "https://api.scryfall.com/cards/opca/83/en?format=image");
+            put("PCA/Plane - We Hope You Like Squirrels", "https://api.scryfall.com/cards/pssc/10/en?format=image");
 
             // C20
             put("C20/Angel", "https://api.scryfall.com/cards/tc20/1/en?format=image");

@@ -18,7 +18,7 @@ jobs:
   build:
     # Run the full Maven suite on the local Windows runner instead of consuming
     # GitHub-hosted Actions minutes.
-    runs-on: [self-hosted, windows, x64]
+    runs-on: [self-hosted, windows, x64, xmage-build]
 
     steps:
     - uses: actions/checkout@v6

@@ -26,12 +26,13 @@ public class PlanarCardRegistryTest {
             PlanarCard card = PlanarCardRegistry.create(metadata.getId());
             Assert.assertNotNull(metadata.getId(), card);
             Assert.assertEquals(metadata.getType(), card.getPlanarCardType());
-            Assert.assertEquals("PCA", metadata.getSetCode());
             Assert.assertEquals(card.getName(), metadata.getImageName());
             Assert.assertFalse(metadata.getEnglishName().startsWith("Plane - "));
             Assert.assertFalse(metadata.getEnglishName().startsWith("Phenomenon - "));
         }
         Assert.assertNull(PlanarCardRegistry.create("plane:not_registered"));
+        Assert.assertEquals("MOC", PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Planes.PLANE_TOWASHI)).getSetCode());
     }
 
     @Test
@@ -57,6 +58,8 @@ public class PlanarCardRegistryTest {
     public void testMetadataTypes() {
         Assert.assertEquals(CardType.PLANE,
                 PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Planes.PLANE_AKOUM)).getType());
+        Assert.assertEquals("Eloren Wilds",
+                PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Planes.PLANE_ELOREN_WILDS)).getEnglishName());
         Assert.assertEquals(CardType.PHENOMENON,
                 PlanarCardRegistry.getMetadata(PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY)).getType());
     }

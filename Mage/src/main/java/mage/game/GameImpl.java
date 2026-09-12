@@ -1618,6 +1618,7 @@ public abstract class GameImpl implements Game {
         newWatchers.add(new FirstStrikeWatcher()); // required for combat code
         newWatchers.add(new BlockedAttackerWatcher()); // BLOCKER_DECLARED
         newWatchers.add(new PlanarRollWatcher()); // needed for RollDiceTest (planechase code needs improves)
+        newWatchers.add(new PlaneswalkedWatcher()); // PLANESWALKED
         newWatchers.add(new AttackedThisTurnWatcher()); // ATTACKER_DECLARED
         newWatchers.add(new CardsDrawnThisTurnWatcher()); // DREW_CARD
         newWatchers.add(new ManaSpentToCastWatcher()); // SPELL_CAST
