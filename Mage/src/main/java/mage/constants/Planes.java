@@ -15,6 +15,7 @@ public enum Planes {
     PLANE_HEDRON_FIELDS_OF_AGADEEM("HedronFieldsOfAgadeemPlane", "Plane - Hedron Fields of Agadeem"),
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
+    PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
     PLANE_PANOPTICON("PanopticonPlane", "Plane - Panopticon"),
     PLANE_TAZEEM("TazeemPlane", "Plane - Tazeem"),
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
