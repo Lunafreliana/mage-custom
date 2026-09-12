@@ -25,6 +25,7 @@ public enum Planes {
     PLANE_THE_EON_FOG("TheEonFogPlane", "Plane - The Eon Fog"),
     PLANE_THE_GREAT_FOREST("TheGreatForestPlane", "Plane - The Great Forest"),
     PLANE_THE_MAELSTROM("TheMaelstromPlane", "Plane - The Maelstrom"),
+    PLANE_THE_PYRAMID_OF_MARS("ThePyramidOfMarsPlane", "Plane - The Pyramid of Mars", "WHO"),
     PLANE_THE_ZEPHYR_MAZE_FOG("TheZephyrMazePlane", "Plane - The Zephyr Maze"),
     PLANE_TRUGA_JUNGLE("TrugaJunglePlane", "Plane - Truga Jungle"),
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
