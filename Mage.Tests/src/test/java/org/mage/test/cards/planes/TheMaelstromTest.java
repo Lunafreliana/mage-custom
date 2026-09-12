@@ -17,6 +17,7 @@ public class TheMaelstromTest extends CardTestPlayerBase {
     @Test
     public void upkeepRevealCanPutPermanentOntoBattlefield() {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
         skipInitShuffling();
 
@@ -34,6 +35,7 @@ public class TheMaelstromTest extends CardTestPlayerBase {
     @Test
     public void revealedNonPermanentGoesToBottom() {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
         skipInitShuffling();
 
@@ -53,6 +55,7 @@ public class TheMaelstromTest extends CardTestPlayerBase {
     public void chaosReturnsPermanentCardFromPlanarControllersGraveyard() {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
         skipInitShuffling();
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
