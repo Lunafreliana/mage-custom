@@ -18,6 +18,8 @@ import org.mage.test.serverside.base.CardTestPlayerBase;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class PhenomenonTest extends CardTestPlayerBase {
 
@@ -171,6 +173,39 @@ public class PhenomenonTest extends CardTestPlayerBase {
             Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
             Assert.assertEquals(info, "Plane - Bant", game.getState().getFaceUpPlanes().get(0).getName());
         });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testInterplanarTunnelPreservesDeckWhenItCannotRevealFivePlanes() {
+        addCard(Zone.LIBRARY, playerA, "Mountain", 20);
+        addCard(Zone.LIBRARY, playerB, "Mountain", 20);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarCardIds = Arrays.asList(
+                PlanarCardRegistry.getId(Planes.PLANE_FIELDS_OF_SUMMER),
+                PlanarCardRegistry.getId(Planes.PLANE_AGYREM),
+                PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY),
+                PlanarCardRegistry.getId(Planes.PLANE_AKOUM),
+                PlanarCardRegistry.getId(Planes.PLANE_ASTRAL_ARENA),
+                PlanarCardRegistry.getId(Planes.PLANE_BANT));
+
+        runCode("encounter Interplanar Tunnel with fewer than five Planes", 1,
+                PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+                    List<UUID> orderBeforeEncounter = game.getState().getSharedPlanarDeck().getOrder();
+                    Assert.assertTrue(info, game.addPhenomenon(
+                            new InterplanarTunnelPhenomenon(), player.getId()));
+                    game.checkStateAndTriggered();
+                    game.getStack().resolve(game);
+
+                    Assert.assertEquals(info, orderBeforeEncounter,
+                            game.getState().getSharedPlanarDeck().getOrder());
+                    Assert.assertEquals(info, 1, game.getState().getFaceUpPhenomena().size());
+
+                    game.checkStateAndTriggered();
+                    Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+                    Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
+                });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
     }

@@ -32,6 +32,20 @@ public class SharedPlanarDeckTest {
     }
 
     @Test
+    public void testPuttingCardOnTopRestoresDeckMetadataAndFaceState() {
+        SharedPlanarDeck deck = knownDeck();
+        Plane plane = (Plane) deck.draw();
+        plane.setFaceUp(true);
+
+        deck.putOnTop(plane);
+
+        Assert.assertEquals(plane.getId(), deck.getOrder().get(0));
+        Assert.assertEquals(deck.getId(), plane.getPlanarDeckId());
+        Assert.assertFalse(plane.isFaceUp());
+        Assert.assertSame(plane, deck.draw());
+    }
+
+    @Test
     public void testCopyPreservesOrderAndIsIndependent() {
         SharedPlanarDeck original = knownDeck();
         SharedPlanarDeck copy = original.copy();
