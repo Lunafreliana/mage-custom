@@ -18,7 +18,7 @@ import mage.filter.StaticFilters;
 import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.filter.predicate.permanent.AttackedThisTurnPredicate;
 import mage.game.command.Plane;
-import mage.target.common.TargetCreaturePermanent;
+import mage.target.TargetPermanent;
 
 /**
  * @author The XMage Developers
@@ -53,7 +53,7 @@ public final class BesiegedVikingVillagePlane extends Plane {
         Ability chaosAbility = new ChaosEnsuesTriggeredAbility(
                 new AddCountersTargetEffect(CounterType.INDESTRUCTIBLE.createInstance()), false
         );
-        chaosAbility.addTarget(new TargetCreaturePermanent(filter));
+        chaosAbility.addTarget(new TargetPermanent(filter));
         this.getAbilities().add(chaosAbility);
     }
 
