@@ -19,6 +19,7 @@ public class TheMaelstromTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         setChoice(playerA, true); // Reveal the top card.
         setChoice(playerA, true); // Put the permanent onto the battlefield.
         setStrictChooseMode(true);
@@ -34,7 +35,9 @@ public class TheMaelstromTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_THE_MAELSTROM);
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         setChoice(playerA, true); // Reveal the top card.
+        setChoice(playerA, false); // Do not reveal it again for the other trigger.
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.DRAW);
         execute();
@@ -52,7 +55,7 @@ public class TheMaelstromTest extends CardTestPlayerBase {
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
-        setChoice(playerA, false); // Do not reveal during upkeep.
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Grizzly Bears");
         setStrictChooseMode(true);
