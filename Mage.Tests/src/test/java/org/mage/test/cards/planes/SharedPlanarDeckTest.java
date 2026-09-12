@@ -5,6 +5,7 @@ import mage.game.GameState;
 import mage.game.command.Plane;
 import mage.game.command.SharedPlanarDeck;
 import mage.game.command.planes.AgyremPlane;
+import mage.game.command.planes.AstralArenaPlane;
 import mage.game.command.planes.FieldsOfSummerPlane;
 import mage.game.command.planes.PanopticonPlane;
 import mage.util.RandomUtil;
@@ -111,6 +112,90 @@ public class SharedPlanarDeckTest {
         Assert.assertTrue(state.isFaceUpPlanarCard(agyrem.getId()));
         Assert.assertThrows(UnsupportedOperationException.class,
                 () -> state.getFaceUpPlanes().remove(0));
+    }
+
+    @Test
+    public void testEmptyDeckDrawIsSafe() {
+        SharedPlanarDeck deck = new SharedPlanarDeck();
+
+        Assert.assertTrue(deck.isEmpty());
+        Assert.assertNull(deck.draw());
+        Assert.assertEquals(0, deck.size());
+    }
+
+    @Test
+    public void testSetPlanesDefensivelyCopiesInputCards() {
+        Plane original = new FieldsOfSummerPlane();
+        SharedPlanarDeck deck = new SharedPlanarDeck();
+        deck.setPlanes(Arrays.asList(original), false);
+
+        Plane stored = (Plane) deck.draw();
+
+        Assert.assertNotSame(original, stored);
+        Assert.assertEquals(original.getId(), stored.getId());
+        Assert.assertNull(original.getPlanarDeckId());
+        Assert.assertEquals(deck.getId(), stored.getPlanarDeckId());
+    }
+
+    @Test
+    public void testReplacingDeckContentsClearsOldOrder() {
+        SharedPlanarDeck deck = knownDeck();
+        Plane replacement = new AstralArenaPlane();
+
+        deck.setPlanes(Arrays.asList(replacement), false);
+
+        Assert.assertEquals(1, deck.size());
+        Assert.assertEquals(replacement.getId(), deck.getOrder().get(0));
+    }
+
+    @Test
+    public void testBottomingFaceUpCardChangesItsPlanarIncarnationOnce() {
+        SharedPlanarDeck deck = knownDeck();
+        Plane plane = (Plane) deck.draw();
+        plane.setFaceUp(true);
+
+        deck.putOnBottom(plane);
+
+        Assert.assertFalse(plane.isFaceUp());
+        Assert.assertEquals(1, plane.getZoneChangeCounter(null));
+        Assert.assertEquals(plane.getId(), deck.getOrder().get(deck.size() - 1));
+    }
+
+    @Test
+    public void testBottomingAlreadyFaceDownCardDoesNotChangeIncarnation() {
+        SharedPlanarDeck deck = new SharedPlanarDeck();
+        Plane plane = new FieldsOfSummerPlane();
+
+        deck.putOnBottom(plane);
+
+        Assert.assertEquals(0, plane.getZoneChangeCounter(null));
+        Assert.assertEquals(deck.getId(), plane.getPlanarDeckId());
+    }
+
+    @Test
+    public void testCopiedDeckRetainsDeckIdentityButNotCardInstances() {
+        SharedPlanarDeck original = knownDeck();
+        SharedPlanarDeck copy = original.copy();
+
+        Plane originalTop = (Plane) original.draw();
+        Plane copiedTop = (Plane) copy.draw();
+
+        Assert.assertEquals(original.getId(), copy.getId());
+        Assert.assertEquals(originalTop.getId(), copiedTop.getId());
+        Assert.assertNotSame(originalTop, copiedTop);
+        copiedTop.setFaceUp(true);
+        Assert.assertFalse(originalTop.isFaceUp());
+    }
+
+    @Test
+    public void testClearRemovesEveryCardButPreservesDeckIdentity() {
+        SharedPlanarDeck deck = knownDeck();
+        UUID deckId = deck.getId();
+
+        deck.clear();
+
+        Assert.assertTrue(deck.isEmpty());
+        Assert.assertEquals(deckId, deck.getId());
     }
 
     private static SharedPlanarDeck knownDeck() {
