@@ -3,6 +3,7 @@ package org.mage.test.cards.planes;
 import mage.abilities.Ability;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.PlaneswalkToSourceTriggeredAbility;
+import mage.abilities.common.PlaneswalkAwayFromSourceTriggeredAbility;
 import mage.abilities.effects.common.DrawCardSourceControllerEffect;
 import mage.abilities.effects.common.RollPlanarDieEffect;
 import mage.constants.Planes;
@@ -46,6 +47,22 @@ public class ExistingPlaneMigrationTest {
                 new GameEvent(GameEvent.EventType.PLANESWALKED, sourceId, null, controllerId), null));
         Assert.assertFalse(ability.checkTrigger(
                 new GameEvent(GameEvent.EventType.PLANESWALKED, UUID.randomUUID(), null, controllerId), null));
+        Assert.assertEquals(controllerId, ability.copy().getControllerId());
+    }
+
+    @Test
+    public void testPlaneswalkAwayFromSourceMatchesObjectIdentity() {
+        PlaneswalkAwayFromSourceTriggeredAbility ability
+                = new PlaneswalkAwayFromSourceTriggeredAbility(new DrawCardSourceControllerEffect(1));
+        UUID sourceId = UUID.randomUUID();
+        UUID controllerId = UUID.randomUUID();
+        ability.setSourceId(sourceId);
+        ability.setControllerId(controllerId);
+
+        Assert.assertTrue(ability.checkTrigger(
+                new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY, sourceId, null, controllerId), null));
+        Assert.assertFalse(ability.checkTrigger(
+                new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY, UUID.randomUUID(), null, controllerId), null));
         Assert.assertEquals(controllerId, ability.copy().getControllerId());
     }
 }

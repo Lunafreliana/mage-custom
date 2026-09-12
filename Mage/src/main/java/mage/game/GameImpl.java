@@ -2252,6 +2252,8 @@ public abstract class GameImpl implements Game {
             return false;
         }
         for (PlanarCard plane : faceUpPlanarCards) {
+            fireEvent(GameEvent.getEvent(
+                    GameEvent.EventType.PLANESWALKED_AWAY, plane.getId(), null, playerId));
             state.removeTriggersOfSourceId(plane.getId());
             state.getCommand().remove(plane);
             SharedPlanarDeck ownerDeck = state.getPlanarDeckMode() == PlanarDeckMode.SHARED

@@ -13,6 +13,7 @@ public enum Planes {
     PLANE_FEEDING_GROUNDS("FeedingGroundsPlane", "Plane - Feeding Grounds"),
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
     PLANE_HEDRON_FIELDS_OF_AGADEEM("HedronFieldsOfAgadeemPlane", "Plane - Hedron Fields of Agadeem"),
+    PLANE_INYS_HAEN("InysHaenPlane", "Plane - Inys Haen", "MOC"),
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
     PLANE_PANOPTICON("PanopticonPlane", "Plane - Panopticon"),
@@ -28,10 +29,16 @@ public enum Planes {
 
     private final String className;
     private final String fullName;
+    private final String setCode;
 
     Planes(String className, String fullName) {
+        this(className, fullName, "PCA");
+    }
+
+    Planes(String className, String fullName, String setCode) {
         this.className = className;
         this.fullName = fullName;
+        this.setCode = setCode;
     }
 
     @Override
@@ -45,6 +52,10 @@ public enum Planes {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public String getSetCode() {
+        return setCode;
     }
 
     public static Planes fromFullName(String fullName) {
