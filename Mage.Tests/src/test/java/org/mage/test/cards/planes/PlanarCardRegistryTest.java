@@ -26,12 +26,13 @@ public class PlanarCardRegistryTest {
             PlanarCard card = PlanarCardRegistry.create(metadata.getId());
             Assert.assertNotNull(metadata.getId(), card);
             Assert.assertEquals(metadata.getType(), card.getPlanarCardType());
-            Assert.assertEquals("PCA", metadata.getSetCode());
             Assert.assertEquals(card.getName(), metadata.getImageName());
             Assert.assertFalse(metadata.getEnglishName().startsWith("Plane - "));
             Assert.assertFalse(metadata.getEnglishName().startsWith("Phenomenon - "));
         }
         Assert.assertNull(PlanarCardRegistry.create("plane:not_registered"));
+        Assert.assertEquals("MOC", PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Planes.PLANE_TOWASHI)).getSetCode());
     }
 
     @Test
