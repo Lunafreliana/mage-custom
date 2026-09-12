@@ -12,19 +12,25 @@ public enum Planes {
     PLANE_EDGE_OF_MALACOL("EdgeOfMalacolPlane", "Plane - Edge of Malacol"),
     PLANE_FEEDING_GROUNDS("FeedingGroundsPlane", "Plane - Feeding Grounds"),
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
+    PLANE_GAVONY("GavonyPlane", "Plane - Gavony"),
     PLANE_HEDRON_FIELDS_OF_AGADEEM("HedronFieldsOfAgadeemPlane", "Plane - Hedron Fields of Agadeem"),
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
+    PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
     PLANE_PANOPTICON("PanopticonPlane", "Plane - Panopticon"),
+    PLANE_SELESNYA_LOFT_GARDENS("SelesnyaLoftGardensPlane", "Plane - Selesnya Loft Gardens"),
     PLANE_TAZEEM("TazeemPlane", "Plane - Tazeem"),
+    PLANE_TOWASHI("TowashiPlane", "Plane - Towashi", "MOC"),
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
     PLANE_THE_EON_FOG("TheEonFogPlane", "Plane - The Eon Fog"),
     PLANE_THE_GREAT_FOREST("TheGreatForestPlane", "Plane - The Great Forest"),
+    PLANE_THE_MAELSTROM("TheMaelstromPlane", "Plane - The Maelstrom"),
     PLANE_THE_ZEPHYR_MAZE_FOG("TheZephyrMazePlane", "Plane - The Zephyr Maze"),
     PLANE_TRUGA_JUNGLE("TrugaJunglePlane", "Plane - Truga Jungle"),
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
     PLANE_TURRI_ISLAND("TurriIslandPlane", "Plane - Turri Island"),
     PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches"),
+    PLANE_WE_HOPE_YOU_LIKE_SQUIRRELS("WeHopeYouLikeSquirrelsPlane", "Plane - We Hope You Like Squirrels");
     PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone", "PUNK");
 
     private final String className;
