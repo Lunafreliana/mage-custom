@@ -41,7 +41,7 @@ public class NephaliaTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        setTarget(playerA, "Grizzly Bears");
+        addTarget(playerA, "Grizzly Bears");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
