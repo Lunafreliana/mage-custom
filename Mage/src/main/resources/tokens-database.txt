@@ -185,6 +185,7 @@
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
 |PLANE:PCA|Plane - The Eon Fog||TheEonFogPlane|
 |PLANE:PCA|Plane - The Great Forest||TheGreatForestPlane|
+|PLANE:WHO|Plane - The Pyramid of Mars||ThePyramidOfMarsPlane|
 |PLANE:PCA|Plane - Truga Jungle||TrugaJunglePlane|
 |PLANE:PCA|Plane - Turri Island||TurriIslandPlane|
 |PLANE:PCA|Plane - Undercity Reaches||UndercityReachesPlane|

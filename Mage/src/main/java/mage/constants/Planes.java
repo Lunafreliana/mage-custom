@@ -20,6 +20,7 @@ public enum Planes {
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
     PLANE_THE_EON_FOG("TheEonFogPlane", "Plane - The Eon Fog"),
     PLANE_THE_GREAT_FOREST("TheGreatForestPlane", "Plane - The Great Forest"),
+    PLANE_THE_PYRAMID_OF_MARS("ThePyramidOfMarsPlane", "Plane - The Pyramid of Mars", "WHO"),
     PLANE_THE_ZEPHYR_MAZE_FOG("TheZephyrMazePlane", "Plane - The Zephyr Maze"),
     PLANE_TRUGA_JUNGLE("TrugaJunglePlane", "Plane - Truga Jungle"),
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
@@ -28,10 +29,16 @@ public enum Planes {
 
     private final String className;
     private final String fullName;
+    private final String setCode;
 
     Planes(String className, String fullName) {
+        this(className, fullName, "PCA");
+    }
+
+    Planes(String className, String fullName, String setCode) {
         this.className = className;
         this.fullName = fullName;
+        this.setCode = setCode;
     }
 
     @Override
@@ -45,6 +52,10 @@ public enum Planes {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public String getSetCode() {
+        return setCode;
     }
 
     public static Planes fromFullName(String fullName) {
