@@ -3,6 +3,7 @@ package mage.abilities;
 import mage.MageObject;
 import mage.constants.Zone;
 import mage.game.Game;
+import mage.game.command.PlanarCard;
 import mage.game.events.GameEvent;
 import mage.game.events.NumberOfTriggersEvent;
 import mage.game.permanent.Permanent;
@@ -259,6 +260,9 @@ public class TriggeredAbilities extends LinkedHashMap<String, TriggeredAbility> 
                         } else if (object instanceof Spell) {
                             // needed so that cast triggered abilities have to correct controller (e.g. Ulamog, the Infinite Gyre).
                             ability.setControllerId(((Spell) object).getControllerId());
+                        } else if (object instanceof PlanarCard) {
+                            // Planar control can change while the card remains associated with the command zone.
+                            ability.setControllerId(((PlanarCard) object).getControllerId());
                         }
                     }
                 }

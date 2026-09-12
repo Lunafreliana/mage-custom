@@ -306,7 +306,9 @@ cards remain associated with the command zone while moving between face-up play
 and their planar decks. Mark the triggered ability as a leave-source trigger so
 the queued ability remains valid after its planar source is removed from the
 face-up command objects; otherwise the event may match but the ability will not
-resolve after the planeswalk operation finishes.
+resolve after the planeswalk operation finishes. Trigger dispatch must also
+snapshot the current controller from the face-up planar object; unlike ordinary
+cards, planar control may change without a conventional card zone change.
 
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A
