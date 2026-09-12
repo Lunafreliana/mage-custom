@@ -501,6 +501,9 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
      */
     boolean planeswalkToNextPlanes(PlaneswalkContext context, int planeCount);
 
+    /** Reveals the top card of the player's applicable planar deck. */
+    boolean revealTopPlanarCard(UUID playerId, boolean mayPutOnBottom, Ability source);
+
     void addCommander(Commander commander);
 
     Dungeon addDungeon(Dungeon dungeon, UUID playerId);
