@@ -8,6 +8,8 @@ import mage.constants.CommanderCardType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
+import mage.game.command.Plane;
+import mage.game.command.PlanarDeckMode;
 import mage.watchers.common.CommanderPlaysCountWatcher;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,25 +20,42 @@ import java.util.UUID;
 
 public class TheCommandZoneTest extends CardTestCommanderDuelBase {
 
+    public TheCommandZoneTest() {
+        setDecknamePlayerA("CommanderDuel_UW.dck");
+        setDecknamePlayerB("CommanderDuel_UW.dck");
+    }
+
     @Test
     public void testPlaneswalkAbilityCanPutCommanderOntoBattlefield() {
         gameOptions.planeChase = true;
-        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_THE_COMMAND_ZONE);
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
+
+        runCode("planeswalk to The Command Zone", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> {
+                    Plane commandZone = Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE);
+                    commandZone.setPlanarDeckOwnerId(playerA.getId());
+                    game.getState().setPlayerPlanarDeck(
+                            playerA.getId(), Collections.singletonList(commandZone), false
+                    );
+                    game.getState().getFaceUpPlanarCards().forEach(card ->
+                            card.setPlanarDeckOwnerId(playerA.getId()));
+                    game.getState().setPlanarDeckMode(PlanarDeckMode.INDIVIDUAL);
+                    Assert.assertTrue(info, game.planeswalk(playerA.getId()));
+                });
 
         setChoice(playerA, true);
         setChoice(playerB, false);
 
         setStrictChooseMode(true);
-        setStopAt(1, PhaseStep.UPKEEP);
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertPermanentCount(playerA, "Ob Nixilis of the Black Oath", 1);
-        assertCommandZoneCount(playerB, "Ob Nixilis of the Black Oath", 1);
+        assertPermanentCount(playerA, "Daxos of Meletis", 1);
+        assertCommandZoneCount(playerB, "Daxos of Meletis", 1);
     }
 
     @Test
     public void testCommanderAbilityTriggersAdditionalTimeDuringYourTurn() {
-        setDecknamePlayerA("CommanderDuel_UW.dck");
         addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 1);
@@ -53,8 +72,9 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
     @Test
     public void testChaosResetsCommanderTax() {
         addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
-        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 5);
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Ob Nixilis of the Black Oath");
+        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 1);
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Daxos of Meletis");
 
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
