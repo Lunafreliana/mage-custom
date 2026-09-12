@@ -4,7 +4,6 @@ import mage.abilities.SpellAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.common.ChaosEnsuesEffect;
 import mage.constants.CardType;
-import mage.constants.ManaType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
@@ -65,11 +64,11 @@ public class SelesnyaLoftGardensTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         activateManaAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "{T}: Add {G}", 2);
+        checkManaPool("two cumulative chaos triggers", 1, PhaseStep.POSTCOMBAT_MAIN,
+                playerA, "G", 6);
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
-
-        assertManaPool(playerA, ManaType.GREEN, 6);
     }
 
     private static SpellAbility createCauseChaosAbility() {
