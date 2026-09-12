@@ -33,7 +33,7 @@ public enum Planes {
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
     PLANE_TURRI_ISLAND("TurriIslandPlane", "Plane - Turri Island"),
     PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches"),
-    PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone");
+    PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone", "PUNK"),
     PLANE_WE_HOPE_YOU_LIKE_SQUIRRELS("WeHopeYouLikeSquirrelsPlane", "Plane - We Hope You Like Squirrels");
 
     private final String className;
