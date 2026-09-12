@@ -89,7 +89,9 @@ public class GameState implements Serializable, Copyable<GameState> {
     private SpellStack stack;
     private Command command;
     private boolean isPlaneChase;
-    private PlanarDeckMode planarDeckMode = PlanarDeckMode.INDIVIDUAL;
+    // Standalone/test games historically use the communal deck until normal
+    // Planechase initialization installs the explicit match-selected mode.
+    private PlanarDeckMode planarDeckMode = PlanarDeckMode.SHARED;
     private UUID planarControllerId;
     private SharedPlanarDeck sharedPlanarDeck = new SharedPlanarDeck();
     private Map<UUID, SharedPlanarDeck> playerPlanarDecks = new HashMap<>();
@@ -222,7 +224,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         sharedPlanarDeck.clear();
         playerPlanarDecks.clear();
         isPlaneChase = false;
-        planarDeckMode = PlanarDeckMode.INDIVIDUAL;
+        planarDeckMode = PlanarDeckMode.SHARED;
         planarControllerId = null;
         revealed.clear();
         lookedAt.clear();

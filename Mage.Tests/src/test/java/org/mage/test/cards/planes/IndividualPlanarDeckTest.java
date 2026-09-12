@@ -19,7 +19,7 @@ public class IndividualPlanarDeckTest extends CardTestPlayerBase {
         addCard(Zone.LIBRARY, playerA, "Mountain", 20);
         addCard(Zone.LIBRARY, playerB, "Mountain", 20);
         gameOptions.planeChase = true;
-        gameOptions.planarDeckMode = PlanarDeckMode.INDIVIDUAL;
+        gameOptions.planarDeckMode = PlanarDeckMode.SHARED;
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
 
         runCode("install individual planar decks", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
@@ -35,17 +35,20 @@ public class IndividualPlanarDeckTest extends CardTestPlayerBase {
                     bant.setPlanarDeckOwnerId(playerB.getId());
                     pools.setPlanarDeckOwnerId(playerB.getId());
                     game.getState().setPlayerPlanarDeck(playerB.getId(), Arrays.asList(bant, pools), false);
+                    game.getState().getFaceUpPlanarCards().forEach(card ->
+                            card.setPlanarDeckOwnerId(playerA.getId()));
+                    game.getState().setPlanarDeckMode(PlanarDeckMode.INDIVIDUAL);
 
                     Assert.assertTrue(info, game.planeswalk(playerB.getId()));
                     Assert.assertEquals(info, "Plane - Bant",
                             game.getState().getFaceUpPlanes().get(0).getName());
-                    Assert.assertEquals(info, 2, game.getState().getPlayerPlanarDeck(playerA.getId()).size());
+                    Assert.assertEquals(info, 3, game.getState().getPlayerPlanarDeck(playerA.getId()).size());
                     Assert.assertEquals(info, 1, game.getState().getPlayerPlanarDeck(playerB.getId()).size());
 
                     Assert.assertTrue(info, game.planeswalk(playerA.getId()));
                     Assert.assertEquals(info, "Plane - Akoum",
                             game.getState().getFaceUpPlanes().get(0).getName());
-                    Assert.assertEquals(info, 1, game.getState().getPlayerPlanarDeck(playerA.getId()).size());
+                    Assert.assertEquals(info, 2, game.getState().getPlayerPlanarDeck(playerA.getId()).size());
                     Assert.assertEquals(info, 2, game.getState().getPlayerPlanarDeck(playerB.getId()).size());
                 });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
