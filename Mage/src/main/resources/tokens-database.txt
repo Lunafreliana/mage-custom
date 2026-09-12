@@ -173,6 +173,7 @@
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
+|PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
 |PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
 |PLANE:PCA|Plane - Feeding Grounds||FeedingGroundsPlane|
