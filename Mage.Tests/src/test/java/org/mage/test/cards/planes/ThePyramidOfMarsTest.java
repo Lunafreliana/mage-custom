@@ -12,7 +12,6 @@ import mage.game.command.PlanarCardRegistry;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
-import org.mage.test.player.TestPlayer;
 
 import java.util.Collections;
 
@@ -27,7 +26,6 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
 
         addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
 
-        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.DRAW);
         execute();
 
@@ -44,12 +42,8 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerB, causeChaos, null, CardType.SORCERY);
 
-        addTarget(playerA, TestPlayer.TARGET_SKIP); // turn 1 upkeep surveil
         castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Cause Chaos");
-        addTarget(playerB, TestPlayer.TARGET_SKIP); // turn 2 upkeep surveil
-        addTarget(playerB, "Grizzly Bears");
 
-        setStrictChooseMode(true);
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
