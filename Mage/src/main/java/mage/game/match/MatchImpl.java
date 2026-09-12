@@ -7,6 +7,11 @@ import mage.game.Game;
 import mage.game.GameException;
 import mage.game.GameInfo;
 import mage.game.command.IndividualPlanarDeckValidator;
+import mage.game.command.PlanarCard;
+import mage.game.command.PlanarCardRegistry;
+import mage.game.command.PlanarDeckMode;
+import mage.game.command.SharedPlanarDeckSource;
+import mage.game.command.SharedPlanarDeckValidator;
 import mage.game.command.SupplementalDeckRuntimeHandlers;
 import mage.game.events.Listener;
 import mage.game.events.TableEvent;
@@ -207,11 +212,28 @@ public abstract class MatchImpl implements Match {
                 .filter(matchPlayer -> !matchPlayer.hasQuit() && matchPlayer.getDeck() != null)
                 .forEach(matchPlayer -> matchPlayer.getDeck().partitionSupplementalDecks());
         boolean useIndividualPlanarDecks = options.isPlaneChase()
-                && options.getSharedPlanarCardIds().isEmpty()
-                && this.players.stream()
-                .filter(matchPlayer -> !matchPlayer.hasQuit() && matchPlayer.getDeck() != null)
-                .anyMatch(matchPlayer -> !matchPlayer.getDeck()
-                        .getSupplementalDeck(SupplementalDeckType.PLANAR).isEmpty());
+                && options.getPlanarDeckMode() == PlanarDeckMode.INDIVIDUAL;
+        boolean mergePlanarContributions = options.isPlaneChase()
+                && options.getPlanarDeckMode() == PlanarDeckMode.SHARED
+                && options.getSharedPlanarDeckSource() == SharedPlanarDeckSource.MERGED_PLAYER_CONTRIBUTIONS;
+        if (mergePlanarContributions) {
+            List<String> mergedIds = this.players.stream()
+                    .filter(matchPlayer -> !matchPlayer.hasQuit() && matchPlayer.getDeck() != null)
+                    .flatMap(matchPlayer -> matchPlayer.getDeck()
+                            .getSupplementalDeck(SupplementalDeckType.PLANAR).stream())
+                    .map(SupplementalDeckCard::getSupplementalDeckId)
+                    .collect(Collectors.toList());
+            List<String> errors = SharedPlanarDeckValidator.validate(mergedIds,
+                    (int) this.players.stream().filter(player -> !player.hasQuit()).count());
+            if (!errors.isEmpty()) {
+                throw new GameException("Invalid merged shared planar deck: " + String.join(" ", errors));
+            }
+            List<PlanarCard> mergedCards = mergedIds.stream()
+                    .map(PlanarCardRegistry::create)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            game.getState().getSharedPlanarDeck().setPlanes(mergedCards, true);
+        }
         for (MatchPlayer matchPlayer : this.players) {
             if (!matchPlayer.hasQuit() && matchPlayer.getDeck() != null) {
                 if (useIndividualPlanarDecks) {
@@ -230,7 +252,8 @@ public abstract class MatchImpl implements Match {
                 game.loadCards(matchPlayer.getDeck().getSideboard(), matchPlayer.getPlayer().getId());
                 for (SupplementalDeckType type : SupplementalDeckType.values()) {
                     List<SupplementalDeckCard> entries = matchPlayer.getDeck().getSupplementalDeck(type);
-                    if (!entries.isEmpty()) {
+                    if (!entries.isEmpty()
+                            && (type != SupplementalDeckType.PLANAR || useIndividualPlanarDecks)) {
                         SUPPLEMENTAL_HANDLERS.initialize(type, matchPlayer.getPlayer().getId(), entries, game);
                     }
                 }

@@ -22,6 +22,7 @@ import mage.game.command.Emblem;
 import mage.game.command.Plane;
 import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
+import mage.game.command.PlanarDeckMode;
 import mage.game.command.SharedPlanarDeck;
 import mage.game.events.*;
 import mage.game.permanent.Battlefield;
@@ -88,6 +89,9 @@ public class GameState implements Serializable, Copyable<GameState> {
     private SpellStack stack;
     private Command command;
     private boolean isPlaneChase;
+    // Standalone/test games historically use the communal deck until normal
+    // Planechase initialization installs the explicit match-selected mode.
+    private PlanarDeckMode planarDeckMode = PlanarDeckMode.SHARED;
     private UUID planarControllerId;
     private SharedPlanarDeck sharedPlanarDeck = new SharedPlanarDeck();
     private Map<UUID, SharedPlanarDeck> playerPlanarDecks = new HashMap<>();
@@ -163,6 +167,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.stack = state.stack.copy();
         this.command = state.command.copy();
         this.isPlaneChase = state.isPlaneChase;
+        this.planarDeckMode = state.planarDeckMode;
         this.planarControllerId = state.planarControllerId;
         this.sharedPlanarDeck = state.sharedPlanarDeck.copy();
         state.playerPlanarDecks.forEach((playerId, deck) -> playerPlanarDecks.put(playerId, deck.copy()));
@@ -219,6 +224,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         sharedPlanarDeck.clear();
         playerPlanarDecks.clear();
         isPlaneChase = false;
+        planarDeckMode = PlanarDeckMode.SHARED;
         planarControllerId = null;
         revealed.clear();
         lookedAt.clear();
@@ -257,6 +263,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.stack = state.stack;
         this.command = state.command;
         this.isPlaneChase = state.isPlaneChase;
+        this.planarDeckMode = state.planarDeckMode;
         this.planarControllerId = state.planarControllerId;
         this.sharedPlanarDeck = state.sharedPlanarDeck;
         this.playerPlanarDecks = state.playerPlanarDecks;
@@ -586,6 +593,14 @@ public class GameState implements Serializable, Copyable<GameState> {
 
     public boolean isPlaneChase() {
         return isPlaneChase;
+    }
+
+    public PlanarDeckMode getPlanarDeckMode() {
+        return planarDeckMode;
+    }
+
+    public void setPlanarDeckMode(PlanarDeckMode planarDeckMode) {
+        this.planarDeckMode = Objects.requireNonNull(planarDeckMode);
     }
 
     public UUID getPlanarControllerId() {

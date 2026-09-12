@@ -15,6 +15,8 @@ import mage.game.events.TableEvent;
 import mage.game.match.Match;
 import mage.game.match.MatchOptions;
 import mage.game.match.MatchPlayer;
+import mage.game.command.PlanarDeckMode;
+import mage.game.command.SharedPlanarDeckSource;
 import mage.game.command.SharedPlanarDeckValidator;
 import mage.game.tournament.Tournament;
 import mage.game.tournament.TournamentOptions;
@@ -669,7 +671,10 @@ public class TableController {
 
     private void startGame(UUID choosingPlayerId) throws GameException {
         try {
-            if (match.getOptions().isPlaneChase() && !match.getOptions().getSharedPlanarCardIds().isEmpty()) {
+            if (match.getOptions().isPlaneChase()
+                    && match.getOptions().getPlanarDeckMode() == PlanarDeckMode.SHARED
+                    && match.getOptions().getSharedPlanarDeckSource() == SharedPlanarDeckSource.TABLE_CONFIGURED
+                    && !match.getOptions().getSharedPlanarCardIds().isEmpty()) {
                 List<String> errors = SharedPlanarDeckValidator.validate(
                         match.getOptions().getSharedPlanarCardIds(), match.getPlayers().size());
                 if (!errors.isEmpty()) {
@@ -682,6 +687,8 @@ public class TableController {
             gameOptions.rollbackTurnsAllowed = match.getOptions().isRollbackTurnsAllowed();
             gameOptions.bannedUsers = match.getOptions().getBannedUsers();
             gameOptions.planeChase = match.getOptions().isPlaneChase();
+            gameOptions.planarDeckMode = match.getOptions().getPlanarDeckMode();
+            gameOptions.sharedPlanarDeckSource = match.getOptions().getSharedPlanarDeckSource();
             gameOptions.sharedPlanarCardIds = new ArrayList<>(match.getOptions().getSharedPlanarCardIds());
             gameOptions.perPlayerEmblemCards = match.getOptions().getPerPlayerEmblemCards();
             gameOptions.globalEmblemCards = match.getOptions().getGlobalEmblemCards();

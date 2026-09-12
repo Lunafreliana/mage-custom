@@ -7,6 +7,8 @@ import mage.constants.MultiplayerAttackOption;
 import mage.constants.RangeOfInfluence;
 import mage.constants.SkillLevel;
 import mage.game.mulligan.MulliganType;
+import mage.game.command.PlanarDeckMode;
+import mage.game.command.SharedPlanarDeckSource;
 import mage.game.result.ResultProtos;
 import mage.players.PlayerType;
 
@@ -37,6 +39,8 @@ public class MatchOptions implements Serializable {
     protected boolean rollbackTurnsAllowed;
     protected boolean spectatorsAllowed;
     protected boolean planeChase;
+    protected PlanarDeckMode planarDeckMode = PlanarDeckMode.INDIVIDUAL;
+    protected SharedPlanarDeckSource sharedPlanarDeckSource = SharedPlanarDeckSource.TABLE_CONFIGURED;
     protected List<String> sharedPlanarCardIds = new ArrayList<>();
     protected int quitRatio;
     protected int minimumRating;
@@ -212,6 +216,23 @@ public class MatchOptions implements Serializable {
 
     public void setPlaneChase(boolean planeChase) {
         this.planeChase = planeChase;
+    }
+
+    public PlanarDeckMode getPlanarDeckMode() {
+        return planarDeckMode == null ? PlanarDeckMode.INDIVIDUAL : planarDeckMode;
+    }
+
+    public void setPlanarDeckMode(PlanarDeckMode planarDeckMode) {
+        this.planarDeckMode = Objects.requireNonNull(planarDeckMode);
+    }
+
+    public SharedPlanarDeckSource getSharedPlanarDeckSource() {
+        return sharedPlanarDeckSource == null
+                ? SharedPlanarDeckSource.TABLE_CONFIGURED : sharedPlanarDeckSource;
+    }
+
+    public void setSharedPlanarDeckSource(SharedPlanarDeckSource sharedPlanarDeckSource) {
+        this.sharedPlanarDeckSource = Objects.requireNonNull(sharedPlanarDeckSource);
     }
 
     public List<String> getSharedPlanarCardIds() {

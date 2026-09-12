@@ -4,13 +4,14 @@ import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.effects.common.PlaneswalkEffect;
 import mage.constants.Zone;
 import mage.game.Game;
+import mage.game.command.PlaneswalkContext;
 import mage.game.events.GameEvent;
 
 /** Source-less inherent Planechase ability created by a planeswalker result. */
 public class PlaneswalkingTriggeredAbility extends TriggeredAbilityImpl {
 
     public PlaneswalkingTriggeredAbility() {
-        super(Zone.ALL, new PlaneswalkEffect(false));
+        super(Zone.ALL, new PlaneswalkEffect(false, PlaneswalkContext.Cause.PLANAR_DIE));
         setTriggerPhrase("Whenever you roll the planeswalker symbol on the planar die, ");
     }
 
