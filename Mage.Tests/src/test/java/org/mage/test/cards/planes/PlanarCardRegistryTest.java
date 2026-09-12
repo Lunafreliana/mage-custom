@@ -79,6 +79,9 @@ public class PlanarCardRegistryTest {
         Assert.assertEquals("PUNK", metadata.getSetCode());
         Assert.assertEquals(Planes.PLANE_THE_COMMAND_ZONE,
                 ((Plane) PlanarCardRegistry.create(metadata.getId())).getPlaneType());
+    }
+
+    @Test
     public void testRegistryIdsAreUniqueAndStableByType() {
         List<PlanarCardRegistry.Metadata> metadata = PlanarCardRegistry.getAvailableCards();
         Set<String> ids = metadata.stream().map(PlanarCardRegistry.Metadata::getId).collect(Collectors.toSet());
