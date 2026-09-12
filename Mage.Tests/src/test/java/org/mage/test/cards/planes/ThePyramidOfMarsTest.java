@@ -20,12 +20,14 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
     @Test
     public void testUpkeepSurveilsForPlanarController() {
         removeAllCardsFromLibrary(playerA);
-        addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
+        // Seven Bears are drawn for the opening hand, leaving these two cards to surveil.
+        addCard(Zone.LIBRARY, playerA, "Grizzly Bears", 8);
         addCard(Zone.LIBRARY, playerA, "Silvercoat Lion");
         usePyramidOfMarsDeck();
 
         addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
 
+        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.DRAW);
         execute();
 
