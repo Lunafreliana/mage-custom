@@ -10,7 +10,6 @@ import mage.abilities.mana.TriggeredManaAbility;
 import mage.constants.Duration;
 import mage.constants.Outcome;
 import mage.constants.Planes;
-import mage.constants.WatcherScope;
 import mage.constants.Zone;
 import mage.game.Game;
 import mage.game.command.Plane;
@@ -19,9 +18,7 @@ import mage.game.events.TappedForManaEvent;
 import mage.game.permanent.Permanent;
 import mage.target.TargetPlayer;
 import mage.target.targetpointer.FixedTarget;
-import mage.watchers.Watcher;
-
-import java.util.UUID;
+import mage.watchers.common.PlaneswalkedWatcher;
 
 /**
  * @author Codex
@@ -39,7 +36,6 @@ public class ElorenWildsPlane extends Plane {
         Ability ability = new ChaosEnsuesTriggeredAbility(
                 new AddContinuousEffectToGame(new ElorenWildsCantCastEffect()), false);
         ability.addTarget(new TargetPlayer());
-        ability.addWatcher(new ElorenWildsPlaneswalkWatcher());
         this.getAbilities().add(ability);
     }
 
@@ -114,8 +110,8 @@ class ElorenWildsCantCastEffect extends ContinuousRuleModifyingEffectImpl {
     @Override
     public void init(Ability source, Game game) {
         super.init(source, game);
-        ElorenWildsPlaneswalkWatcher watcher = game.getState().getWatcher(ElorenWildsPlaneswalkWatcher.class);
-        planeswalkCount = watcher == null ? 0 : watcher.getPlaneswalkCount();
+        PlaneswalkedWatcher watcher = game.getState().getWatcher(PlaneswalkedWatcher.class);
+        planeswalkCount = watcher == null ? 0 : watcher.getCount();
     }
 
     @Override
@@ -125,8 +121,8 @@ class ElorenWildsCantCastEffect extends ContinuousRuleModifyingEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        ElorenWildsPlaneswalkWatcher watcher = game.getState().getWatcher(ElorenWildsPlaneswalkWatcher.class);
-        if (watcher != null && watcher.getPlaneswalkCount() > planeswalkCount) {
+        PlaneswalkedWatcher watcher = game.getState().getWatcher(PlaneswalkedWatcher.class);
+        if (watcher != null && watcher.getCount() > planeswalkCount) {
             discard();
             return false;
         }
@@ -136,35 +132,5 @@ class ElorenWildsCantCastEffect extends ContinuousRuleModifyingEffectImpl {
     @Override
     public ElorenWildsCantCastEffect copy() {
         return new ElorenWildsCantCastEffect(this);
-    }
-}
-
-class ElorenWildsPlaneswalkWatcher extends Watcher {
-
-    private int planeswalkCount;
-
-    ElorenWildsPlaneswalkWatcher() {
-        super(WatcherScope.GAME);
-    }
-
-    private ElorenWildsPlaneswalkWatcher(final ElorenWildsPlaneswalkWatcher watcher) {
-        super(watcher);
-        this.planeswalkCount = watcher.planeswalkCount;
-    }
-
-    @Override
-    public void watch(GameEvent event, Game game) {
-        if (event.getType() == GameEvent.EventType.PLANESWALKED) {
-            planeswalkCount++;
-        }
-    }
-
-    int getPlaneswalkCount() {
-        return planeswalkCount;
-    }
-
-    @Override
-    public ElorenWildsPlaneswalkWatcher copy() {
-        return new ElorenWildsPlaneswalkWatcher(this);
     }
 }
