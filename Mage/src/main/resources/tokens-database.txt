@@ -187,6 +187,7 @@
 |PLANE:PCA|Plane - Selesnya Loft Gardens||SelesnyaLoftGardensPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
+|PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|

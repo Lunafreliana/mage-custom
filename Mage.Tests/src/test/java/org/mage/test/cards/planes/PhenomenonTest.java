@@ -9,6 +9,7 @@ import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
+import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.stack.StackObject;
 import org.junit.Assert;
@@ -143,6 +144,64 @@ public class PhenomenonTest extends CardTestPlayerBase {
         });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
+    }
+
+    @Test
+    public void testRealityShapingResolvesOnceForEachPlayerInTurnOrder() {
+        prepareStartedPlanechaseGame();
+        addCard(Zone.HAND, playerA, "Soul Warden");
+        addCard(Zone.HAND, playerB, "Grizzly Bears");
+
+        setChoice(playerA, true);
+        setChoice(playerB, true);
+        runCode("encounter Reality Shaping", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(info, game.addPhenomenon(new RealityShapingPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+        });
+
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertPermanentCount(playerA, "Soul Warden", 1);
+        assertPermanentCount(playerB, "Grizzly Bears", 1);
+        assertLife(playerA, 21);
+        assertHandCount(playerA, 0);
+        assertHandCount(playerB, 0);
+    }
+
+    @Test
+    public void testRealityShapingIsOptionalAndOnlyAllowsPermanentCards() {
+        prepareStartedPlanechaseGame();
+        addCard(Zone.HAND, playerA, "Lightning Bolt");
+        addCard(Zone.HAND, playerB, "Grizzly Bears");
+
+        setChoice(playerB, false);
+        runCode("encounter Reality Shaping", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(info, game.addPhenomenon(new RealityShapingPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+        });
+
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertHandCount(playerA, "Lightning Bolt", 1);
+        assertHandCount(playerB, "Grizzly Bears", 1);
+        assertPermanentCount(playerB, "Grizzly Bears", 0);
+    }
+
+    @Test
+    public void testRealityShapingRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.REALITY_SHAPING));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Reality Shaping", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Reality Shaping", metadata.getImageName());
+        Assert.assertEquals("PCA", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof RealityShapingPhenomenon);
     }
 
     private void prepareStartedPlanechaseGame() {
