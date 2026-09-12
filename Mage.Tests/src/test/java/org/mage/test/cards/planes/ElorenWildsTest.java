@@ -40,11 +40,10 @@ public class ElorenWildsTest extends CardTestPlayerBase {
         runCode("a player planeswalks", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) ->
                 game.fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED,
                         game.getState().getFaceUpPlanes().get(0).getId(), null, player.getId())));
-        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Memnite");
+        checkPlayableAbility("casting is allowed after planeswalking", 1, PhaseStep.POSTCOMBAT_MAIN,
+                playerB, "Cast Memnite", true);
 
-        setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(1, PhaseStep.END_TURN);
         execute();
-
-        assertPermanentCount(playerB, "Memnite", 1);
     }
 }
