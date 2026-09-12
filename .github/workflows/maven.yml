@@ -44,8 +44,8 @@ jobs:
           $url = "https://dlcdn.apache.org/maven/maven-3/$version/binaries/apache-maven-$version-bin.zip"
 
           Write-Host "Downloading Apache Maven $version..."
-          Invoke-WebRequest -Uri $url -OutFile $zip
-          $checksumText = (Invoke-WebRequest -Uri "$url.sha512").Content
+          Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $zip
+          $checksumText = (Invoke-WebRequest -UseBasicParsing -Uri "$url.sha512").Content
           $expected = [regex]::Match($checksumText, '[A-Fa-f0-9]{128}').Value.ToLowerInvariant()
           $actual = (Get-FileHash -Path $zip -Algorithm SHA512).Hash.ToLowerInvariant()
           if (-not $expected -or $actual -ne $expected) {
