@@ -443,6 +443,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 18. **Source/controller assumption:** source may have left or changed control before resolution.
 19. **Text-only correctness:** `setText` can make UI text look right while rules behavior remains wrong.
 20. **Insufficient tests:** happy path passes but legality, cleanup, optional decline, multiple events, or copied state fails.
+21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
 
 ## 16. Reuse-first rule (mandatory)
 

@@ -1447,7 +1447,7 @@ public abstract class GameImpl implements Game {
             } else {
                 initializeIndividualPlanarDecks();
             }
-            turnStartingPlaneFaceUp(startingPlayerId);
+            initializeStartingPlane(startingPlayerId);
             state.setPlaneChase(this, gameOptions.planeChase);
             for (Player player : getPlayers().values()) {
                 RollPlanarDieSpecialAction action = new RollPlanarDieSpecialAction();
@@ -1550,7 +1550,12 @@ public abstract class GameImpl implements Game {
         }
     }
 
-    private boolean turnStartingPlaneFaceUp(UUID startingPlayerId) {
+    /**
+     * Performs the beginning-of-game procedure from rules 103.7 and 901.5.
+     * This is deliberately separate from planeswalking: setup emits no events
+     * and beginning-of-game phenomena are bottomed without being encountered.
+     */
+    private boolean initializeStartingPlane(UUID startingPlayerId) {
         SharedPlanarDeck deck = getPlanarDeckForPlayer(startingPlayerId);
         if (deck == null) {
             return false;
@@ -1562,7 +1567,8 @@ public abstract class GameImpl implements Game {
                 return false;
             }
             if (planarCard.getPlanarCardType() == CardType.PLANE) {
-                return turnPlanarCardFaceUp(planarCard, startingPlayerId, false);
+                putPlanarCardFaceUp(planarCard);
+                return true;
             }
             // 103.7/901.5: turn setup phenomena face up, but suppress all
             // triggers, then turn them face down on the bottom.
@@ -1578,7 +1584,7 @@ public abstract class GameImpl implements Game {
         if (planarCard == null) {
             return false;
         }
-        return turnPlanarCardFaceUp(planarCard, planeswalkingPlayerId, true);
+        return turnPlanarCardFaceUp(planarCard, planeswalkingPlayerId);
     }
 
     private SharedPlanarDeck getPlanarDeckForPlayer(UUID playerId) {
@@ -1609,13 +1615,14 @@ public abstract class GameImpl implements Game {
         return true;
     }
 
-    private boolean turnPlanarCardFaceUp(PlanarCard planarCard, UUID playerId, boolean emitEvents) {
+    private void putPlanarCardFaceUp(PlanarCard planarCard) {
         planarCard.setControllerId(state.getPlanarControllerId());
         planarCard.setFaceUp(true);
         state.addCommandObject(planarCard);
-        if (!emitEvents) {
-            return true;
-        }
+    }
+
+    private boolean turnPlanarCardFaceUp(PlanarCard planarCard, UUID playerId) {
+        putPlanarCardFaceUp(planarCard);
         if (planarCard.getPlanarCardType() == CardType.PHENOMENON) {
             informPlayers(getPlayer(playerId).getLogName() + " encountered " + planarCard.getLogName());
             fireEvent(new GameEvent(GameEvent.EventType.ENCOUNTERED_PHENOMENON,

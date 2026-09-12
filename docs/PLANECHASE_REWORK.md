@@ -140,6 +140,8 @@ After all players have kept their opening hands and completed applicable opening
 
 If that card is a Phenomenon, it is put on the bottom of that same planar deck and the process repeats until a Plane is turned face up. No abilities of cards turned face up during this beginning-of-game process trigger. The resulting Plane becomes the starting Plane.
 
+The engine models this with a dedicated starting-plane initialization operation after opening-hand actions. It uses the planar deck's ordinary draw/bottom bookkeeping, but does not enter the normal planeswalk operation or emit planeswalk/encounter events.
+
 There is no separate `initialPlanarDeckChooserId` in the rules-default mode.
 
 ### 3.3 Who supplies the next planar card when a player planeswalks
