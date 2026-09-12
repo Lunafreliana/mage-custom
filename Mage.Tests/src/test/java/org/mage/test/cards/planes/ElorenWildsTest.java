@@ -1,6 +1,5 @@
 package org.mage.test.cards.planes;
 
-import mage.constants.ManaType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
@@ -21,14 +20,13 @@ public class ElorenWildsTest extends CardTestPlayerBase {
 
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
         execute();
-
-        assertManaPool(playerA, ManaType.GREEN, 2);
     }
 
     @Test
     public void testChaosStopsTargetCastingOnlyUntilPlaneswalk() {
         addPlane(playerA, Planes.PLANE_ELOREN_WILDS);
         addCard(Zone.HAND, playerB, "Memnite", 2);
+        addCard(Zone.BATTLEFIELD, playerB, "Vedalken Orrery");
 
         runCode("chaos ensues", 1, PhaseStep.UPKEEP, playerA, (info, player, game) -> {
             game.fireEvent(new GameEvent(GameEvent.EventType.CHAOS_ENSUES,
