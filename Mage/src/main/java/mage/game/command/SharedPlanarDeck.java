@@ -58,6 +58,12 @@ public final class SharedPlanarDeck implements Serializable, Copyable<SharedPlan
         cards.addLast(card);
     }
 
+    public void putOnTop(PlanarCard card) {
+        card.setPlanarDeckId(id);
+        card.setFaceUp(false);
+        cards.addFirst(card);
+    }
+
     public UUID getId() {
         return id;
     }
