@@ -33,20 +33,19 @@ public class BadWolfBayTest extends CardTestPlayerBase {
     @Test
     public void chaosStopsCardsReturningFromExileThatTurn() {
         addPlane(playerA, Planes.PLANE_BAD_WOLF_BAY);
-        addCard(Zone.BATTLEFIELD, playerA, "Aetherling");
-        addCard(Zone.BATTLEFIELD, playerA, "Island");
+        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{U}: exile {this}");
+        addTarget(playerA, "Grizzly Bears");
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
 
         setStopAt(2, PhaseStep.UPKEEP);
         execute();
 
-        assertExileCount(playerA, "Aetherling", 1);
-        assertPermanentCount(playerA, "Aetherling", 0);
+        assertExileCount(playerA, "Grizzly Bears", 1);
+        assertPermanentCount(playerA, "Grizzly Bears", 0);
     }
 
     @Test
