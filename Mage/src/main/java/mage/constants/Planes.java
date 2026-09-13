@@ -30,6 +30,7 @@ public enum Planes {
     PLANE_INYS_HAEN("InysHaenPlane", "Plane - Inys Haen", "MOC"),
     PLANE_LAKE_SILENCIO("LakeSilencioPlane", "Plane - Lake Silencio", "WHO"),
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
+    PLANE_LLANOWAR("LlanowarPlane", "Plane - Llanowar"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
     PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
     PLANE_OOD_SPHERE("OodSpherePlane", "Plane - Ood Sphere", "WHO"),
