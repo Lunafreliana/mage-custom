@@ -84,7 +84,6 @@ public class TheAetherFluesTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Hill Giant");
         addChaosSpell();
 
-        setChoice(playerA, false); // Do not sacrifice during upkeep.
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         setChoice(playerA, true);
         setChoice(playerA, "Hill Giant");
