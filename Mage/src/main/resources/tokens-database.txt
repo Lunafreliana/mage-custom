@@ -191,6 +191,7 @@
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
+|PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Pyramid of Mars||ThePyramidOfMarsPlane|
 |PLANE:MOC|Plane - Towashi||TowashiPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
