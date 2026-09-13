@@ -186,6 +186,7 @@
 |PLANE:PCA|Plane - Feeding Grounds||FeedingGroundsPlane|
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
+|PLANE:WHO|Plane - Gardens of Tranquil Repose||GardensOfTranquilReposePlane|
 |PLANE:PCA|Plane - Grixis||GrixisPlane|
 |PLANE:PCA|Plane - Goldmeadow||GoldmeadowPlane|
 |PLANE:PCA|Plane - Grand Ossuary||GrandOssuaryPlane|
