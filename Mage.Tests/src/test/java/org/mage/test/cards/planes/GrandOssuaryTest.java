@@ -29,7 +29,7 @@ public class GrandOssuaryTest extends CardTestPlayerBase {
         execute();
 
         assertGraveyardCount(playerB, "Hill Giant", 1);
-        assertPowerToughness(playerB, "Silvercoat Lion", 5, 4);
+        assertPowerToughness(playerB, "Silvercoat Lion", 5, 5);
     }
 
     @Test
