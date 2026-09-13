@@ -55,6 +55,7 @@ public enum MageObjectType {
     COMMANDER("Commander", false, false, true),
     DESIGNATION("Designation", false, false, true),
     PLANE("Plane", false, false, true),
+    PHENOMENON("Phenomenon", false, false, true),
     NULL("NullObject", false, false, false);
 
     private final String text;
