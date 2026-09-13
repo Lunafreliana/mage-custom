@@ -20,6 +20,7 @@ public class AretopolisTest extends CardTestPlayerBase {
     @Test
     public void planeswalkUpkeepAndChaosUseCurrentScrollCount() {
         addPlane(playerA, Planes.PLANE_ARETOPOLIS);
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.LIBRARY, playerA, "Forest", 10);
         skipInitShuffling();
 
@@ -40,7 +41,8 @@ public class AretopolisTest extends CardTestPlayerBase {
 
         // Arrival gains 1, upkeep gains 2, and chaos draws 3.
         assertLife(playerA, 23);
-        assertHandCount(playerA, "Forest", 4); // One turn draw plus three cards from chaos.
+        // The starting player skips their first draw step, so all three Forests were drawn by chaos.
+        assertHandCount(playerA, "Forest", 3);
     }
 
     @Test
