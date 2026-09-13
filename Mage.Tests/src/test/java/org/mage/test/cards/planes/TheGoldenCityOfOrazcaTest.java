@@ -59,7 +59,7 @@ public class TheGoldenCityOfOrazcaTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         setChoice(playerA, true);
-        addTarget(playerA, "Grizzly Bears");
+        setChoice(playerA, "Grizzly Bears");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
