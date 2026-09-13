@@ -74,12 +74,14 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
 
         attack(1, playerA, "Grizzly Bears");
         setChoice(playerA, "Lightning Bolt");
-        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
+        // Wait until the next turn so the second-main-phase trigger has resolved
+        // and the manifested card exists before choosing the chaos ability's target.
+        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, EmptyNames.FACE_DOWN_CREATURE.getTestCommand());
         addTarget(playerA, playerB);
 
         setStrictChooseMode(true);
-        setStopAt(1, PhaseStep.END_TURN);
+        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
         assertLife(playerB, 17);
