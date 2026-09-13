@@ -2279,7 +2279,7 @@ public abstract class GameImpl implements Game {
         if (!canPlaneswalk(playerId)) {
             return false;
         }
-        bottomFaceUpPlanarCards();
+        bottomFaceUpPlanarCards(playerId);
         return turnTopPlanarCardFaceUp(playerId);
     }
 
@@ -2363,7 +2363,7 @@ public abstract class GameImpl implements Game {
         if (!canPlaneswalk(playerId) || destinationCards.isEmpty()) {
             return false;
         }
-        bottomFaceUpPlanarCards();
+        bottomFaceUpPlanarCards(playerId);
         // All destinations must be face up before any planeswalk event is
         // emitted: Spatial Merging planeswalks to its two Planes simultaneously.
         for (PlanarCard destination : destinationCards) {
@@ -2389,8 +2389,10 @@ public abstract class GameImpl implements Game {
         return true;
     }
 
-    private void bottomFaceUpPlanarCards() {
+    private void bottomFaceUpPlanarCards(UUID planeswalkingPlayerId) {
         for (PlanarCard plane : new ArrayList<>(state.getFaceUpPlanarCards())) {
+            fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                    plane.getId(), (Ability) null, planeswalkingPlayerId, 0, true));
             state.removeTriggersOfSourceId(plane.getId());
             state.getCommand().remove(plane);
             SharedPlanarDeck ownerDeck = state.getPlanarDeckMode() == PlanarDeckMode.SHARED

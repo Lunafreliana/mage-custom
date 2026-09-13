@@ -238,6 +238,11 @@ In individual mode it must:
 9. allow normal trigger/APNAP processing;
 10. continue through normal priority and state-based actions.
 
+The lifecycle events include one departure event for each planar object being
+walked away from. Emit it while that face-up object's abilities are still
+registered, then unregister and bottom the object. This preserves “planeswalk
+away from” triggers and also handles variants with multiple face-up Planes.
+
 For shared mode, the same operation resolves the applicable deck through shared-mode context instead of the player's individual deck.
 
 A conceptual context object may be useful:
