@@ -174,6 +174,7 @@
 |PLANE:WHO|Plane - Antarctic Research Base||AntarcticResearchBasePlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:WHO|Plane - Bad Wolf Bay||BadWolfBayPlane|
+|PLANE:WHO|Plane - Coal Hill School||CoalHillSchoolPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
 |PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
