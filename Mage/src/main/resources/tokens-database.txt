@@ -181,6 +181,7 @@
 |PLANE:PCA|Plane - Feeding Grounds||FeedingGroundsPlane|
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
+|PLANE:PCA|Plane - Goldmeadow||GoldmeadowPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
 |PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
 |PLANE:MOC|Plane - Kharasha Foothills||KharashaFoothillsPlane|
