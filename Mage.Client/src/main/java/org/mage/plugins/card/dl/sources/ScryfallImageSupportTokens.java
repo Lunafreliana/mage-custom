@@ -408,6 +408,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Academy at Tolaria West", "https://api.scryfall.com/cards/opca/9/en?format=image");
             put("PCA/Plane - Agyrem", "https://api.scryfall.com/cards/opca/11/en?format=image");
             put("PCA/Plane - Akoum", "https://api.scryfall.com/cards/opca/12/en?format=image");
+            put("WHO/Plane - Amy's Home", "https://api.scryfall.com/cards/who/566/en?format=image");
             put("PCA/Plane - Astral Arena", "https://api.scryfall.com/cards/opca/14/en?format=image");
             put("PCA/Plane - Bant", "https://api.scryfall.com/cards/opca/15/en?format=image");
             put("PCA/Plane - Eloren Wilds", "https://api.scryfall.com/cards/opca/21/en?format=image");
@@ -415,6 +416,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Feeding Grounds", "https://api.scryfall.com/cards/opca/23/en?format=image");
             put("PCA/Plane - Fields of Summer", "https://api.scryfall.com/cards/opca/24/en?format=image");
             put("PCA/Plane - Gavony", "https://api.scryfall.com/cards/opca/27/en?format=image");
+            put("PCA/Plane - Grixis", "https://api.scryfall.com/cards/opca/33/en?format=image");
             put("PCA/Plane - Stairs to Infinity", "https://api.scryfall.com/cards/opca/73/en?format=image");
             put("WHO/Plane - The Pyramid of Mars", "https://api.scryfall.com/cards/who/597/en?format=image");
             put("PCA/Plane - Hedron Fields of Agadeem", "https://api.scryfall.com/cards/opca/35/en?format=image");
@@ -424,6 +426,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Nephalia", "https://api.scryfall.com/cards/opca/56/en?format=image");
             put("PCA/Plane - Panopticon", "https://api.scryfall.com/cards/opca/62/en?format=image");
             put("PCA/Plane - Selesnya Loft Gardens", "https://api.scryfall.com/cards/opca/69/en?format=image");
+            put("PCA/Plane - Takenuma", "https://api.scryfall.com/cards/opca/76/en?format=image");
             put("PCA/Plane - Tazeem", "https://api.scryfall.com/cards/opca/78/en?format=image");
             put("PCA/Plane - The Dark Barony", "https://api.scryfall.com/cards/opca/19/en?format=image");
             put("PCA/Plane - The Eon Fog", "https://api.scryfall.com/cards/opca/22/en?format=image");
