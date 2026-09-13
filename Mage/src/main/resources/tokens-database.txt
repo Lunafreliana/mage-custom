@@ -215,6 +215,7 @@
 |PLANE:WHO|Plane - The Pyramid of Mars||ThePyramidOfMarsPlane|
 |PLANE:MOC|Plane - Towashi||TowashiPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
+|PLANE:MOC|Plane - The Aether Flues||TheAetherFluesPlane|
 |PLANE:PCA|Plane - The Eon Fog||TheEonFogPlane|
 |PLANE:PCA|Plane - The Great Forest||TheGreatForestPlane|
 |PLANE:PCA|Plane - The Maelstrom||TheMaelstromPlane|

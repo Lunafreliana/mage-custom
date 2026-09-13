@@ -47,6 +47,7 @@ public enum Planes {
     PLANE_THE_PYRAMID_OF_MARS("ThePyramidOfMarsPlane", "Plane - The Pyramid of Mars", "WHO"),
     PLANE_TOWASHI("TowashiPlane", "Plane - Towashi", "MOC"),
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
+    PLANE_THE_AETHER_FLUES("TheAetherFluesPlane", "Plane - The Aether Flues", "MOC"),
     PLANE_THE_EON_FOG("TheEonFogPlane", "Plane - The Eon Fog"),
     PLANE_THE_GREAT_FOREST("TheGreatForestPlane", "Plane - The Great Forest"),
     PLANE_THE_MAELSTROM("TheMaelstromPlane", "Plane - The Maelstrom"),
