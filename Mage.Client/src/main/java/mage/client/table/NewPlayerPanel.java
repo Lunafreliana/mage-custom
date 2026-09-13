@@ -2,6 +2,7 @@ package mage.client.table;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 import javax.swing.*;
 
 import mage.cards.decks.DeckFileFilter;
@@ -38,17 +39,29 @@ public class NewPlayerPanel extends javax.swing.JPanel {
             fcSelectDeck.setCurrentDirectory(new File(lastFolder));
         }
         int ret = fcSelectDeck.showDialog(this, "Select Deck");
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            File file = fcSelectDeck.getSelectedFile();
-            if (file != null) {
-                this.txtPlayerDeck.setText(file.getPath());
-            }
-            try {
-                MageFrame.getPreferences().put("lastDeckFolder", file.getCanonicalPath());
-            } catch (IOException ex) {
-            }
+        try {
+            processDeckSelection(
+                    ret,
+                    fcSelectDeck.getSelectedFile(),
+                    this.txtPlayerDeck::setText,
+                    path -> MageFrame.getPreferences().put("lastDeckFolder", path)
+            );
+        } catch (IOException ex) {
         }
         fcSelectDeck.setSelectedFile(null);
+    }
+
+    static void processDeckSelection(int result, File file, Consumer<String> deckPathConsumer,
+                                     Consumer<String> directoryPathConsumer) throws IOException {
+        if (result != JFileChooser.APPROVE_OPTION || file == null) {
+            return;
+        }
+
+        deckPathConsumer.accept(file.getPath());
+        File directory = file.getParentFile();
+        if (directory != null) {
+            directoryPathConsumer.accept(directory.getCanonicalPath());
+        }
     }
 
     protected void generateDeck() {

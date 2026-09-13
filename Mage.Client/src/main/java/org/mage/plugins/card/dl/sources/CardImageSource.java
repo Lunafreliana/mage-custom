@@ -70,6 +70,10 @@ public interface CardImageSource {
 
     boolean isCardImageProvided(String setCode, String cardName);
 
+    default boolean isExactNameLookupSupported() {
+        return false;
+    }
+
     default boolean isTokenImageProvided(String setCode, String cardName, Integer tokenNumber) {
         return false;
     }

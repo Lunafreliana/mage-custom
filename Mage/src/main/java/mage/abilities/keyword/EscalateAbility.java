@@ -15,6 +15,8 @@ import mage.constants.Zone;
 import mage.game.Game;
 import mage.util.CardUtil;
 
+import java.util.Objects;
+
 /**
  * @author emerald000
  */
@@ -60,10 +62,9 @@ class EscalateEffect extends CostModificationEffectImpl {
 
     @Override
     public boolean applies(Ability abilityToModify, Ability source, Game game) {
-        if (abilityToModify.getSourceId().equals(source.getSourceId()) && (abilityToModify instanceof SpellAbility)) {
-            return abilityToModify.getModes().getSelectedModes().size() > 1;
-        }
-        return false;
+        return abilityToModify instanceof SpellAbility
+                && Objects.equals(abilityToModify.getSourceId(), source.getSourceId())
+                && abilityToModify.getModes().getSelectedModes().size() > 1;
     }
 
     @Override
