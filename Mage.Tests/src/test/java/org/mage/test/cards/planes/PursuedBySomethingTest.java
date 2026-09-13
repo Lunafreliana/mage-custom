@@ -24,7 +24,7 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
         addCard(Zone.LIBRARY, playerA, "Forest");
 
         attack(1, playerA, "Grizzly Bears");
-        addTarget(playerA, "Lightning Bolt");
+        setChoice(playerA, "Lightning Bolt");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.END_TURN);
@@ -73,7 +73,7 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
         addChaosSpell();
 
         attack(1, playerA, "Grizzly Bears");
-        addTarget(playerA, "Lightning Bolt");
+        setChoice(playerA, "Lightning Bolt");
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, EmptyNames.FACE_DOWN_CREATURE.getTestCommand());
         addTarget(playerA, playerB);

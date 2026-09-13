@@ -419,6 +419,12 @@ whereas `setChoice` is used only for the separate ordering prompt when two or
 more cards remain on top. A mismatched command may be consumed by the following
 prompt and produce a misleading invalid-choice failure.
 
+Manifest dread likewise selects from a private temporary card collection with
+`Player.choose`, so tests must queue the card to manifest with `setChoice`, even
+though the engine represents that selection with `TargetCardInLibrary`. Using
+`addTarget` leaves the target command unconsumed and can corrupt the commands
+queued for the following ability.
+
 Rules-provided special actions are stored separately from ordinary playable
 abilities. A test for one must enable the game option or state that installs the
 special action instead of adding an old card-local compatibility ability. The
