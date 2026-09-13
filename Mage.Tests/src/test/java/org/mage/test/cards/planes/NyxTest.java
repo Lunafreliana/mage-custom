@@ -1,13 +1,11 @@
 package org.mage.test.cards.planes;
 
-import mage.abilities.SpellAbility;
-import mage.abilities.costs.mana.ManaCostsImpl;
-import mage.abilities.effects.common.ChaosEnsuesEffect;
 import mage.constants.CardType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.events.GameEvent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -48,14 +46,23 @@ public class NyxTest extends CardTestPlayerBase {
     public void chaosAddsManaEqualToChosenColorDevotion() {
         addPlane(playerA, Planes.PLANE_NYX);
         addCard(Zone.BATTLEFIELD, playerA, "Leatherback Baloth");
-        addCustomCardWithSpell(playerA, createCauseChaosAbility(), null, CardType.SORCERY);
 
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
+        runCode("resolve Nyx chaos trigger", 1, PhaseStep.PRECOMBAT_MAIN,
+                playerA, (info, player, game) -> {
+                    game.fireEvent(new GameEvent(
+                            GameEvent.EventType.CHAOS_ENSUES,
+                            game.getState().getFaceUpPlanes().get(0).getId(),
+                            null,
+                            player.getId()
+                    ));
+                    game.checkStateAndTriggered();
+                    game.getStack().resolve(game);
+                    Assert.assertEquals(info, 3, player.getManaPool().getGreen());
+                });
         setChoice(playerA, "Green");
-        checkManaPool("mana from green devotion", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "G", 3);
 
         setStrictChooseMode(true);
-        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
         execute();
     }
 
@@ -70,11 +77,5 @@ public class NyxTest extends CardTestPlayerBase {
         Assert.assertEquals("Plane - Nyx", metadata.getImageName());
         Assert.assertEquals("MOC", metadata.getSetCode());
         Assert.assertNotNull(PlanarCardRegistry.create(metadata.getId()));
-    }
-
-    private static SpellAbility createCauseChaosAbility() {
-        SpellAbility ability = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
-        ability.addEffect(new ChaosEnsuesEffect());
-        return ability;
     }
 }
