@@ -4,7 +4,6 @@ import mage.abilities.SpellAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.common.ChaosEnsuesEffect;
 import mage.constants.CardType;
-import mage.constants.CommanderCardType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
@@ -15,6 +14,8 @@ import org.junit.Test;
 import org.mage.test.serverside.base.CardTestCommanderDuelBase;
 
 import java.util.UUID;
+
+import static mage.constants.CommanderCardType.ANY;
 
 public class TheCommandZoneTest extends CardTestCommanderDuelBase {
 
@@ -48,7 +49,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Balduvian Bears");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN, playerA);
         runCode("commander was cast once", 1, PhaseStep.BEGIN_COMBAT, playerA, (info, player, game) -> {
-            UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
+            UUID commanderId = game.getCommandersIds(player, ANY, false)
                     .stream()
                     .filter(id -> game.getCard(id) != null
                             && game.getCard(id).getName().equals("Balduvian Bears"))
@@ -62,7 +63,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
         waitStackResolved(1, PhaseStep.POSTCOMBAT_MAIN);
         runCode("commander tax reset", 1, PhaseStep.END_TURN, playerA, (info, player, game) -> {
-            UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
+            UUID commanderId = game.getCommandersIds(player, ANY, false)
                     .stream()
                     .filter(id -> game.getCard(id) != null
                             && game.getCard(id).getName().equals("Balduvian Bears"))
