@@ -4,10 +4,13 @@ import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
+import mage.abilities.common.delayed.AtTheBeginOfNextEndStepDelayedTriggeredAbility;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.CreateTokenCopyTargetEffect;
+import mage.abilities.effects.common.ExileTargetEffect;
 import mage.constants.Outcome;
 import mage.constants.Planes;
+import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.filter.StaticFilters;
 import mage.game.Game;
@@ -17,7 +20,10 @@ import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.TargetPermanent;
 import mage.target.common.TargetSacrifice;
+import mage.target.targetpointer.FixedTargets;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -112,6 +118,7 @@ class KharashaFoothillsTokenEffect extends OneShotEffect {
             return false;
         }
 
+        List<Permanent> tokens = new ArrayList<>();
         for (UUID playerId : game.getState().getPlayersInRange(controller.getId(), game)) {
             Player opponent = game.getPlayer(playerId);
             if (playerId.equals(defendingPlayerId) || opponent == null
@@ -125,8 +132,16 @@ class KharashaFoothillsTokenEffect extends OneShotEffect {
             );
             effect.setSavedPermanent(attacker);
             if (effect.apply(game, source)) {
-                effect.exileTokensCreatedAtNextEndStep(game, source);
+                tokens.addAll(effect.getAddedTokenPermanents());
             }
+        }
+        if (!tokens.isEmpty()) {
+            ExileTargetEffect exileEffect = new ExileTargetEffect(null, "", Zone.BATTLEFIELD);
+            exileEffect.setText("exile those tokens");
+            exileEffect.setTargetPointer(new FixedTargets(tokens, game));
+            game.addDelayedTriggeredAbility(new AtTheBeginOfNextEndStepDelayedTriggeredAbility(
+                    exileEffect, TargetController.ANY
+            ), source);
         }
         return true;
     }

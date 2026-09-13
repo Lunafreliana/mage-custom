@@ -75,7 +75,7 @@ public class KharashaFoothillsTest extends CardTestCommander4Players {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Hill Giant");
         setChoice(playerA, true);
-        addTarget(playerA, "Grizzly Bears^Silvercoat Lion");
+        setChoice(playerA, "Grizzly Bears^Silvercoat Lion");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
