@@ -249,6 +249,21 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     }
 
     @Test
+    public void test_PlanarDieWithSpellCostIncreaseInHand() {
+        useHedronFieldsPlanechase();
+        addCard(Zone.HAND, playerA, "Vanish into Eternity");
+
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
+        setDieRollResult(playerA, 3);
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.END_TURN);
+        execute();
+
+        assertHandCount(playerA, "Vanish into Eternity", 1);
+    }
+
+    @Test
     public void test_PlanarDieWithForEachSpellCostReductionInHand() {
         useHedronFieldsPlanechase();
         addCard(Zone.HAND, playerA, "Avatar of Growth");
