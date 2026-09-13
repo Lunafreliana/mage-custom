@@ -306,6 +306,13 @@ runtime object from restoring its printed effects when it becomes active again.
 Deactivate or remove the registered runtime copies, and preserve the printed
 ability graph.
 
+Keyword abilities are not necessarily battlefield-only. If a Plane or another
+command-zone object has a keyword whose reusable implementation defaults to
+`Zone.BATTLEFIELD`, add or use a zone-aware constructor on that shared keyword
+implementation rather than duplicating the keyword in the command object. Keep
+the battlefield constructor as the default for ordinary cards, and test that the
+keyword follows the current command-zone controller.
+
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A
 battlefield ability that has not yet triggered can still have
@@ -497,6 +504,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
 22. **Command-zone source tested only at resolution:** a command-zone object's ability may resolve correctly while client view construction fails with that ability pending. For every new command-zone ability source type, construct player and spectator `GameView`s (including the copied-game server path) while its ability is on the stack, and verify source identity, rules, type, and image lookup metadata before testing resolution.
 23. **Historical counter reset implemented outside its watcher:** when card text resets a game-history value (for example, commander casts used for commander tax), expose and call a semantic reset operation on the authoritative watcher. Do not replace the watcher or mutate only one derived counter; all indexes and aggregates maintained by that watcher must remain consistent.
+24. **Tap prevention loses the combat exception:** effects that say a permanent cannot become tapped except while being declared as an attacker must inspect the prospective `TAP` event's combat flag. Preserve the `forCombat` context when creating the replacement event in `Permanent.tap`; checking only the current phase cannot distinguish an attack declaration from another effect that taps a permanent during that step.
 
 ## 16. Reuse-first rule (mandatory)
 
