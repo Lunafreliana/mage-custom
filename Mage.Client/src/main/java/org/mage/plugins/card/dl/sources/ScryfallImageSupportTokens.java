@@ -416,6 +416,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Fields of Summer", "https://api.scryfall.com/cards/opca/24/en?format=image");
             put("PCA/Plane - Gavony", "https://api.scryfall.com/cards/opca/27/en?format=image");
             put("PCA/Plane - Stairs to Infinity", "https://api.scryfall.com/cards/opca/73/en?format=image");
+            put("WHO/Plane - The Pyramid of Mars", "https://api.scryfall.com/cards/who/597/en?format=image");
             put("PCA/Plane - Hedron Fields of Agadeem", "https://api.scryfall.com/cards/opca/35/en?format=image");
             put("PCA/Plane - Lethe Lake", "https://api.scryfall.com/cards/opca/47/en?format=image");
             put("PCA/Plane - Naya", "https://api.scryfall.com/cards/opca/55/en?format=image");

@@ -404,6 +404,14 @@ assertGraveyardCount(playerB, "Grizzly Bears", 1);
 
 The framework's actual overloads allow turn/step scheduling and choices. The base normally supplies `playerA` and `playerB` (special multiplayer bases configure more players); `addPlayer` is not the ordinary card-test setup call in this checkout. Common tools include `addCard(zone, player, name, count)`, `castSpell`, `activateAbility`, `setChoice`, `setModeChoice`, `setTarget`, `passPhase`, `setStopAt`, and `execute`. Assertions include `assertPermanentCount`, `assertLife`, `assertGraveyardCount`, `assertHandCount`, `assertLibraryCount`, `assertExileCount`, `assertTapped`, `assertPowerToughness`, `assertCounterCount`, `assertAbility`, and `assertPlayerHasAbility`.
 
+Match queued test commands to the prompt API used by the implementation, not
+merely to the English word "choose." In particular, surveil's selection of
+cards to put into the graveyard is a target-selection prompt and must be queued
+with `addTarget` (use `TestPlayer.TARGET_SKIP` to keep all inspected cards),
+whereas `setChoice` is used only for the separate ordering prompt when two or
+more cards remain on top. A mismatched command may be consumed by the following
+prompt and produce a misleading invalid-choice failure.
+
 Rules-provided special actions are stored separately from ordinary playable
 abilities. A test for one must enable the game option or state that installs the
 special action instead of adding an old card-local compatibility ability. The
