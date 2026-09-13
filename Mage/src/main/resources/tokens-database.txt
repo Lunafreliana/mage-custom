@@ -187,6 +187,7 @@
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
 |PLANE:PCA|Plane - Grixis||GrixisPlane|
 |PLANE:PCA|Plane - Goldmeadow||GoldmeadowPlane|
+|PLANE:PCA|Plane - Grand Ossuary||GrandOssuaryPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
 |PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
 |PLANE:PCA|Plane - Immersturm||ImmersturmPlane|
