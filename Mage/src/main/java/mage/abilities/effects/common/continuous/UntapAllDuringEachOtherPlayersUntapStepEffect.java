@@ -14,16 +14,23 @@ import mage.game.permanent.Permanent;
 public class UntapAllDuringEachOtherPlayersUntapStepEffect extends ContinuousEffectImpl {
 
     private final FilterPermanent filter;
+    private final boolean eachPlayersUntapStep;
 
     public UntapAllDuringEachOtherPlayersUntapStepEffect(FilterPermanent filter) {
+        this(filter, false);
+    }
+
+    public UntapAllDuringEachOtherPlayersUntapStepEffect(FilterPermanent filter, boolean eachPlayersUntapStep) {
         super(Duration.WhileOnBattlefield, Outcome.Untap);
         this.filter = filter;
+        this.eachPlayersUntapStep = eachPlayersUntapStep;
         staticText = setStaticText();
     }
 
     protected UntapAllDuringEachOtherPlayersUntapStepEffect(final UntapAllDuringEachOtherPlayersUntapStepEffect effect) {
         super(effect);
         this.filter = effect.filter;
+        this.eachPlayersUntapStep = effect.eachPlayersUntapStep;
     }
 
     @Override
@@ -33,14 +40,17 @@ public class UntapAllDuringEachOtherPlayersUntapStepEffect extends ContinuousEff
 
     @Override
     public boolean apply(Layer layer, SubLayer sublayer, Ability source, Game game) {
-        if (layer == Layer.RulesEffects && game.getTurnStepType() == PhaseStep.UNTAP && !source.isControlledBy(game.getActivePlayerId())) {
+        if (layer == Layer.RulesEffects
+                && game.getTurnStepType() == PhaseStep.UNTAP
+                && (eachPlayersUntapStep || !source.isControlledBy(game.getActivePlayerId()))) {
             Integer appliedTurn = (Integer) game.getState().getValue(source.getSourceId() + "appliedTurn");
             if (appliedTurn == null) {
                 appliedTurn = 0;
             }
             if (appliedTurn < game.getTurnNum()) {
                 game.getState().setValue(source.getSourceId() + "appliedTurn", game.getTurnNum());
-                for (Permanent permanent : game.getBattlefield().getAllActivePermanents(filter, source.getControllerId(), game)) {
+                for (Permanent permanent : game.getBattlefield().getActivePermanents(
+                        filter, source.getControllerId(), source, game)) {
                     boolean untap = true;
                     for (RestrictionEffect effect : game.getContinuousEffects().getApplicableRestrictionEffects(permanent, game).keySet()) {
                         untap &= effect.canBeUntapped(permanent, source, game, true);
@@ -70,7 +80,9 @@ public class UntapAllDuringEachOtherPlayersUntapStepEffect extends ContinuousEff
             sb.append("all ");
         }
         sb.append(filter.getMessage());
-        sb.append(" during each other player's untap step");
+        sb.append(eachPlayersUntapStep
+                ? " during each player's untap step"
+                : " during each other player's untap step");
         return sb.toString();
     }
 }
