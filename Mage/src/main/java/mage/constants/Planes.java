@@ -9,6 +9,7 @@ public enum Planes {
     PLANE_AKOUM("AkoumPlane", "Plane - Akoum"),
     PLANE_ANTARCTIC_RESEARCH_BASE("AntarcticResearchBasePlane", "Plane - Antarctic Research Base", "WHO"),
     PLANE_ASTRAL_ARENA("AstralArenaPlane", "Plane - Astral Arena"),
+    PLANE_BAD_WOLF_BAY("BadWolfBayPlane", "Plane - Bad Wolf Bay", "WHO"),
     PLANE_BANT("BantPlane", "Plane - Bant"),
     PLANE_BESIEGED_VIKING_VILLAGE("BesiegedVikingVillagePlane", "Plane - Besieged Viking Village", "WHO"),
     PLANE_ELOREN_WILDS("ElorenWildsPlane", "Plane - Eloren Wilds"),
