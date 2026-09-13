@@ -89,7 +89,7 @@ class GardensOfTranquilReposeDiesEffect extends OneShotEffect {
 class GardensOfTranquilReposeChaosEffect extends OneShotEffect {
 
     GardensOfTranquilReposeChaosEffect() {
-        super(Outcome.CreateToken);
+        super(Outcome.PutCreatureInPlay);
         staticText = "create X 3/3 black Dalek artifact creature tokens with menace, where X is one plus "
                 + "the number of cards exiled with {this}";
     }
