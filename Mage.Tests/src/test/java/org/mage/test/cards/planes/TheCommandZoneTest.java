@@ -56,9 +56,12 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         setChoice(playerA, false); // Don't gain life from Fields of Summer
 
         runCode("planeswalk to The Command Zone", 1, PhaseStep.POSTCOMBAT_MAIN, playerA,
-                (info, player, game) -> Assert.assertTrue(info, game.addPlane(
-                        Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
-                )));
+                (info, player, game) -> {
+                    Assert.assertEquals(info + " (hand before planeswalking)", 0, player.getHand().size());
+                    Assert.assertTrue(info, game.addPlane(
+                            Plane.createPlane(Planes.PLANE_THE_COMMAND_ZONE), playerA.getId()
+                    ));
+                });
         setChoice(playerB, false);
 
         setStrictChooseMode(true);
