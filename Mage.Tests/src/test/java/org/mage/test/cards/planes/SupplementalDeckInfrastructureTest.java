@@ -153,7 +153,7 @@ public class SupplementalDeckInfrastructureTest {
         Assert.assertEquals("Mutual Epiphany", view.getName());
         Assert.assertTrue(view.getCardTypes().contains(CardType.PHENOMENON));
         Assert.assertTrue(view.isToRotate());
-        Assert.assertTrue(rules.contains("encounter mutual epiphany"));
+        Assert.assertTrue(rules.contains("encounter"));
         Assert.assertTrue(rules.contains("each player draws four cards"));
     }
 

@@ -635,8 +635,9 @@ Deck group without Planechase-specific Commander or sideboard parsing.
 Deck-building and browser surfaces represent registry entries with
 `PlanarDeckCard`, a non-castable supplemental carrier rather than a token or a
 runtime `PlanarCard`. The carrier retains the registry identity, Plane or
-Phenomenon type, and copies the rules-bearing abilities from the registry's
-runtime object into the ordinary `Card`/`CardView` path. Runtime command-zone
+Phenomenon type, and snapshots display rules from the registry's runtime object
+into the ordinary `Card`/`CardView` path. It deliberately does not copy
+executable abilities into this non-playable carrier. Runtime command-zone
 Planes and Phenomena continue to use their dedicated views and token-repository
 art lookup.
 
