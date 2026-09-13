@@ -8,6 +8,7 @@ import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.permanent.Permanent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -24,7 +25,11 @@ public class AstralArenaTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Glory Seeker");
 
         attack(1, playerA, "Grizzly Bears", playerB);
-        attack(1, playerA, "Glory Seeker", playerB);
+        runCode("second creature cannot attack", 1, PhaseStep.DECLARE_BLOCKERS, playerA,
+                (info, player, game) -> {
+                    Permanent secondCreature = getPermanent("Glory Seeker", playerA);
+                    Assert.assertFalse(info, secondCreature.canAttack(playerB.getId(), game));
+                });
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
@@ -41,7 +46,12 @@ public class AstralArenaTest extends CardTestPlayerBase {
 
         attack(1, playerA, "Craw Wurm", playerB);
         block(1, playerB, "Grizzly Bears", "Craw Wurm");
-        block(1, playerB, "Glory Seeker", "Craw Wurm");
+        runCode("second creature cannot block", 1, PhaseStep.DECLARE_BLOCKERS, playerB,
+                (info, player, game) -> {
+                    Permanent secondCreature = getPermanent("Glory Seeker", playerB);
+                    Assert.assertFalse(info,
+                            game.getCombat().getGroups().get(0).canBlock(secondCreature, game));
+                });
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
