@@ -630,6 +630,23 @@ main-deck error rather than silently correcting malformed input. Supplemental
 group labels come from `SupplementalDeckType`, allowing a future Attraction
 Deck group without Planechase-specific Commander or sideboard parsing.
 
+#### Planar card presentation and optional artwork
+
+Deck-building and browser surfaces represent registry entries with
+`PlanarDeckCard`, a non-castable supplemental carrier rather than a token or a
+runtime `PlanarCard`. The carrier retains the registry identity, Plane or
+Phenomenon type, and snapshots display rules from the registry's runtime object
+into the ordinary `Card`/`CardView` path. It deliberately does not copy
+executable abilities into this non-playable carrier. Runtime command-zone
+Planes and Phenomena continue to use their dedicated views and token-repository
+art lookup.
+
+Artwork is optional presentation data in both paths. In image render mode an
+available image is displayed normally; when a planar card image is unavailable,
+`CardPanelRenderModeImage` delegates to the existing generated-card renderer so
+the name, type line, complete rules, chaos ability, and encounter ability remain
+readable. Normal cards and tokens retain their existing missing-image behavior.
+
 ### Phase 10 — Rules-Default Individual Planar Deck Gameplay
 
 Implement the normal Planechase model described in sections 3 and 4.
