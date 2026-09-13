@@ -17,6 +17,7 @@ import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.SupplementalDeckRuntimeHandler;
 import mage.game.command.SupplementalDeckRuntimeHandlers;
+import mage.view.CardView;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -127,6 +128,33 @@ public class SupplementalDeckInfrastructureTest {
         Assert.assertEquals(registryId, card.getSupplementalDeckId());
         Assert.assertEquals(registryId, card.getCardNumber());
         Assert.assertTrue(card.getCardTypeForDeckbuilding().contains(CardType.PHENOMENON));
+    }
+
+    @Test
+    public void planeCarrierExposesRuntimeRulesIncludingChaosWithoutArtwork() {
+        PlanarDeckCard card = new PlanarDeckCard(PlanarCardRegistry.getId(Planes.PLANE_AKOUM));
+        CardView view = new CardView(card);
+        String rules = String.join(" ", view.getRules()).toLowerCase();
+
+        Assert.assertEquals("Akoum", view.getName());
+        Assert.assertTrue(view.getCardTypes().contains(CardType.PLANE));
+        Assert.assertTrue(view.isToRotate());
+        Assert.assertTrue(rules.contains("enchantment spells"));
+        Assert.assertTrue(rules.contains("chaos ensues"));
+        Assert.assertTrue(rules.contains("isn't enchanted"));
+    }
+
+    @Test
+    public void phenomenonCarrierExposesEncounterRulesWithoutArtwork() {
+        PlanarDeckCard card = new PlanarDeckCard(PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY));
+        CardView view = new CardView(card);
+        String rules = String.join(" ", view.getRules()).toLowerCase();
+
+        Assert.assertEquals("Mutual Epiphany", view.getName());
+        Assert.assertTrue(view.getCardTypes().contains(CardType.PHENOMENON));
+        Assert.assertTrue(view.isToRotate());
+        Assert.assertTrue(rules.contains("encounter"));
+        Assert.assertTrue(rules.contains("each player draws four cards"));
     }
 
     @Test
