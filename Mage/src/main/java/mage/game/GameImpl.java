@@ -24,10 +24,13 @@ import mage.abilities.keyword.*;
 import mage.abilities.mana.DelayedTriggeredManaAbility;
 import mage.abilities.mana.TriggeredManaAbility;
 import mage.abilities.special.RollPlanarDieSpecialAction;
+import mage.abilities.triggers.MainPhaseWatcher;
 import mage.cards.*;
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckCardInfo;
 import mage.choices.Choice;
+import mage.choices.ChoiceHintType;
+import mage.choices.ChoiceImpl;
 import mage.collectors.DataCollectorServices;
 import mage.constants.*;
 import mage.counters.CounterType;
@@ -1656,6 +1659,7 @@ public abstract class GameImpl implements Game {
         newWatchers.add(new TemptedByTheRingWatcher()); // TEMPTED_BY_RING
         newWatchers.add(new SpellsCastWatcher()); // SPELL_CAST
         newWatchers.add(new AttackedOrBlockedThisCombatWatcher()); // required for tests
+        newWatchers.add(new MainPhaseWatcher()); // supports abilities introduced after initial watcher collection
 
         // runtime check - allows only GAME scope (one watcher per game)
         newWatchers.forEach(watcher -> {
@@ -2307,6 +2311,51 @@ public abstract class GameImpl implements Game {
             return false;
         }
         return planeswalkToCards(context, planes);
+    }
+
+    @Override
+    public boolean choosePlaneForTopOfPlanarDeck(UUID playerId, int planeCount, Ability source) {
+        Player player = getPlayer(playerId);
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
+        if (player == null || deck == null || planeCount < 1) {
+            return false;
+        }
+        List<PlanarCard> revealed = new ArrayList<>();
+        List<PlanarCard> planes = new ArrayList<>();
+        int cardsToCheck = deck.size();
+        while (cardsToCheck-- > 0 && planes.size() < planeCount) {
+            PlanarCard card = deck.draw();
+            if (card == null) {
+                break;
+            }
+            revealed.add(card);
+            informPlayers(player.getLogName() + " revealed " + card.getLogName());
+            if (card.getPlanarCardType() == CardType.PLANE) {
+                planes.add(card);
+            }
+        }
+        if (planes.isEmpty()) {
+            Collections.shuffle(revealed, RandomUtil.getRandom());
+            revealed.forEach(deck::putOnBottom);
+            return false;
+        }
+
+        Choice choice = new ChoiceImpl(true, ChoiceHintType.CARD);
+        choice.setMessage("Choose a Plane to put on top of your planar deck");
+        choice.setChoices(planes.stream().map(PlanarCard::getName)
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
+        player.choose(Outcome.Benefit, choice, this);
+        String chosenName = choice.getChoice();
+        PlanarCard chosen = planes.stream()
+                .filter(card -> card.getName().equals(chosenName))
+                .findFirst()
+                .orElse(planes.get(0));
+
+        revealed.remove(chosen);
+        Collections.shuffle(revealed, RandomUtil.getRandom());
+        revealed.forEach(deck::putOnBottom);
+        deck.putOnTop(chosen);
+        return true;
     }
 
     private boolean planeswalkToCards(PlaneswalkContext context, List<PlanarCard> destinationCards) {

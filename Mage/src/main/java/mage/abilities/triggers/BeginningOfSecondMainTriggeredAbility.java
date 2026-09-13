@@ -2,11 +2,9 @@ package mage.abilities.triggers;
 
 import mage.abilities.effects.Effect;
 import mage.constants.TargetController;
-import mage.constants.WatcherScope;
 import mage.constants.Zone;
 import mage.game.Game;
 import mage.game.events.GameEvent;
-import mage.watchers.Watcher;
 
 /**
  * @author TheElk801
@@ -67,35 +65,4 @@ public class BeginningOfSecondMainTriggeredAbility extends AtStepTriggeredAbilit
         }
     }
 
-}
-
-class MainPhaseWatcher extends Watcher {
-
-    private int mainPhaseCount = 0;
-
-    MainPhaseWatcher() {
-        super(WatcherScope.GAME);
-    }
-
-    @Override
-    public void watch(GameEvent event, Game game) {
-        switch (event.getType()) {
-            case PRECOMBAT_MAIN_PHASE_PRE:
-            case POSTCOMBAT_MAIN_PHASE_PRE:
-                mainPhaseCount++;
-        }
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-        this.mainPhaseCount = 0;
-    }
-
-    static boolean checkCount(Game game) {
-        return game
-                .getState()
-                .getWatcher(MainPhaseWatcher.class)
-                .mainPhaseCount == 2;
-    }
 }

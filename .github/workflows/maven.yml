@@ -1,4 +1,4 @@
-name: Build and run tests (self-hosted)
+name: Build and run tests (GitHub-hosted)
 
 on:
   push:
@@ -16,9 +16,9 @@ concurrency:
 
 jobs:
   build:
-    # Run the full Maven suite on the local Windows runner instead of consuming
-    # GitHub-hosted Actions minutes.
-    runs-on: [self-hosted, windows, x64, xmage-build]
+    # Keep the existing Windows-specific build commands, but run them on a
+    # GitHub-hosted Windows runner.
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v6

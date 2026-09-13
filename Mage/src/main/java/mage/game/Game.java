@@ -501,6 +501,13 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
      */
     boolean planeswalkToNextPlanes(PlaneswalkContext context, int planeCount);
 
+    /**
+     * Reveals cards from the player's applicable planar deck until the requested
+     * number of Planes have been found. That player chooses one of those Planes
+     * to put on top; the other revealed cards are randomized on the bottom.
+     */
+    boolean choosePlaneForTopOfPlanarDeck(UUID playerId, int planeCount, Ability source);
+
     /** Reveals the top card of the player's applicable planar deck. */
     boolean revealTopPlanarCard(UUID playerId, boolean mayPutOnBottom, Ability source);
 
