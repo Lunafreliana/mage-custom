@@ -452,6 +452,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 19. **Text-only correctness:** `setText` can make UI text look right while rules behavior remains wrong.
 20. **Insufficient tests:** happy path passes but legality, cleanup, optional decline, multiple events, or copied state fails.
 21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
+22. **Missing command-object view support:** an ability can trigger from any command-zone object type. When adding one, audit stack, command-zone, and ability view construction together; a view path that handles Plane but not Phenomenon can crash every connected client while that source's ability is on the stack.
 
 ## 16. Reuse-first rule (mandatory)
 

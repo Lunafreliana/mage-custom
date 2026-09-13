@@ -31,6 +31,7 @@ import mage.game.ControllableOrOwnerable;
 import mage.game.Game;
 import mage.game.command.Dungeon;
 import mage.game.command.Emblem;
+import mage.game.command.Phenomenon;
 import mage.game.command.Plane;
 import mage.game.permanent.Permanent;
 import mage.game.permanent.PermanentCard;
@@ -850,6 +851,13 @@ public class CardView extends SimpleCardView {
             // Display in landscape/rotated/on its side
             this.rotate = true;
             this.rules = new ArrayList<>(plane.getAbilities().getRules(game, plane));
+        } else if (object instanceof Phenomenon) {
+            this.mageObjectType = MageObjectType.PHENOMENON;
+            Phenomenon phenomenon = (Phenomenon) object;
+            this.rarity = Rarity.SPECIAL;
+            this.frameStyle = FrameStyle.M15_NORMAL;
+            this.rotate = true;
+            this.rules = new ArrayList<>(phenomenon.getAbilities().getRules(game, phenomenon));
         } else if (object instanceof Designation) {
             this.mageObjectType = MageObjectType.DESIGNATION;
             Designation designation = (Designation) object;

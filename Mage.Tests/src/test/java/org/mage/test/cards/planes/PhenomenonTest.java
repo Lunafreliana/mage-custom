@@ -12,6 +12,7 @@ import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.stack.StackObject;
+import mage.view.GameView;
 import mage.watchers.common.PlaneswalkedWatcher;
 import org.junit.Assert;
 import org.junit.Test;
@@ -142,6 +143,10 @@ public class PhenomenonTest extends CardTestPlayerBase {
 
             game.checkStateAndTriggered();
             Assert.assertEquals(info, 1, game.getStack().size());
+
+            GameView gameView = getGameView(player);
+            Assert.assertEquals(info, 1, gameView.getStack().size());
+
             game.getStack().resolve(game);
 
             Assert.assertEquals(info, 2, game.getState().getFaceUpPlanes().size());
