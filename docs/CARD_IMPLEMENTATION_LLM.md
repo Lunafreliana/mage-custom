@@ -432,6 +432,14 @@ test player can select non-mana special actions through `activateAbility`; match
 the action's current generated rules text rather than a legacy wrapper's cost or
 wording.
 
+Registering a special action does not make it available at every priority.
+Use `SpecialActions.getAvailableActions` for the GUI's Special button and its
+selection menu, so both consult each action's `canActivate` restrictions and
+preserve the distinction between ordinary actions and mana-payment actions.
+Do not put a blanket sorcery-timing restriction on the Special button: other
+actions can be legal during combat or payment. Test the `GameView` and available
+choices before activation, including forbidden timing and an occupied stack.
+
 Special actions may have no card source and therefore a null `sourceId`. Shared
 cost-modification effects must first reject ability kinds they do not modify and
 must compare identifiers null-safely; a spell-only modifier must not dereference
