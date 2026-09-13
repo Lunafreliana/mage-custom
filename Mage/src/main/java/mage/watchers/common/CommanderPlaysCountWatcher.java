@@ -72,4 +72,12 @@ public class CommanderPlaysCountWatcher extends Watcher {
     public int getPlayerCount(UUID playerId) {
         return this.playerCount.getOrDefault(playerId, 0);
     }
+
+    /**
+     * Resets commander-cast history without replacing the game-level watcher.
+     */
+    public void resetCommanderCastCounts() {
+        playsCount.clear();
+        playerCount.clear();
+    }
 }
