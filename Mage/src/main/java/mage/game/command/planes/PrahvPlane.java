@@ -1,6 +1,5 @@
 package mage.game.command.planes;
 
-import mage.abilities.Ability;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.dynamicvalue.common.CardsInControllerHandCount;
@@ -15,8 +14,8 @@ import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
+import mage.watchers.common.AttackedThisTurnWatcher;
 import mage.watchers.common.CastSpellLastTurnWatcher;
-import mage.watchers.common.PlayerAttackedWatcher;
 
 /**
  * @author JayDi85
@@ -32,9 +31,9 @@ public final class PrahvPlane extends Plane {
         ));
 
         // If you attacked with creatures this turn, you can't cast spells.
-        Ability ability = new SimpleStaticAbility(Zone.COMMAND, new PrahvCantCastEffect());
-        ability.addWatcher(new PlayerAttackedWatcher());
-        this.getAbilities().add(ability);
+        this.getAbilities().add(new SimpleStaticAbility(
+                Zone.COMMAND, new PrahvCantCastEffect()
+        ));
 
         // Whenever chaos ensues, you gain life equal to the number of cards in your hand.
         this.getAbilities().add(new ChaosEnsuesTriggeredAbility(
@@ -101,10 +100,11 @@ class PrahvCantCastEffect extends ContinuousRuleModifyingEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        PlayerAttackedWatcher watcher = game.getState().getWatcher(PlayerAttackedWatcher.class);
+        AttackedThisTurnWatcher watcher = game.getState().getWatcher(AttackedThisTurnWatcher.class);
         return event.getPlayerId().equals(source.getControllerId())
                 && watcher != null
-                && watcher.getNumberOfAttackersCurrentTurn(source.getControllerId()) > 0;
+                && watcher.getAttackedThisTurnCreaturesPermanentLKI().stream()
+                .anyMatch(permanent -> permanent.isControlledBy(source.getControllerId()));
     }
 
     @Override
