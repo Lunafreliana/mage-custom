@@ -3,6 +3,7 @@ package mage.cards.decks;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.constants.CardType;
+import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 
 /**
@@ -18,6 +19,11 @@ public final class PlanarDeckCard extends CardImpl implements SupplementalDeckCa
         PlanarCardRegistry.Metadata metadata = requireMetadata(registryId);
         this.registryId = registryId;
         this.cardType.add(metadata.getType());
+        PlanarCard planarCard = PlanarCardRegistry.create(registryId);
+        if (planarCard == null) {
+            throw new IllegalArgumentException("Unable to create planar card: " + registryId);
+        }
+        planarCard.getAbilities().forEach(ability -> this.addAbility(ability.copy()));
         this.setExpansionSetCode(metadata.getSetCode());
         this.setCardNumber(registryId);
         this.extraDeckCard = true;
