@@ -25,6 +25,7 @@ public enum Planes {
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
     PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
+    PLANE_NYX("NyxPlane", "Plane - Nyx", "MOC"),
     PLANE_OOD_SPHERE("OodSpherePlane", "Plane - Ood Sphere", "WHO"),
     PLANE_PANOPTICON("PanopticonPlane", "Plane - Panopticon"),
     PLANE_PURSUED_BY_SOMETHING("PursuedBySomethingPlane", "Plane - Pursued by Something", "PUNK"),
