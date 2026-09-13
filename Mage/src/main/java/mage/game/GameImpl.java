@@ -2268,9 +2268,8 @@ public abstract class GameImpl implements Game {
         if (!canPlaneswalk(playerId)) {
             return false;
         }
-        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
-        PlanarCard destination = deck == null ? null : deck.draw();
-        return destination != null && planeswalkToCards(context, Collections.singletonList(destination));
+        planeswalkAwayFromFaceUpPlanarCards(playerId);
+        return turnTopPlanarCardFaceUp(playerId);
     }
 
     @Override
@@ -2308,11 +2307,7 @@ public abstract class GameImpl implements Game {
         if (!canPlaneswalk(playerId) || destinationCards.isEmpty()) {
             return false;
         }
-        for (PlanarCard plane : new ArrayList<>(state.getFaceUpPlanarCards())) {
-            fireEvent(GameEvent.getEvent(
-                    GameEvent.EventType.PLANESWALKED_AWAY, plane.getId(), null, playerId));
-        }
-        bottomFaceUpPlanarCards();
+        planeswalkAwayFromFaceUpPlanarCards(playerId);
         // All destinations must be face up before any planeswalk event is
         // emitted: Spatial Merging planeswalks to its two Planes simultaneously.
         for (PlanarCard destination : destinationCards) {
@@ -2336,6 +2331,14 @@ public abstract class GameImpl implements Game {
             }
         }
         return true;
+    }
+
+    private void planeswalkAwayFromFaceUpPlanarCards(UUID planeswalkingPlayerId) {
+        for (PlanarCard plane : new ArrayList<>(state.getFaceUpPlanarCards())) {
+            fireEvent(GameEvent.getEvent(
+                    GameEvent.EventType.PLANESWALKED_AWAY, plane.getId(), null, planeswalkingPlayerId));
+        }
+        bottomFaceUpPlanarCards();
     }
 
     private void bottomFaceUpPlanarCards() {
