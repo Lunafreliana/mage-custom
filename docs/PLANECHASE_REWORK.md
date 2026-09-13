@@ -35,7 +35,7 @@ Planechase runtime objects use the common `PlanarCard` abstraction and remain co
 
 A deck-building representation may be a lightweight card/proxy object, but that object exists only to carry stable metadata and supplemental-deck identity through the deck editor and `.dck` serialization. At game initialization it is consumed and converted into the correct variant runtime object.
 
-Planar gameplay identity is independent from artwork and physical printing identity. A canonical Plane or Phenomenon definition may eventually offer several physical printings as art variants without creating additional gameplay cards. When a deck-building carrier has only synthetic printing metadata, the image subsystem may resolve a suitable real-card printing by the authoritative English card name and store it under the carrier's normal local cache identity.
+Planar gameplay identity is independent from artwork and physical printing identity. A canonical Plane or Phenomenon definition may eventually offer several physical printings as art variants without creating additional gameplay cards. The deck-building carrier and runtime object must share the token-repository image identity. Scryfall may resolve an unmapped planar image by authoritative English name, but it stores the result only at that shared token path rather than creating a second ordinary-card cache entry.
 
 ### 2.2 Planar die and Planechase rules core
 
@@ -640,8 +640,16 @@ runtime `PlanarCard`. The carrier retains the registry identity, Plane or
 Phenomenon type, and snapshots display rules from the registry's runtime object
 into the ordinary `Card`/`CardView` path. It deliberately does not copy
 executable abilities into this non-playable carrier. Runtime command-zone
-Planes and Phenomena continue to use their dedicated views and token-repository
-art lookup.
+Planes and Phenomena continue to use their dedicated views. The carrier copies
+the runtime object's image metadata, and both views resolve that metadata
+through the same token-repository path.
+
+Scryfall token lookup prefers an existing explicit mapping. When a Plane or
+Phenomenon has no mapping, its required `Plane - ` or `Phenomenon - ` token
+prefix is removed and the remaining English name is sent to Scryfall's exact
+name endpoint. The downloader treats that generic planar fallback as available,
+so adding a planar implementation to the token database does not also require a
+hardcoded URL. Ordinary tokens remain mapping-only.
 
 Artwork is optional presentation data in both paths. In image render mode an
 available image is displayed normally; when a planar card image is unavailable,

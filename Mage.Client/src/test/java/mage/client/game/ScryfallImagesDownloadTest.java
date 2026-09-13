@@ -1,9 +1,11 @@
 package mage.client.game;
 
-import mage.constants.Phenomena;
+import mage.cards.decks.PlanarDeckCard;
 import mage.constants.Planes;
+import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.sets.TheLordOfTheRingsTalesOfMiddleEarth;
+import mage.view.CardView;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.plugins.card.dl.sources.CardImageSource;
@@ -82,43 +84,44 @@ public class ScryfallImagesDownloadTest {
     }
 
     @Test
-    public void test_PlanarProxyExactNameDownloadLinks() throws Exception {
+    public void test_PlanarTokenDownloadLinks() throws Exception {
         CardImageSource imageSource = ScryfallImageSource.getInstance();
 
-        PlanarCardRegistry.Metadata planeMetadata = PlanarCardRegistry.getMetadata(
-                PlanarCardRegistry.getId(Planes.PLANE_THE_GREAT_FOREST));
-        CardDownloadData plane = planarProxy(planeMetadata);
-        Assert.assertFalse("Planes are real cards, not tokens", plane.isToken());
+        CardDownloadData mappedPlane = planarToken("Plane - Academy at Tolaria West", "PCA");
+        Assert.assertTrue(imageSource.isTokenImageProvided("PCA", mappedPlane.getName(), 0));
         Assert.assertEquals(
-                "https://api.scryfall.com/cards/named?exact=The+Great+Forest&format=image",
-                imageSource.generateCardUrl(plane).getBaseUrl());
-        Assert.assertEquals(
-                "https://api.scryfall.com/cards/named?exact=The+Great+Forest&format=image&version=small",
-                ScryfallImageSourceSmall.getInstance().generateCardUrl(plane).getBaseUrl());
+                "https://api.scryfall.com/cards/opca/9/en?format=image",
+                imageSource.generateTokenUrl(mappedPlane).getBaseUrl());
 
-        PlanarCardRegistry.Metadata phenomenonMetadata = PlanarCardRegistry.getMetadata(
-                PlanarCardRegistry.getId(Phenomena.MUTUAL_EPIPHANY));
-        CardDownloadData phenomenon = planarProxy(phenomenonMetadata);
-        Assert.assertFalse("Phenomena use the same real-card path", phenomenon.isToken());
+        CardDownloadData unmappedPlane = planarToken("Plane - Antarctic Research Base", "WHO");
+        Assert.assertTrue(imageSource.isTokenImageProvided("WHO", unmappedPlane.getName(), 0));
         Assert.assertEquals(
-                "https://api.scryfall.com/cards/named?exact=Mutual+Epiphany&format=image",
-                imageSource.generateCardUrl(phenomenon).getBaseUrl());
-
-        CardDownloadData punctuated = CardDownloadData.forExactNameCard(
-                "Norn's Dominion, Ravnica-City", "PCA", "plane:unknown");
+                "https://api.scryfall.com/cards/named?exact=Antarctic+Research+Base&format=image",
+                imageSource.generateTokenUrl(unmappedPlane).getBaseUrl());
         Assert.assertEquals(
-                "https://api.scryfall.com/cards/named?exact=Norn%27s+Dominion%2C+Ravnica-City&format=image",
-                imageSource.generateCardUrl(punctuated).getBaseUrl());
+                "https://api.scryfall.com/cards/named?exact=Antarctic+Research+Base&format=image&version=small",
+                ScryfallImageSourceSmall.getInstance().generateTokenUrl(unmappedPlane).getBaseUrl());
 
-        CardDownloadData unknown = CardDownloadData.forExactNameCard(
-                "Unknown Planar Card", "PCA", "plane:not_registered");
+        CardDownloadData phenomenon = planarToken("Phenomenon - Interplanar Tunnel", "PCA");
+        Assert.assertTrue(imageSource.isTokenImageProvided("PCA", phenomenon.getName(), 0));
         Assert.assertEquals(
-                "https://api.scryfall.com/cards/named?exact=Unknown+Planar+Card&format=image",
-                imageSource.generateCardUrl(unknown).getBaseUrl());
+                "https://api.scryfall.com/cards/named?exact=Interplanar+Tunnel&format=image",
+                imageSource.generateTokenUrl(phenomenon).getBaseUrl());
+    }
 
-        Assert.assertTrue("The downloaded image must use the proxy's existing card cache path",
-                CardImageUtils.buildImagePathToCardOrToken(plane)
-                        .endsWith("PCA" + java.io.File.separator + "The Great Forest.full.jpg"));
+    @Test
+    public void test_PlanarCarrierUsesRuntimeTokenImagePath() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Planes.PLANE_AKOUM));
+        PlanarDeckCard carrier = new PlanarDeckCard(metadata.getId());
+        PlanarCard runtime = PlanarCardRegistry.create(metadata.getId());
+        runtime.setSourceObjectAndInitImage();
+
+        Assert.assertEquals(
+                CardImageUtils.buildImagePathToCardView(new CardView((mage.MageObject) runtime, null)),
+                CardImageUtils.buildImagePathToCardView(new CardView(carrier)));
+        Assert.assertTrue(CardImageUtils.buildImagePathToCardView(new CardView(carrier))
+                .contains(java.io.File.separator + "TOK"));
     }
 
     @Test
@@ -127,14 +130,14 @@ public class ScryfallImagesDownloadTest {
         token.setToken(true);
 
         Assert.assertTrue(token.isToken());
-        Assert.assertFalse(token.isExactNameLookup());
         Assert.assertEquals(
                 "https://api.scryfall.com/cards/tpca/5/en?format=image",
                 ScryfallImageSource.getInstance().generateTokenUrl(token).getBaseUrl());
     }
 
-    private static CardDownloadData planarProxy(PlanarCardRegistry.Metadata metadata) {
-        return CardDownloadData.forExactNameCard(
-                metadata.getEnglishName(), metadata.getSetCode(), metadata.getId());
+    private static CardDownloadData planarToken(String name, String setCode) {
+        CardDownloadData result = new CardDownloadData(name, setCode, "0", false, 0);
+        result.setToken(true);
+        return result;
     }
 }
