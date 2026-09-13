@@ -64,30 +64,30 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
     }
 
     @Test
-    public void chaosCastsManifestedInstantForFree() {
+    public void chaosCastsManifestedSorceryForFree() {
         skipInitShuffling();
         addPlane(playerA, Planes.PLANE_PURSUED_BY_SOMETHING);
         // Ball Lightning satisfies the intervening-if condition, then sacrifices
         // itself at end of turn so the manifested card is the only legal target
         // when chaos ensues on the following turn.
         addCard(Zone.BATTLEFIELD, playerA, "Ball Lightning");
-        addCard(Zone.LIBRARY, playerA, "Lightning Bolt@manifestedBolt");
+        addCard(Zone.LIBRARY, playerA, "Divination");
         addCard(Zone.LIBRARY, playerA, "Forest");
+        addCard(Zone.LIBRARY, playerA, "Island", 2);
         addChaosSpell();
 
         attack(1, playerA, "Ball Lightning");
-        setChoice(playerA, "Lightning Bolt");
+        setChoice(playerA, "Divination");
         // Wait until the next turn so the second-main-phase trigger has resolved
         // and the manifested card exists before choosing the chaos ability's target.
         castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, playerB);
 
         setStrictChooseMode(true);
         setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertLife(playerB, 17);
-        assertGraveyardCount(playerA, "Lightning Bolt", 1);
+        assertHandCount(playerA, "Island", 2);
+        assertGraveyardCount(playerA, "Divination", 1);
         assertPermanentCount(playerA, EmptyNames.FACE_DOWN_CREATURE.getTestCommand(), 0);
     }
 
