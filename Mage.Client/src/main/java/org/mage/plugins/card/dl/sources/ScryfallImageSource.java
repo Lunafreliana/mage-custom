@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import mage.MageException;
 import mage.client.remote.XmageURLConnection;
 import mage.client.util.CardLanguage;
+import mage.game.command.PlanarCardRegistry;
 import mage.util.JsonUtil;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileInputStream;
@@ -17,6 +18,7 @@ import org.mage.plugins.card.dl.DownloadServiceInfo;
 import org.mage.plugins.card.images.CardDownloadData;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,6 +99,14 @@ public class ScryfallImageSource implements CardImageSource {
         String baseUrl = null;
         String alternativeUrl = null;
 
+        // Some real-card carriers (currently Planechase deck-builder entries)
+        // deliberately have no physical printing identity. Their authoritative
+        // name is still sufficient for Scryfall's exact-name endpoint, while
+        // their synthetic set/collector metadata remains the local cache key.
+        if (!isToken && card.isExactNameLookup()) {
+            baseUrl = createExactNameImageUrl(card.getName());
+        }
+
         // TOKENS TRY
 
         // tokens support only direct links
@@ -163,6 +173,16 @@ public class ScryfallImageSource implements CardImageSource {
         }
 
         return new CardImageUrls(baseUrl, alternativeUrl);
+    }
+
+    static String createExactNameImageUrl(String cardName) {
+        try {
+            return "https://api.scryfall.com/cards/named?exact="
+                    + URLEncoder.encode(cardName, "UTF-8")
+                    + "&format=image";
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-8 URL encoding is unavailable", e);
+        }
     }
 
     // TODO: delete face code after bulk data implemented?
@@ -859,6 +879,13 @@ public class ScryfallImageSource implements CardImageSource {
             }
         }
 
+        // Exact-name planar lookups retain their carrier set as the cache key,
+        // including synthetic codes which are not physical Scryfall sets.
+        PlanarCardRegistry.getAvailableCards().stream()
+                .map(PlanarCardRegistry.Metadata::getSetCode)
+                .filter(code -> !supportedSetsCopy.contains(code))
+                .forEach(supportedSetsCopy::add);
+
         return supportedSetsCopy;
     }
 
@@ -866,6 +893,11 @@ public class ScryfallImageSource implements CardImageSource {
     public boolean isCardImageProvided(String setCode, String cardName) {
         // all cards from set
         return ScryfallImageSupportCards.getSupportedSets().contains(setCode);
+    }
+
+    @Override
+    public boolean isExactNameLookupSupported() {
+        return true;
     }
 
     @Override
