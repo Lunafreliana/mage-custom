@@ -48,6 +48,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
     public void testPlaneswalkAbilityDrawsForPlayerControllingCommander() {
         gameOptions.planeChase = true;
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
+        // Use an explicit zero-card baseline: commander test decks do not retain a normal seven-card opening hand.
         removeAllCardsFromHand(playerA);
         removeAllCardsFromHand(playerB);
 
