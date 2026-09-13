@@ -1,9 +1,8 @@
 package mage.game.command.planes;
 
-import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.Ability;
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.SimpleStaticAbility;
-import mage.abilities.effects.Effect;
 import mage.abilities.effects.RestrictionEffect;
 import mage.abilities.effects.common.DamageAllEffect;
 import mage.constants.Duration;
@@ -13,31 +12,31 @@ import mage.filter.common.FilterCreaturePermanent;
 import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.permanent.Permanent;
-import mage.watchers.common.AttackedThisTurnWatcher;
 
 import java.util.UUID;
 
 /**
  * @author VibecodingQueens
  */
-public class AstralArenaPlane extends Plane {
+public final class AstralArenaPlane extends Plane {
 
     public AstralArenaPlane() {
         this.setPlaneType(Planes.PLANE_ASTRAL_ARENA);
 
-        // No more than one creature can attack each turn.  No more than one creature can block each turn.
-        SimpleStaticAbility ability = new SimpleStaticAbility(Zone.COMMAND, new AstralArenaAttackRestrictionEffect());
-        ability.addWatcher(new AttackedThisTurnWatcher());
-        SimpleStaticAbility ability2 = new SimpleStaticAbility(Zone.COMMAND, new AstralArenaBlockRestrictionEffect());
-        ability2.addWatcher(new AttackedThisTurnWatcher());
-        this.getAbilities().add(ability);
-        this.getAbilities().add(ability2);
+        // No more than one creature can attack each combat.
+        this.getAbilities().add(new SimpleStaticAbility(
+                Zone.COMMAND, new AstralArenaAttackRestrictionEffect()
+        ));
 
-        // Whenever chaos ensues, {this} deals 2 damage to each creature
-        Effect chaosEffect = new DamageAllEffect(2, new FilterCreaturePermanent());
+        // No more than one creature can block each combat.
+        this.getAbilities().add(new SimpleStaticAbility(
+                Zone.COMMAND, new AstralArenaBlockRestrictionEffect()
+        ));
 
-        ChaosEnsuesTriggeredAbility chaosAbility = new ChaosEnsuesTriggeredAbility(chaosEffect, false);
-        this.getAbilities().add(chaosAbility);
+        // Whenever chaos ensues, Astral Arena deals 2 damage to each creature.
+        this.getAbilities().add(new ChaosEnsuesTriggeredAbility(
+                new DamageAllEffect(2, new FilterCreaturePermanent()), false
+        ));
     }
 
     private AstralArenaPlane(final AstralArenaPlane plane) {
@@ -57,7 +56,7 @@ class AstralArenaAttackRestrictionEffect extends RestrictionEffect {
         staticText = "No more than one creature can attack each combat";
     }
 
-    AstralArenaAttackRestrictionEffect(final AstralArenaAttackRestrictionEffect effect) {
+    private AstralArenaAttackRestrictionEffect(final AstralArenaAttackRestrictionEffect effect) {
         super(effect);
     }
 
@@ -84,7 +83,7 @@ class AstralArenaBlockRestrictionEffect extends RestrictionEffect {
         staticText = "No more than one creature can block each combat";
     }
 
-    AstralArenaBlockRestrictionEffect(final AstralArenaBlockRestrictionEffect effect) {
+    private AstralArenaBlockRestrictionEffect(final AstralArenaBlockRestrictionEffect effect) {
         super(effect);
     }
 
@@ -99,7 +98,19 @@ class AstralArenaBlockRestrictionEffect extends RestrictionEffect {
     }
 
     @Override
-    public boolean canBlock(Permanent attacker, Permanent blocker, Ability source, Game game, boolean canUseChooseDialogs) {
-        return game.getCombat().getBlockers().isEmpty();
+    public boolean canBlock(Permanent attacker, Permanent newBlocker, Ability source, Game game, boolean canUseChooseDialogs) {
+        if (attacker == null) {
+            return true;
+        }
+        for (UUID creatureId : game.getCombat().getBlockers()) {
+            Permanent existingBlocker = game.getPermanent(creatureId);
+            if (existingBlocker != null
+                    && existingBlocker.isControlledBy(newBlocker.getControllerId())
+                    && game.getPlayer(existingBlocker.getControllerId())
+                    .hasOpponent(attacker.getControllerId(), game)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
