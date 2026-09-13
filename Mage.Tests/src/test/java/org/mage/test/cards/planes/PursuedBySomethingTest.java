@@ -79,7 +79,9 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
         attack(1, playerA, "Ball Lightning");
         setChoice(playerA, "Divination");
         // Wait until the next turn so the second-main-phase trigger has resolved
-        // and the manifested card exists before choosing the chaos ability's target.
+        // and the manifested card is the only creature when the chaos trigger asks
+        // for a target. TestPlayer can then select that sole legal target without a
+        // queued player target intended for the exiled spell.
         castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
 
         setStrictChooseMode(true);
