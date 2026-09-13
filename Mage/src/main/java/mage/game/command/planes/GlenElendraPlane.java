@@ -1,6 +1,5 @@
 package mage.game.command.planes;
 
-import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.effects.common.continuous.ExchangeControlTargetEffect;
@@ -10,20 +9,16 @@ import mage.constants.Duration;
 import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.constants.TargetController;
-import mage.constants.WatcherScope;
 import mage.constants.Zone;
 import mage.game.Game;
 import mage.game.command.Plane;
-import mage.game.events.DamagedPlayerEvent;
 import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
 import mage.target.common.TargetControlledCreaturePermanent;
 import mage.target.common.TargetCreaturePermanent;
-import mage.watchers.Watcher;
+import mage.watchers.common.CombatDamageToPlayerThisCombatWatcher;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,7 +42,6 @@ public final class GlenElendraPlane extends Plane {
         );
         ability.addTarget(new GlenElendraDamagingCreatureTarget());
         ability.addTarget(new GlenElendraDamagedPlayersCreatureTarget());
-        ability.addWatcher(new GlenElendraCombatDamageWatcher());
         this.getAbilities().add(ability);
 
         // Whenever chaos ensues, gain control of target creature you own.
@@ -94,39 +88,6 @@ class GlenElendraEndOfCombatTriggeredAbility extends AtStepTriggeredAbility {
     }
 }
 
-class GlenElendraCombatDamageWatcher extends Watcher {
-
-    private final Map<MageObjectReference, UUID> damagedPlayers = new HashMap<>();
-
-    GlenElendraCombatDamageWatcher() {
-        super(WatcherScope.GAME);
-    }
-
-    @Override
-    public void watch(GameEvent event, Game game) {
-        if (event.getType() == GameEvent.EventType.END_COMBAT_STEP_POST) {
-            damagedPlayers.clear();
-            return;
-        }
-        if (event.getType() != GameEvent.EventType.DAMAGED_PLAYER
-                || !((DamagedPlayerEvent) event).isCombatDamage()) {
-            return;
-        }
-        Permanent permanent = game.getPermanent(event.getSourceId());
-        if (permanent != null && permanent.isCreature(game)) {
-            damagedPlayers.put(new MageObjectReference(permanent, game), event.getPlayerId());
-        }
-    }
-
-    UUID getDamagedPlayer(UUID permanentId, Game game) {
-        return damagedPlayers.entrySet().stream()
-                .filter(entry -> entry.getKey().refersTo(permanentId, game))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
-    }
-}
-
 class GlenElendraDamagingCreatureTarget extends TargetControlledCreaturePermanent {
 
     GlenElendraDamagingCreatureTarget() {
@@ -139,7 +100,8 @@ class GlenElendraDamagingCreatureTarget extends TargetControlledCreaturePermanen
 
     @Override
     public boolean canTarget(UUID playerId, UUID id, Ability source, Game game) {
-        GlenElendraCombatDamageWatcher watcher = game.getState().getWatcher(GlenElendraCombatDamageWatcher.class);
+        CombatDamageToPlayerThisCombatWatcher watcher = game.getState()
+                .getWatcher(CombatDamageToPlayerThisCombatWatcher.class);
         return watcher != null && watcher.getDamagedPlayer(id, game) != null
                 && super.canTarget(playerId, id, source, game);
     }
@@ -147,7 +109,8 @@ class GlenElendraDamagingCreatureTarget extends TargetControlledCreaturePermanen
     @Override
     public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
         Set<UUID> possibleTargets = new HashSet<>(super.possibleTargets(sourceControllerId, source, game));
-        GlenElendraCombatDamageWatcher watcher = game.getState().getWatcher(GlenElendraCombatDamageWatcher.class);
+        CombatDamageToPlayerThisCombatWatcher watcher = game.getState()
+                .getWatcher(CombatDamageToPlayerThisCombatWatcher.class);
         possibleTargets.removeIf(id -> watcher == null || watcher.getDamagedPlayer(id, game) == null);
         return possibleTargets;
     }
@@ -188,7 +151,8 @@ class GlenElendraDamagedPlayersCreatureTarget extends TargetCreaturePermanent {
 
     private static UUID getDamagedPlayer(Ability source, Game game) {
         Permanent firstTarget = game.getPermanent(source.getTargets().get(0).getFirstTarget());
-        GlenElendraCombatDamageWatcher watcher = game.getState().getWatcher(GlenElendraCombatDamageWatcher.class);
+        CombatDamageToPlayerThisCombatWatcher watcher = game.getState()
+                .getWatcher(CombatDamageToPlayerThisCombatWatcher.class);
         return firstTarget == null || watcher == null ? null : watcher.getDamagedPlayer(firstTarget.getId(), game);
     }
 
