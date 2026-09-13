@@ -199,6 +199,7 @@
 |PLANE:MOC|Plane - The Golden City of Orazca||TheGoldenCityOfOrazcaPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
+|PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|
 |PLANE:WHO|Plane - The Pyramid of Mars||ThePyramidOfMarsPlane|
 |PLANE:MOC|Plane - Towashi||TowashiPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
@@ -208,6 +209,7 @@
 |PLANE:PCA|Plane - Truga Jungle||TrugaJunglePlane|
 |PLANE:PCA|Plane - Turri Island||TurriIslandPlane|
 |PLANE:PCA|Plane - Undercity Reaches||UndercityReachesPlane|
+|PLANE:PCA|Plane - Velis Vel||VelisVelPlane|
 |PLANE:PCA|Plane - We Hope You Like Squirrels||WeHopeYouLikeSquirrelsPlane|
 |PLANE:PCA|Plane - The Zephyr Maze||TheZephyrMazePlane|
 |PLANE:PCA|Plane - Trail of the Mage-Rings||TrailOfTheMageRingsPlane|

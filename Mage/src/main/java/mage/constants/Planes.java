@@ -31,6 +31,7 @@ public enum Planes {
     PLANE_THE_GOLDEN_CITY_OF_ORAZCA("TheGoldenCityOfOrazcaPlane", "Plane - The Golden City of Orazca", "MOC"),
     PLANE_THE_GREAT_AERIE("TheGreatAeriePlane", "Plane - The Great Aerie", "MOC"),
     PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone", "PUNK"),
+    PLANE_THE_LUX_FOUNDATION_LIBRARY("TheLuxFoundationLibraryPlane", "Plane - The Lux Foundation Library", "WHO"),
     PLANE_THE_PYRAMID_OF_MARS("ThePyramidOfMarsPlane", "Plane - The Pyramid of Mars", "WHO"),
     PLANE_TOWASHI("TowashiPlane", "Plane - Towashi", "MOC"),
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
@@ -42,6 +43,7 @@ public enum Planes {
     PLANE_TRAIL_OF_THE_MAGE_RINGS("TrailOfTheMageRingsPlane", "Plane - Trail of the Mage-Rings"),
     PLANE_TURRI_ISLAND("TurriIslandPlane", "Plane - Turri Island"),
     PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches"),
+    PLANE_VELIS_VEL("VelisVelPlane", "Plane - Velis Vel"),
     PLANE_WE_HOPE_YOU_LIKE_SQUIRRELS("WeHopeYouLikeSquirrelsPlane", "Plane - We Hope You Like Squirrels");
 
     private final String className;
