@@ -249,6 +249,21 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     }
 
     @Test
+    public void test_PlanarDieWithForEachSpellCostReductionInHand() {
+        useHedronFieldsPlanechase();
+        addCard(Zone.HAND, playerA, "Avatar of Growth");
+
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
+        setDieRollResult(playerA, 3);
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.END_TURN);
+        execute();
+
+        assertHandCount(playerA, "Avatar of Growth", 1);
+    }
+
+    @Test
     public void test_PlanarDice_OneOrMoreDieRollTriggersMustWork() {
         // Active player can roll the planar die: Whenever you roll {CHAOS}, create a 7/7 colorless Eldrazi creature with annhilator 1
         useHedronFieldsPlanechase();

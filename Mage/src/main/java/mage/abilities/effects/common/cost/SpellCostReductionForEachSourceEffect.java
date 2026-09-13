@@ -12,6 +12,8 @@ import mage.constants.Outcome;
 import mage.game.Game;
 import mage.util.CardUtil;
 
+import java.util.Objects;
+
 /**
  * @author JayDi85
  */
@@ -80,10 +82,8 @@ public class SpellCostReductionForEachSourceEffect extends CostModificationEffec
 
     @Override
     public boolean applies(Ability abilityToModify, Ability source, Game game) {
-        if (abilityToModify.getSourceId().equals(source.getSourceId()) && (abilityToModify instanceof SpellAbility)) {
-            return true;
-        }
-        return false;
+        return abilityToModify instanceof SpellAbility
+                && Objects.equals(abilityToModify.getSourceId(), source.getSourceId());
     }
 
     @Override
