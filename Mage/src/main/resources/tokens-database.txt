@@ -176,6 +176,7 @@
 |PLANE:WHO|Plane - Bad Wolf Bay||BadWolfBayPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
+|PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|
 |PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
 |PLANE:PCA|Plane - Feeding Grounds||FeedingGroundsPlane|
