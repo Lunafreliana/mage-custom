@@ -404,6 +404,22 @@ assertGraveyardCount(playerB, "Grizzly Bears", 1);
 
 The framework's actual overloads allow turn/step scheduling and choices. The base normally supplies `playerA` and `playerB` (special multiplayer bases configure more players); `addPlayer` is not the ordinary card-test setup call in this checkout. Common tools include `addCard(zone, player, name, count)`, `castSpell`, `activateAbility`, `setChoice`, `setModeChoice`, `setTarget`, `passPhase`, `setStopAt`, and `execute`. Assertions include `assertPermanentCount`, `assertLife`, `assertGraveyardCount`, `assertHandCount`, `assertLibraryCount`, `assertExileCount`, `assertTapped`, `assertPowerToughness`, `assertCounterCount`, `assertAbility`, and `assertPlayerHasAbility`.
 
+For exact library counts or a controlled mill/reveal sequence, call
+`removeAllCardsFromLibrary` for every relevant player before adding the fixture.
+`addCard(Zone.LIBRARY, ...)` adds to the default test deck; `skipInitShuffling()`
+only preserves order and does not empty it. Test mode skips opening-hand draws,
+but normal turn draws and triggered mills still change the counts. Use different
+card names for library filler and pre-seeded graveyard cards when testing which
+cards an effect returns.
+
+Planechase tests must distinguish startup from a real planeswalk. Configure
+`gameOptions.planeChase` and an explicit `gameOptions.sharedPlanarDeck` for the
+normal starting-plane procedure. The `addPlane` test helper enters the gameplay
+reveal path and already emits `PLANESWALKED`; calling it before `execute()` can
+leave an arrival trigger pending alongside the first upkeep trigger. Test arrival
+separately with `game.planeswalk(...)` during a scheduled main phase, and test the
+starting Plane's upkeep without an artificial arrival or trigger-order choice.
+
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of
 cards to put into the graveyard is a target-selection prompt and must be queued
