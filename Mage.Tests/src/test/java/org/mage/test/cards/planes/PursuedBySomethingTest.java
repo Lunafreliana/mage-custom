@@ -68,7 +68,7 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
         skipInitShuffling();
         addPlane(playerA, Planes.PLANE_PURSUED_BY_SOMETHING);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
-        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
+        addCard(Zone.LIBRARY, playerA, "Lightning Bolt@manifestedBolt");
         addCard(Zone.LIBRARY, playerA, "Forest");
         addChaosSpell();
 
@@ -77,7 +77,7 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
         // Wait until the next turn so the second-main-phase trigger has resolved
         // and the manifested card exists before choosing the chaos ability's target.
         castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, EmptyNames.FACE_DOWN_CREATURE.getTestCommand());
+        addTarget(playerA, "@manifestedBolt");
         addTarget(playerA, playerB);
 
         setStrictChooseMode(true);
