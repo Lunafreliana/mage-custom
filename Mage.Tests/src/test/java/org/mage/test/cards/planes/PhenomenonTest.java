@@ -1,17 +1,24 @@
 package org.mage.test.cards.planes;
 
 import mage.constants.CardType;
+import mage.constants.MageObjectType;
 import mage.constants.PhaseStep;
 import mage.constants.Phenomena;
 import mage.constants.Planes;
 import mage.constants.Zone;
+import mage.game.Game;
 import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
+import mage.game.events.GameEvent;
+import mage.game.stack.StackAbility;
 import mage.game.stack.StackObject;
+import mage.view.CardView;
+import mage.view.GameView;
+import mage.view.StackAbilityView;
 import mage.watchers.common.PlaneswalkedWatcher;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,6 +26,7 @@ import org.mage.test.serverside.base.CardTestPlayerBase;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 
 public class PhenomenonTest extends CardTestPlayerBase {
 
@@ -103,6 +111,43 @@ public class PhenomenonTest extends CardTestPlayerBase {
     }
 
     @Test
+    public void testMutualEpiphanyEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new MutualEpiphanyPhenomenon());
+    }
+
+    @Test
+    public void testRealityShapingEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new RealityShapingPhenomenon());
+    }
+
+    @Test
+    public void testSpatialMergingEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new SpatialMergingPhenomenon());
+    }
+
+    private void assertPhenomenonEncounterStackViews(Phenomenon phenomenon) {
+        prepareStartedPlanechaseGame();
+        runCode("inspect " + phenomenon.getName() + " encounter stack views",
+                1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(info, game.addPhenomenon(phenomenon, player.getId()));
+            game.checkStateAndTriggered();
+
+            StackAbility encounter = getOnlyStackAbility(info, game);
+            Assert.assertNotNull(info, game.getObject(encounter.getSourceId()));
+            Assert.assertTrue(info, game.getObject(encounter.getSourceId()) instanceof Phenomenon);
+            Phenomenon source = (Phenomenon) game.getObject(encounter.getSourceId());
+            Assert.assertEquals(info, phenomenon.getName(), source.getName());
+            assertPendingStackViews(info, game, encounter.getId(), source);
+
+            game.getStack().remove(encounter, game);
+            game.checkStateAndTriggered();
+            Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
     public void testRemovingEncounterTriggerMakesSbaPlaneswalk() {
         prepareStartedPlanechaseGame();
         runCode("remove encounter trigger", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
@@ -142,12 +187,33 @@ public class PhenomenonTest extends CardTestPlayerBase {
 
             game.checkStateAndTriggered();
             Assert.assertEquals(info, 1, game.getStack().size());
+            StackAbility encounter = getOnlyStackAbility(info, game);
+            assertPendingStackViews(info, game, encounter.getId(),
+                    game.getState().getFaceUpPhenomena().get(0));
             game.getStack().resolve(game);
 
             Assert.assertEquals(info, 2, game.getState().getFaceUpPlanes().size());
             Assert.assertEquals(info, "Plane - Akoum", game.getState().getFaceUpPlanes().get(0).getName());
             Assert.assertEquals(info, "Plane - Agyrem", game.getState().getFaceUpPlanes().get(1).getName());
             Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testPlaneTriggerStillHasStackView() {
+        addPlane(playerA, Planes.PLANE_FIELDS_OF_SUMMER);
+        runCode("inspect plane trigger stack view", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            PlanarCard plane = game.getState().getFaceUpPlanes().get(0);
+            game.fireEvent(new GameEvent(GameEvent.EventType.CHAOS_ENSUES,
+                    plane.getId(), null, player.getId()));
+            game.checkStateAndTriggered();
+
+            StackAbility trigger = getOnlyStackAbility(info, game);
+            GameView view = new GameView(game.getState(), game, player.getId(), null);
+            assertStackSourceView(info, view, trigger.getId(), plane.getId(),
+                    plane.getName(), CardType.PLANE);
         });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
@@ -216,5 +282,50 @@ public class PhenomenonTest extends CardTestPlayerBase {
         addCard(Zone.LIBRARY, playerB, "Mountain", 20);
         gameOptions.planeChase = true;
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
+    }
+
+    private static StackAbility getOnlyStackAbility(String info, Game game) {
+        Assert.assertEquals(info, 1, game.getStack().size());
+        StackObject stackObject = game.getStack().getFirstOrNull();
+        Assert.assertTrue(info, stackObject instanceof StackAbility);
+        return (StackAbility) stackObject;
+    }
+
+    private void assertPendingStackViews(String info, Game game, UUID stackId, Phenomenon phenomenon) {
+        int faceUpCount = game.getState().getFaceUpPhenomena().size();
+        int planarDeckSize = game.getState().getSharedPlanarDeck().size();
+
+        GameView playerView = new GameView(game.getState(), game, playerA.getId(), null);
+        GameView spectatorView = new GameView(game.getState(), game, null, null);
+        Game copiedGame = game.copy();
+        GameView copiedPlayerView = new GameView(
+                copiedGame.getState(), copiedGame, playerA.getId(), null);
+
+        assertStackSourceView(info, playerView, stackId, phenomenon.getId(),
+                phenomenon.getName(), CardType.PHENOMENON);
+        assertStackSourceView(info, spectatorView, stackId, phenomenon.getId(),
+                phenomenon.getName(), CardType.PHENOMENON);
+        assertStackSourceView(info, copiedPlayerView, stackId, phenomenon.getId(),
+                phenomenon.getName(), CardType.PHENOMENON);
+
+        Assert.assertNotNull(info, game.getStack().getStackObject(stackId));
+        Assert.assertEquals(info, faceUpCount, game.getState().getFaceUpPhenomena().size());
+        Assert.assertEquals(info, planarDeckSize, game.getState().getSharedPlanarDeck().size());
+    }
+
+    private static void assertStackSourceView(String info, GameView gameView, UUID stackId,
+                                              UUID sourceId, String sourceName, CardType sourceType) {
+        CardView stackView = gameView.getStack().get(stackId);
+        Assert.assertTrue(info, stackView instanceof StackAbilityView);
+        CardView sourceView = ((StackAbilityView) stackView).getSourceCard();
+        Assert.assertEquals(info, sourceId, sourceView.getId());
+        Assert.assertEquals(info, sourceName, sourceView.getName());
+        Assert.assertTrue(info, sourceView.getCardTypes().contains(sourceType));
+        Assert.assertFalse(info, sourceView.getRules().isEmpty());
+        Assert.assertFalse(info, sourceView.getRules().get(0).trim().isEmpty());
+        Assert.assertEquals(info, "PCA", sourceView.getExpansionSetCode());
+        Assert.assertTrue(info, sourceView.getMageObjectType().isUseTokensRepository());
+        Assert.assertEquals(info, MageObjectType.ABILITY_STACK_FROM_TOKEN,
+                sourceView.getMageObjectType());
     }
 }

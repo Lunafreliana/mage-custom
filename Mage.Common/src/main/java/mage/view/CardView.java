@@ -32,6 +32,7 @@ import mage.game.Game;
 import mage.game.command.Dungeon;
 import mage.game.command.Emblem;
 import mage.game.command.Plane;
+import mage.game.command.Phenomenon;
 import mage.game.permanent.Permanent;
 import mage.game.permanent.PermanentCard;
 import mage.game.permanent.PermanentToken;
@@ -850,6 +851,13 @@ public class CardView extends SimpleCardView {
             // Display in landscape/rotated/on its side
             this.rotate = true;
             this.rules = new ArrayList<>(plane.getAbilities().getRules(game, plane));
+        } else if (object instanceof Phenomenon) {
+            this.mageObjectType = MageObjectType.PHENOMENON;
+            Phenomenon phenomenon = (Phenomenon) object;
+            this.rarity = Rarity.SPECIAL;
+            this.frameStyle = FrameStyle.M15_NORMAL;
+            this.rotate = true;
+            this.rules = new ArrayList<>(phenomenon.getAbilities().getRules(game, phenomenon));
         } else if (object instanceof Designation) {
             this.mageObjectType = MageObjectType.DESIGNATION;
             Designation designation = (Designation) object;
@@ -940,6 +948,7 @@ public class CardView extends SimpleCardView {
         this.displayName = name;
         this.displayFullName = name;
         this.rules = new ArrayList<>(plane.getRules());
+        this.cardTypes = Collections.singletonList(CardType.PLANE);
 
         // image - display the plane in landscape (similar to Fused cards)
         this.rotate = true;
@@ -953,6 +962,31 @@ public class CardView extends SimpleCardView {
         this.playableStats = plane.playableStats.copy();
         this.isChoosable = plane.isChoosable();
         this.isSelected = plane.isSelected();
+    }
+
+    public CardView(PhenomenonView phenomenon) {
+        this(true);
+        this.gameObject = true;
+        this.id = phenomenon.getId();
+        this.mageObjectType = MageObjectType.PHENOMENON;
+        this.name = phenomenon.getName();
+        this.displayName = name;
+        this.displayFullName = name;
+        this.rules = new ArrayList<>(phenomenon.getRules());
+        this.cardTypes = Collections.singletonList(CardType.PHENOMENON);
+
+        // Planar cards use the token repository and landscape presentation.
+        this.rotate = true;
+        this.frameStyle = FrameStyle.M15_NORMAL;
+        this.expansionSetCode = phenomenon.getExpansionSetCode();
+        this.cardNumber = "";
+        this.imageFileName = phenomenon.getImageFileName();
+        this.imageNumber = phenomenon.getImageNumber();
+        this.rarity = Rarity.SPECIAL;
+
+        this.playableStats = phenomenon.playableStats.copy();
+        this.isChoosable = phenomenon.isChoosable();
+        this.isSelected = phenomenon.isSelected();
     }
 
     public CardView(Designation designation, StackAbility stackAbility) {

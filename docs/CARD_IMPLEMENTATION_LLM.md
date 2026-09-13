@@ -452,6 +452,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 19. **Text-only correctness:** `setText` can make UI text look right while rules behavior remains wrong.
 20. **Insufficient tests:** happy path passes but legality, cleanup, optional decline, multiple events, or copied state fails.
 21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
+22. **Command-zone source tested only at resolution:** a command-zone object's ability may resolve correctly while client view construction fails with that ability pending. For every new command-zone ability source type, construct player and spectator `GameView`s (including the copied-game server path) while its ability is on the stack, and verify source identity, rules, type, and image lookup metadata before testing resolution.
 
 ## 16. Reuse-first rule (mandatory)
 

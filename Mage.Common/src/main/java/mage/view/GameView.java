@@ -16,6 +16,7 @@ import mage.game.combat.CombatGroup;
 import mage.game.command.Dungeon;
 import mage.game.command.Emblem;
 import mage.game.command.Plane;
+import mage.game.command.Phenomenon;
 import mage.game.permanent.Permanent;
 import mage.game.permanent.PermanentCard;
 import mage.game.permanent.PermanentToken;
@@ -140,6 +141,12 @@ public class GameView implements Serializable {
                         checkPaid(stackObject.getId(), ((StackAbility) stackObject));
                     } else if (object instanceof Plane) {
                         CardView cardView = new CardView(new PlaneView((Plane) object, game));
+                        stackObject.setName(object.getName());
+                        stack.put(stackObject.getId(),
+                                new StackAbilityView(game, (StackAbility) stackObject, object.getName(), object, cardView));
+                        checkPaid(stackObject.getId(), ((StackAbility) stackObject));
+                    } else if (object instanceof Phenomenon) {
+                        CardView cardView = new CardView(new PhenomenonView((Phenomenon) object, game));
                         stackObject.setName(object.getName());
                         stack.put(stackObject.getId(),
                                 new StackAbilityView(game, (StackAbility) stackObject, object.getName(), object, cardView));
