@@ -196,6 +196,7 @@
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
+|PLANE:MOC|Plane - The Golden City of Orazca||TheGoldenCityOfOrazcaPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Pyramid of Mars||ThePyramidOfMarsPlane|

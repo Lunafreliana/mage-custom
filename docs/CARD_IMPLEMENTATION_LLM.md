@@ -306,6 +306,13 @@ runtime object from restoring its printed effects when it becomes active again.
 Deactivate or remove the registered runtime copies, and preserve the printed
 ability graph.
 
+Keyword abilities are not necessarily battlefield-only. If a Plane or another
+command-zone object has a keyword whose reusable implementation defaults to
+`Zone.BATTLEFIELD`, add or use a zone-aware constructor on that shared keyword
+implementation rather than duplicating the keyword in the command object. Keep
+the battlefield constructor as the default for ordinary cards, and test that the
+keyword follows the current command-zone controller.
+
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A
 battlefield ability that has not yet triggered can still have
