@@ -77,7 +77,7 @@ public class PursuedBySomethingTest extends CardTestPlayerBase {
         // Wait until the next turn so the second-main-phase trigger has resolved
         // and the manifested card exists before choosing the chaos ability's target.
         castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, "@manifestedBolt");
+        addTarget(playerA, EmptyNames.FACE_DOWN_CREATURE.getTestCommand());
         addTarget(playerA, playerB);
 
         setStrictChooseMode(true);
