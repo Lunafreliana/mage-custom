@@ -18,6 +18,7 @@ public enum Planes {
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
     PLANE_GAVONY("GavonyPlane", "Plane - Gavony"),
     PLANE_GRAND_OSSUARY("GrandOssuaryPlane", "Plane - Grand Ossuary"),
+    PLANE_GOLDMEADOW("GoldmeadowPlane", "Plane - Goldmeadow"),
     PLANE_HEDRON_FIELDS_OF_AGADEEM("HedronFieldsOfAgadeemPlane", "Plane - Hedron Fields of Agadeem"),
     PLANE_HORIZON_BOUGHS("HorizonBoughsPlane", "Plane - Horizon Boughs"),
     PLANE_KHARASHA_FOOTHILLS("KharashaFoothillsPlane", "Plane - Kharasha Foothills", "MOC"),
