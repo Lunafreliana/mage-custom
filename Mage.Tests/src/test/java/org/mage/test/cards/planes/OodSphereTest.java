@@ -20,13 +20,13 @@ public class OodSphereTest extends CardTestPlayerBase {
     public void noncreatureSpellsOfEveryPlayerHaveConvoke() {
         addPlane(playerA, Planes.PLANE_OOD_SPHERE);
         addCard(Zone.BATTLEFIELD, playerB, "Goblin Racketeer", 4);
-        addCard(Zone.HAND, playerB, "Diabolic Tutor");
-        addCard(Zone.HAND, playerB, "Hill Giant");
+        addCard(Zone.HAND, playerB, "Hedron Archive");
+        addCard(Zone.HAND, playerB, "Juggernaut");
 
         checkPlayableAbility("opponent's noncreature spell has convoke", 2, PhaseStep.PRECOMBAT_MAIN,
-                playerB, "Cast Diabolic Tutor", true);
+                playerB, "Cast Hedron Archive", true);
         checkPlayableAbility("creature spell does not have convoke", 2, PhaseStep.PRECOMBAT_MAIN,
-                playerB, "Cast Hill Giant", false);
+                playerB, "Cast Juggernaut", false);
 
         setStrictChooseMode(true);
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
@@ -50,7 +50,8 @@ public class OodSphereTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Hill Giant");
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Tap creature", "Hill Giant");
-        attack(2, playerB, "Hill Giant", playerA);
+        // Goad makes Hill Giant attack automatically. Explicitly scheduling the mandatory attack would
+        // duplicate the framework's forced-attack action and leave an unconsumed test command.
 
         setStrictChooseMode(true);
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
