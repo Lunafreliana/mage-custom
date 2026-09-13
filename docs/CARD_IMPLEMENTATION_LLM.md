@@ -419,6 +419,14 @@ test player can select non-mana special actions through `activateAbility`; match
 the action's current generated rules text rather than a legacy wrapper's cost or
 wording.
 
+Registering a special action does not make it available at every priority.
+Use `SpecialActions.getAvailableActions` for the GUI's Special button and its
+selection menu, so both consult each action's `canActivate` restrictions and
+preserve the distinction between ordinary actions and mana-payment actions.
+Do not put a blanket sorcery-timing restriction on the Special button: other
+actions can be legal during combat or payment. Test the `GameView` and available
+choices before activation, including forbidden timing and an occupied stack.
+
 Special actions may have no card source and therefore a null `sourceId`. Shared
 cost-modification effects must first reject ability kinds they do not modify and
 must compare identifiers null-safely; a spell-only modifier must not dereference
@@ -453,6 +461,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 20. **Insufficient tests:** happy path passes but legality, cleanup, optional decline, multiple events, or copied state fails.
 21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
 22. **Command-zone source tested only at resolution:** a command-zone object's ability may resolve correctly while client view construction fails with that ability pending. For every new command-zone ability source type, construct player and spectator `GameView`s (including the copied-game server path) while its ability is on the stack, and verify source identity, rules, type, and image lookup metadata before testing resolution.
+23. **Historical counter reset implemented outside its watcher:** when card text resets a game-history value (for example, commander casts used for commander tax), expose and call a semantic reset operation on the authoritative watcher. Do not replace the watcher or mutate only one derived counter; all indexes and aggregates maintained by that watcher must remain consistent.
 
 ## 16. Reuse-first rule (mandatory)
 

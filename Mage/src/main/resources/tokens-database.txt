@@ -171,6 +171,7 @@
 |PLANE:PCA|Plane - Academy at Tolaria West||AcademyAtTolariaWestPlane|
 |PLANE:PCA|Plane - Agyrem||AgyremPlane|
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
+|PLANE:WHO|Plane - Antarctic Research Base||AntarcticResearchBasePlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
@@ -180,18 +181,22 @@
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
+|PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
 |PLANE:PCA|Plane - Panopticon||PanopticonPlane|
+|PLANE:PCA|Plane - Prahv||PrahvPlane|
 |PLANE:PCA|Plane - Selesnya Loft Gardens||SelesnyaLoftGardensPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
+|PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
+|PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Pyramid of Mars||ThePyramidOfMarsPlane|
 |PLANE:MOC|Plane - Towashi||TowashiPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
