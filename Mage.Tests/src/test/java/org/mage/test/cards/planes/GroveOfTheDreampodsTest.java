@@ -73,6 +73,9 @@ public class GroveOfTheDreampodsTest extends CardTestPlayerBase {
         useGroveOfTheDreampodsPlanechase();
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
         removeAllCardsFromLibrary(playerA);
+        // Keep a noncreature card available for the turn-one draw. The upkeep
+        // trigger returns it to the library, so the player reaches main phase.
+        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
         skipInitShuffling();
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
