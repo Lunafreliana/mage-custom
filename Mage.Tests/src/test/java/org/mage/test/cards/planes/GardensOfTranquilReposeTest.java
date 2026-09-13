@@ -19,6 +19,7 @@ public class GardensOfTranquilReposeTest extends CardTestPlayerBase {
 
     @Test
     public void deadCreatureIsExiledAndItsControllerScries() {
+        setStrictChooseMode(true);
         addPlane(playerA, Planes.PLANE_GARDENS_OF_TRANQUIL_REPOSE);
         addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
         addCard(Zone.LIBRARY, playerB, "Island");
@@ -40,6 +41,7 @@ public class GardensOfTranquilReposeTest extends CardTestPlayerBase {
 
     @Test
     public void chaosCreatesOneDalekPlusOneForEachLinkedExiledCard() {
+        setStrictChooseMode(true);
         addPlane(playerA, Planes.PLANE_GARDENS_OF_TRANQUIL_REPOSE);
         addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
 
