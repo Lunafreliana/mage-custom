@@ -10,6 +10,9 @@ import mage.game.Game;
 import mage.game.command.Phenomenon;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.command.PlanarDeckMode;
+import mage.game.command.Plane;
+import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
@@ -26,6 +29,7 @@ import org.mage.test.serverside.base.CardTestPlayerBase;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class PhenomenonTest extends CardTestPlayerBase {
@@ -125,6 +129,11 @@ public class PhenomenonTest extends CardTestPlayerBase {
         assertPhenomenonEncounterStackViews(new SpatialMergingPhenomenon());
     }
 
+    @Test
+    public void testInterplanarTunnelEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new InterplanarTunnelPhenomenon());
+    }
+
     private void assertPhenomenonEncounterStackViews(Phenomenon phenomenon) {
         prepareStartedPlanechaseGame();
         runCode("inspect " + phenomenon.getName() + " encounter stack views",
@@ -196,6 +205,66 @@ public class PhenomenonTest extends CardTestPlayerBase {
             Assert.assertEquals(info, "Plane - Akoum", game.getState().getFaceUpPlanes().get(0).getName());
             Assert.assertEquals(info, "Plane - Agyrem", game.getState().getFaceUpPlanes().get(1).getName());
             Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testInterplanarTunnelChoosesNextPlaneInSharedMode() {
+        testInterplanarTunnelChoosesNextPlane(PlanarDeckMode.SHARED);
+    }
+
+    @Test
+    public void testInterplanarTunnelChoosesNextPlaneInIndividualMode() {
+        testInterplanarTunnelChoosesNextPlane(PlanarDeckMode.INDIVIDUAL);
+    }
+
+    private void testInterplanarTunnelChoosesNextPlane(PlanarDeckMode mode) {
+        prepareStartedPlanechaseGame();
+        setChoice(playerA, "Plane - Agyrem");
+        runCode("encounter Interplanar Tunnel in " + mode + " mode",
+                1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            game.getState().setPlanarDeckMode(mode);
+            if (mode == PlanarDeckMode.INDIVIDUAL) {
+                game.getState().setPlayerPlanarDeck(player.getId(), Collections.emptyList(), false);
+                // The test starts with the shared-mode fixture and then installs
+                // an individual deck. Associate its already face-up starting
+                // Plane with that deck so the Phenomenon SBA can return it to
+                // its owner before revealing the chosen Plane.
+                game.getState().getFaceUpPlanarCards().forEach(card ->
+                        card.setPlanarDeckOwnerId(player.getId()));
+            }
+            Assert.assertTrue(info, game.addPhenomenon(new InterplanarTunnelPhenomenon(), player.getId()));
+
+            List<PlanarCard> cards = Arrays.asList(
+                    Plane.createPlane(Planes.PLANE_AKOUM),
+                    new MutualEpiphanyPhenomenon(),
+                    Plane.createPlane(Planes.PLANE_FIELDS_OF_SUMMER),
+                    Plane.createPlane(Planes.PLANE_AGYREM),
+                    Plane.createPlane(Planes.PLANE_BANT),
+                    Plane.createPlane(Planes.PLANE_NAYA));
+            cards.forEach(card -> card.setPlanarDeckOwnerId(player.getId()));
+            if (mode == PlanarDeckMode.INDIVIDUAL) {
+                game.getState().setPlayerPlanarDeck(player.getId(), cards, false);
+            } else {
+                game.getState().getSharedPlanarDeck().setPlanes(cards, false);
+            }
+
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+            game.checkStateAndTriggered();
+
+            Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
+            Assert.assertEquals(info, 1, game.getState().getFaceUpPlanes().size());
+            Assert.assertEquals(info, "Plane - Agyrem",
+                    game.getState().getFaceUpPlanes().get(0).getName());
+            int remainingCards = mode == PlanarDeckMode.INDIVIDUAL
+                    ? game.getState().getPlayerPlanarDeck(player.getId()).size()
+                    : game.getState().getSharedPlanarDeck().size();
+            // The original face-up Plane is also returned to the deck by the
+            // Phenomenon state-based action before the chosen Plane is revealed.
+            Assert.assertEquals(info, cards.size() + 1, remainingCards);
         });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
@@ -275,6 +344,19 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals("Phenomenon - Reality Shaping", metadata.getImageName());
         Assert.assertEquals("PCA", metadata.getSetCode());
         Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof RealityShapingPhenomenon);
+    }
+
+    @Test
+    public void testInterplanarTunnelRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.INTERPLANAR_TUNNEL));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Interplanar Tunnel", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Interplanar Tunnel", metadata.getImageName());
+        Assert.assertEquals("PCA", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof InterplanarTunnelPhenomenon);
     }
 
     private void prepareStartedPlanechaseGame() {

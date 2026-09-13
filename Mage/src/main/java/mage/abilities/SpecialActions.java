@@ -1,11 +1,13 @@
 package mage.abilities;
 
+import mage.game.Game;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * Special actions to activate at any priority time (GUI has special button to show a special commands list)
+ * Special actions with individual activation restrictions (GUI has a special button to show available actions)
  * <p>
  * Two types of action:
  * - mana actions (auto-generated on each mana pay cycle, auto-clean)
@@ -36,6 +38,16 @@ public class SpecialActions extends AbilitiesImpl<SpecialAction> {
             }
         }
         return controlledBy;
+    }
+
+    /**
+     * Available choices for the special-action button and its menu. Registration
+     * alone does not mean an action is legal at the current priority or payment step.
+     */
+    public Map<UUID, SpecialAction> getAvailableActions(UUID controllerId, boolean manaAction, Game game) {
+        Map<UUID, SpecialAction> available = getControlledBy(controllerId, manaAction);
+        available.values().removeIf(action -> !action.canActivate(controllerId, game).canActivate());
+        return available;
     }
 
     @Override

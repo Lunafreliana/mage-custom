@@ -12,9 +12,9 @@ concurrency:
 
 jobs:
   publish:
-    # Keep publishing off GitHub-hosted runners. This job is intentionally sent
-    # to the lightweight local runner that also handles the labeler workflows.
-    runs-on: [self-hosted, windows, x64, xmage]
+    # Keep the existing Windows-specific publish commands, but run them on a
+    # GitHub-hosted Windows runner.
+    runs-on: windows-latest
     timeout-minutes: 60
 
     steps:

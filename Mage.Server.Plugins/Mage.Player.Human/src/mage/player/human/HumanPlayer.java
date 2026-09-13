@@ -2301,7 +2301,8 @@ public class HumanPlayer extends PlayerImpl {
             return;
         }
 
-        Map<UUID, SpecialAction> specialActions = game.getState().getSpecialActions().getControlledBy(playerId, unpaidForManaAction != null);
+        Map<UUID, SpecialAction> specialActions = game.getState().getSpecialActions()
+                .getAvailableActions(playerId, unpaidForManaAction != null, game);
         if (!specialActions.isEmpty()) {
             prepareForResponse(game);
             if (!isExecutingMacro()) {
