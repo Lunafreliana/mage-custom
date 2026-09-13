@@ -488,6 +488,11 @@ Also use `rg 'new CandidateEffect|CandidateEffect.getInstance' Mage.Sets/src/mag
 1. **Is it a spell instruction?** Add effects/targets to `getSpellAbility()` in printed order.
 2. **“When/Whenever/At …”** Use a triggered ability. “At the beginning of your upkeep/end step” suggests the matching reusable beginning trigger. Determine controller, active player, and trigger zone.
 3. **“When [this] enters”** use `EntersBattlefieldTriggeredAbility`; “dies” uses `DiesTriggeredAbility`; do not approximate dies with any graveyard move.
+   Planechase “when you planeswalk away from [this]” abilities use
+   `PlaneswalkAwayFromSourceTriggeredAbility`. The engine emits the departure
+   event after returning the planar object to its planar deck while its
+   command-zone triggers remain registered for the rules-required look back in
+   time; do not approximate this with the event for the destination Plane.
 4. **“If” in the trigger clause before the comma** may be intervening-if: use the trigger condition so it checks twice.
 5. **“As [this] enters” / “enters with”** search as-enters replacement/enters-with-counter abilities; an ETB trigger is too late.
 6. **“If … would … instead”** is a replacement effect matching the event, not a trigger after it.

@@ -2342,12 +2342,16 @@ public abstract class GameImpl implements Game {
 
     private void bottomFaceUpPlanarCards() {
         for (PlanarCard plane : new ArrayList<>(state.getFaceUpPlanarCards())) {
-            state.removeTriggersOfSourceId(plane.getId());
             state.getCommand().remove(plane);
             SharedPlanarDeck ownerDeck = state.getPlanarDeckMode() == PlanarDeckMode.SHARED
                     ? state.getSharedPlanarDeck()
                     : state.getPlayerPlanarDeck(plane.getPlanarDeckOwnerId());
             ownerDeck.putOnBottom(plane);
+            // Keep this object's triggers registered through its departure event;
+            // rules 603.10g and 701.31d make planeswalk-away triggers look back in time.
+            fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                    plane.getId(), (Ability) null, state.getPlanarControllerId(), 0, true));
+            state.removeTriggersOfSourceId(plane.getId());
         }
     }
 
