@@ -522,6 +522,11 @@ public class CardView extends SimpleCardView {
             this.power = Integer.toString(card.getPower().getValue());
             this.toughness = Integer.toString(card.getToughness().getValue());
             this.cardTypes = new ArrayList<>(card.getCardType(game));
+            if (this.cardTypes.contains(CardType.PLANE) || this.cardTypes.contains(CardType.PHENOMENON)) {
+                // Supplemental planar carriers use the same landscape presentation
+                // as their runtime command-zone counterparts.
+                this.rotate = true;
+            }
             this.subTypes = card.getSubtype(game).copy();
             this.superTypes = card.getSuperType(game);
             this.color = card.getColor(game).copy();
