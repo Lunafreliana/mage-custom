@@ -18,7 +18,6 @@ public class CardDownloadData {
     private boolean isSecondSide;
     private boolean isFlippedSide;
     private boolean isSplitCard;
-    private boolean isExactNameLookup;
     private final boolean isUsesVariousArt;
 
     public CardDownloadData(String name, String setCode, String collectorId, boolean isUsesVariousArt, Integer imageNumber) {
@@ -27,12 +26,6 @@ public class CardDownloadData {
         this.collectorId = collectorId;
         this.isUsesVariousArt = isUsesVariousArt;
         this.imageNumber = imageNumber;
-    }
-
-    public static CardDownloadData forExactNameCard(String name, String setCode, String localCollectorId) {
-        CardDownloadData result = new CardDownloadData(name, setCode, localCollectorId, false, 0);
-        result.setExactNameLookup(true);
-        return result;
     }
 
     public CardDownloadData(final CardDownloadData card) {
@@ -45,7 +38,6 @@ public class CardDownloadData {
         this.isSecondSide = card.isSecondSide;
         this.isFlippedSide = card.isFlippedSide;
         this.isSplitCard = card.isSplitCard;
-        this.isExactNameLookup = card.isExactNameLookup;
         this.isUsesVariousArt = card.isUsesVariousArt;
     }
 
@@ -70,10 +62,6 @@ public class CardDownloadData {
         if (this.isToken != other.isToken) {
             return false;
         }
-        if (this.isExactNameLookup != other.isExactNameLookup) {
-            return false;
-        }
-
         return this.isSecondSide == other.isSecondSide;
     }
 
@@ -85,7 +73,6 @@ public class CardDownloadData {
         hash = 47 * hash + (this.collectorId != null ? this.collectorId.hashCode() : 0);
         hash = 47 * hash + (this.imageNumber != null ? this.imageNumber.hashCode() : 0);
         hash = 47 * hash + (this.isToken ? 1 : 0);
-        hash = 47 * hash + (this.isExactNameLookup ? 1 : 0);
         hash = 47 * hash + (this.isSecondSide ? 1 : 0);
         return hash;
     }
@@ -141,19 +128,6 @@ public class CardDownloadData {
 
     public void setToken(boolean token) {
         this.isToken = token;
-    }
-
-    /**
-     * Marks a real card whose local/cache identity is reliable, but whose set
-     * and collector number are presentation metadata rather than a Scryfall
-     * printing identity.
-     */
-    public void setExactNameLookup(boolean exactNameLookup) {
-        isExactNameLookup = exactNameLookup;
-    }
-
-    public boolean isExactNameLookup() {
-        return isExactNameLookup;
     }
 
     public boolean isSecondSide() {

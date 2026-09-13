@@ -7,7 +7,6 @@ import com.google.gson.JsonParser;
 import mage.MageException;
 import mage.client.remote.XmageURLConnection;
 import mage.client.util.CardLanguage;
-import mage.game.command.PlanarCardRegistry;
 import mage.util.JsonUtil;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileInputStream;
@@ -99,19 +98,17 @@ public class ScryfallImageSource implements CardImageSource {
         String baseUrl = null;
         String alternativeUrl = null;
 
-        // Some real-card carriers (currently Planechase deck-builder entries)
-        // deliberately have no physical printing identity. Their authoritative
-        // name is still sufficient for Scryfall's exact-name endpoint, while
-        // their synthetic set/collector metadata remains the local cache key.
-        if (!isToken && card.isExactNameLookup()) {
-            baseUrl = createExactNameImageUrl(card.getName());
-        }
-
         // TOKENS TRY
 
-        // tokens support only direct links
+        // Prefer explicit token links; planar objects can fall back to exact name.
         if (isToken) {
             baseUrl = ScryfallImageSupportTokens.findTokenLink(card.getSet(), card.getName(), card.getImageNumber());
+            if (baseUrl == null) {
+                String exactName = ScryfallImageSupportTokens.getPlanarExactName(card.getName());
+                if (exactName != null) {
+                    baseUrl = createExactNameImageUrl(exactName);
+                }
+            }
             alternativeUrl = null;
         }
 
@@ -879,13 +876,6 @@ public class ScryfallImageSource implements CardImageSource {
             }
         }
 
-        // Exact-name planar lookups retain their carrier set as the cache key,
-        // including synthetic codes which are not physical Scryfall sets.
-        PlanarCardRegistry.getAvailableCards().stream()
-                .map(PlanarCardRegistry.Metadata::getSetCode)
-                .filter(code -> !supportedSetsCopy.contains(code))
-                .forEach(supportedSetsCopy::add);
-
         return supportedSetsCopy;
     }
 
@@ -896,14 +886,10 @@ public class ScryfallImageSource implements CardImageSource {
     }
 
     @Override
-    public boolean isExactNameLookupSupported() {
-        return true;
-    }
-
-    @Override
     public boolean isTokenImageProvided(String setCode, String cardName, Integer tokenNumber) {
-        // only direct tokens from set
-        return ScryfallImageSupportTokens.findTokenLink(setCode, cardName, tokenNumber) != null;
+        // Regular tokens require an explicit link; planar names have a generic fallback.
+        return ScryfallImageSupportTokens.findTokenLink(setCode, cardName, tokenNumber) != null
+                || ScryfallImageSupportTokens.getPlanarExactName(cardName) != null;
     }
 
     /**
