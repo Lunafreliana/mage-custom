@@ -228,6 +228,12 @@ public class PhenomenonTest extends CardTestPlayerBase {
             game.getState().setPlanarDeckMode(mode);
             if (mode == PlanarDeckMode.INDIVIDUAL) {
                 game.getState().setPlayerPlanarDeck(player.getId(), Collections.emptyList(), false);
+                // The test starts with the shared-mode fixture and then installs
+                // an individual deck. Associate its already face-up starting
+                // Plane with that deck so the Phenomenon SBA can return it to
+                // its owner before revealing the chosen Plane.
+                game.getState().getFaceUpPlanarCards().forEach(card ->
+                        card.setPlanarDeckOwnerId(player.getId()));
             }
             Assert.assertTrue(info, game.addPhenomenon(new InterplanarTunnelPhenomenon(), player.getId()));
 
