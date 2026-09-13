@@ -23,6 +23,7 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
         skipInitShuffling();
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         addTarget(playerA, "Grizzly Bears"); // planeswalk surveil: put the Bears into the graveyard
         addTarget(playerA, TestPlayer.TARGET_SKIP); // upkeep surveil: leave the Island on top
 
@@ -40,11 +41,14 @@ public class ThePyramidOfMarsTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_THE_PYRAMID_OF_MARS);
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
         addCard(Zone.GRAVEYARD, playerA, "Divination");
+        removeAllCardsFromLibrary(playerA);
+        skipInitShuffling();
 
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Grizzly Bears");
 
