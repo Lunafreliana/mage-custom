@@ -14,14 +14,18 @@ import org.junit.Test;
 import org.mage.test.player.TestPlayer;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
+import java.util.Collections;
+
 public class TheGreatAerieTest extends CardTestPlayerBase {
 
     @Test
     public void planeswalkAndEachPlanarControllersUpkeepBolster() {
-        addPlane(playerA, Planes.PLANE_THE_GREAT_AERIE);
+        useTheGreatAeriePlanechase();
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
+        setStrictChooseMode(true);
         setStopAt(2, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
@@ -38,10 +42,12 @@ public class TheGreatAerieTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant"); // 3/3
         addChaosSpell();
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Wall of Frost");
         addTarget(playerA, "Hill Giant");
 
+        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
@@ -57,6 +63,7 @@ public class TheGreatAerieTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
         addChaosSpell();
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Grizzly Bears");
         addTarget(playerA, TestPlayer.TARGET_SKIP);
@@ -86,5 +93,10 @@ public class TheGreatAerieTest extends CardTestPlayerBase {
         SpellAbility ability = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         ability.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, ability, null, CardType.SORCERY);
+    }
+
+    private void useTheGreatAeriePlanechase() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_THE_GREAT_AERIE);
     }
 }
