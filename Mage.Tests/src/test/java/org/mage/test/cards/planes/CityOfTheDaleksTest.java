@@ -26,7 +26,8 @@ public class CityOfTheDaleksTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertLife(playerB, 18);
+        // Grizzly Bears deals 2 combat damage in addition to the 2 life lost to the trigger.
+        assertLife(playerB, 16);
     }
 
     @Test
