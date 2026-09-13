@@ -24,8 +24,8 @@ public class AmysHomeTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Island");
 
         setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
-        addTarget(playerA, "Grizzly Bears");
-        addTarget(playerA, "Hill Giant");
+        setChoice(playerA, "Grizzly Bears");
+        setChoice(playerA, "Hill Giant");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
@@ -48,6 +48,9 @@ public class AmysHomeTest extends CardTestPlayerBase {
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
+        setChoice(playerA, TestPlayer.CHOICE_SKIP); // Skip the first optional suspend effect.
+        setChoice(playerA, TestPlayer.CHOICE_SKIP); // Skip the second optional suspend effect.
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Grizzly Bears"); // Add a time counter.
         addTarget(playerA, TestPlayer.TARGET_SKIP); // Do not remove one.
