@@ -408,6 +408,7 @@ public class ScryfallImageSupportTokens {
             put("PCA/Plane - Academy at Tolaria West", "https://api.scryfall.com/cards/opca/9/en?format=image");
             put("PCA/Plane - Agyrem", "https://api.scryfall.com/cards/opca/11/en?format=image");
             put("PCA/Plane - Akoum", "https://api.scryfall.com/cards/opca/12/en?format=image");
+            put("WHO/Plane - Amy's Home", "https://api.scryfall.com/cards/who/566/en?format=image");
             put("PCA/Plane - Astral Arena", "https://api.scryfall.com/cards/opca/14/en?format=image");
             put("PCA/Plane - Bant", "https://api.scryfall.com/cards/opca/15/en?format=image");
             put("PCA/Plane - Eloren Wilds", "https://api.scryfall.com/cards/opca/21/en?format=image");

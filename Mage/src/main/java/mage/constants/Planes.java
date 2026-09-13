@@ -7,6 +7,7 @@ public enum Planes {
     PLANE_ACADEMY_AT_TOLARIA_WEST("AcademyAtTolariaWestPlane", "Plane - Academy at Tolaria West"),
     PLANE_AGYREM("AgyremPlane", "Plane - Agyrem"),
     PLANE_AKOUM("AkoumPlane", "Plane - Akoum"),
+    PLANE_AMYS_HOME("AmysHomePlane", "Plane - Amy's Home", "WHO"),
     PLANE_ANTARCTIC_RESEARCH_BASE("AntarcticResearchBasePlane", "Plane - Antarctic Research Base", "WHO"),
     PLANE_ASTRAL_ARENA("AstralArenaPlane", "Plane - Astral Arena"),
     PLANE_BAD_WOLF_BAY("BadWolfBayPlane", "Plane - Bad Wolf Bay", "WHO"),

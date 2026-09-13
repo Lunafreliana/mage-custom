@@ -171,6 +171,7 @@
 |PLANE:PCA|Plane - Academy at Tolaria West||AcademyAtTolariaWestPlane|
 |PLANE:PCA|Plane - Agyrem||AgyremPlane|
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
+|PLANE:WHO|Plane - Amy's Home||AmysHomePlane|
 |PLANE:WHO|Plane - Antarctic Research Base||AntarcticResearchBasePlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:WHO|Plane - Bad Wolf Bay||BadWolfBayPlane|
