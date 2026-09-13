@@ -4,6 +4,7 @@ import mage.MageInt;
 import mage.cards.MageCardLocation;
 import mage.cards.action.ActionCallback;
 import mage.client.dialog.PreferencesDialog;
+import mage.client.util.CardRenderMode;
 import mage.client.util.GUISizeHelper;
 import mage.client.util.ImageCaches;
 import mage.client.util.ImageHelper;
@@ -11,6 +12,7 @@ import mage.client.util.SoftValuesLoadingCache;
 import mage.components.ImagePanel;
 import mage.components.ImagePanelStyle;
 import mage.constants.AbilityType;
+import mage.constants.CardType;
 import mage.constants.SubType;
 import mage.util.DebugUtil;
 import mage.view.CardView;
@@ -76,6 +78,7 @@ public class CardPanelRenderModeImage extends CardPanel {
     private String fullImagePath = null;
 
     private boolean hasImage = false;
+    private CardRenderer noArtRenderer;
 
     private boolean displayTitleAnyway;
     private final boolean displayFullImagePath;
@@ -301,6 +304,7 @@ public class CardPanelRenderModeImage extends CardPanel {
 
         displayTitleAnyway = PreferencesDialog.getCachedValue(PreferencesDialog.KEY_SHOW_CARD_NAMES, "true").equals("true");
         displayFullImagePath = PreferencesDialog.getCachedValue(PreferencesDialog.KEY_SHOW_FULL_IMAGE_PATH, "false").equals("true");
+        updateNoArtRenderer(newGameCard);
 
         // Title Text
         titleText = new GlowText();
@@ -422,11 +426,11 @@ public class CardPanelRenderModeImage extends CardPanel {
         // TITLE
 
         boolean showText = !isAnimationPanel() && canShowCardIcons(cardWidth, hasImage);
-        titleText.setVisible(showText);
+        titleText.setVisible(showText && !usesTextFallback(cardView, hasImage));
         ptText1.setVisible(showText && !ptText1.getText().isEmpty());
         ptText2.setVisible(showText && !ptText2.getText().isEmpty());
         ptText3.setVisible(showText && !ptText3.getText().isEmpty());
-        fullImageText.setVisible(fullImagePath != null);
+        fullImageText.setVisible(fullImagePath != null && !usesTextFallback(cardView, hasImage));
 
         if (showText) {
             int mainFontSize = GUISizeHelper.getImageRendererMainFontSize(cardHeight);
@@ -504,6 +508,21 @@ public class CardPanelRenderModeImage extends CardPanel {
                                 hasImage, isSelected(), isChoosable(), getGameCard().isPlayable(), getGameCard().isCanAttack(),
                                 getGameCard().isCanBlock())),
                 0, 0, cardLocation.getCardWidth(), cardLocation.getCardHeight(), null);
+        if (usesTextFallback(getGameCard(), hasImage)) {
+            BufferedImage fallback = GraphicsUtilities.createCompatibleTranslucentImage(
+                    cardLocation.getCardWidth(), cardLocation.getCardHeight());
+            Graphics2D fallbackGraphics = fallback.createGraphics();
+            try {
+                fallbackGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                fallbackGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                noArtRenderer.draw(fallbackGraphics,
+                        new CardPanelAttributes(cardLocation.getCardWidth(), cardLocation.getCardHeight(),
+                                isChoosable(), isSelected(), isTransformed()), fallback);
+            } finally {
+                fallbackGraphics.dispose();
+            }
+            g2d.drawImage(fallback, 0, 0, null);
+        }
         g2d.dispose();
     }
 
@@ -617,6 +636,7 @@ public class CardPanelRenderModeImage extends CardPanel {
     public void update(CardView card) {
         // Super
         super.update(card);
+        updateNoArtRenderer(getGameCard());
 
         // real card to show stores in getGameCard (e.g. after user clicks on night icon -- night card must be rendered)
         updatePTTexts(getGameCard());
@@ -632,6 +652,20 @@ public class CardPanelRenderModeImage extends CardPanel {
 
         // Finally, queue a repaint
         repaint();
+    }
+
+    static boolean usesTextFallback(CardView card, boolean hasImage) {
+        return !hasImage && (card.getCardTypes().contains(CardType.PLANE)
+                || card.getCardTypes().contains(CardType.PHENOMENON));
+    }
+
+    private void updateNoArtRenderer(CardView card) {
+        if (usesTextFallback(card, false)) {
+            this.noArtRenderer = new CardRendererFactory().create(card, CardRenderMode.FORCED_M15.getId());
+            this.noArtRenderer.setArtImage(null);
+        } else {
+            this.noArtRenderer = null;
+        }
     }
 
     @Override

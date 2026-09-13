@@ -47,7 +47,11 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Balduvian Bears");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN, playerA);
         runCode("commander was cast once", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
-            UUID commanderId = getPermanent("Balduvian Bears", player).getId();
+            UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
+                    .stream()
+                    .filter(id -> game.getCard(id) != null
+                            && game.getCard(id).getName().equals("Balduvian Bears"))
+                    .findFirst().orElse(null);
             CommanderPlaysCountWatcher watcher = game.getState().getWatcher(CommanderPlaysCountWatcher.class);
             Assert.assertNotNull(watcher);
             Assert.assertEquals(1, watcher.getPlaysCount(commanderId));
@@ -56,7 +60,11 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         runCode("commander tax reset", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
-            UUID commanderId = getPermanent("Balduvian Bears", player).getId();
+            UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
+                    .stream()
+                    .filter(id -> game.getCard(id) != null
+                            && game.getCard(id).getName().equals("Balduvian Bears"))
+                    .findFirst().orElse(null);
             CommanderPlaysCountWatcher watcher = game.getState().getWatcher(CommanderPlaysCountWatcher.class);
             Assert.assertNotNull(watcher);
             Assert.assertEquals(0, watcher.getPlaysCount(commanderId));
