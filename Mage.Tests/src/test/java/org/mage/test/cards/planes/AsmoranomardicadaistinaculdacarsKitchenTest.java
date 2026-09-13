@@ -65,7 +65,9 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
 
         assertGraveyardCount(playerA, "Grizzly Bears", 1);
         assertGraveyardCount(playerA, "Sol Ring", 1);
-        assertHandCount(playerA, "Island", 3); // One turn draw plus two drawn by the chaos ability.
+        // The starting player skips their first draw step, so these are exactly the two cards
+        // drawn by the chaos ability.
+        assertHandCount(playerA, "Island", 2);
         assertLife(playerA, 18);
     }
 
