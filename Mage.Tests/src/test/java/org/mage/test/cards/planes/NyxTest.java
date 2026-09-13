@@ -18,6 +18,7 @@ public class NyxTest extends CardTestPlayerBase {
     public void nontokenCreaturesBecomeEnchantmentsAndTriggerConstellation() {
         addPlane(playerA, Planes.PLANE_NYX);
         addCard(Zone.HAND, playerA, "Grizzly Bears");
+        addCard(Zone.BATTLEFIELD, playerA, "Forest", 2);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears");
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -32,6 +33,7 @@ public class NyxTest extends CardTestPlayerBase {
     public void tokenCreaturesDoNotBecomeEnchantmentsOrTriggerConstellation() {
         addPlane(playerA, Planes.PLANE_NYX);
         addCard(Zone.HAND, playerA, "Raise the Alarm");
+        addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Raise the Alarm");
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -50,7 +52,7 @@ public class NyxTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         setChoice(playerA, "Green");
-        checkManaPool("mana from green devotion", 1, PhaseStep.POSTCOMBAT_MAIN, playerA, "G", 3);
+        checkManaPool("mana from green devotion", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "G", 3);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
