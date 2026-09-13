@@ -22,6 +22,7 @@ public enum Planes {
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
     PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
     PLANE_PANOPTICON("PanopticonPlane", "Plane - Panopticon"),
+    PLANE_PURSUED_BY_SOMETHING("PursuedBySomethingPlane", "Plane - Pursued by Something", "PUNK"),
     PLANE_PRAHV("PrahvPlane", "Plane - Prahv"),
     PLANE_SELESNYA_LOFT_GARDENS("SelesnyaLoftGardensPlane", "Plane - Selesnya Loft Gardens"),
     PLANE_STAIRS_TO_INFINITY("StairsToInfinityPlane", "Plane - Stairs to Infinity"),
