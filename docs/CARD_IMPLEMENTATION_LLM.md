@@ -412,6 +412,12 @@ but normal turn draws and triggered mills still change the counts. Use different
 card names for library filler and pre-seeded graveyard cards when testing which
 cards an effect returns.
 
+Commander test bases also load a default commander. Adding another card to
+`Zone.COMMAND` does not remove that commander. When asserting cast history or
+commander tax, identify the actual card being exercised (for example, through
+`getPermanent(cardName, player)` after it resolves); never select an arbitrary
+commander with `getCommandersIds(...).stream().findFirst()`.
+
 Planechase tests must distinguish startup from a real planeswalk. Configure
 `gameOptions.planeChase` and an explicit `gameOptions.sharedPlanarDeck` for the
 normal starting-plane procedure. The `addPlane` test helper enters the gameplay

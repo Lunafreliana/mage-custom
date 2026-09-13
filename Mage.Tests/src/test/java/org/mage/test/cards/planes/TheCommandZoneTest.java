@@ -4,7 +4,6 @@ import mage.abilities.SpellAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.common.ChaosEnsuesEffect;
 import mage.constants.CardType;
-import mage.constants.CommanderCardType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
@@ -48,20 +47,20 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Balduvian Bears");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN, playerA);
         runCode("commander was cast once", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
-            UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
-                    .stream().findFirst().orElse(null);
+            UUID commanderId = getPermanent("Balduvian Bears", player).getId();
             CommanderPlaysCountWatcher watcher = game.getState().getWatcher(CommanderPlaysCountWatcher.class);
             Assert.assertNotNull(watcher);
             Assert.assertEquals(1, watcher.getPlaysCount(commanderId));
+            Assert.assertEquals(1, watcher.getPlayerCount(player.getId()));
         });
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         runCode("commander tax reset", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
-            UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
-                    .stream().findFirst().orElse(null);
+            UUID commanderId = getPermanent("Balduvian Bears", player).getId();
             CommanderPlaysCountWatcher watcher = game.getState().getWatcher(CommanderPlaysCountWatcher.class);
             Assert.assertNotNull(watcher);
             Assert.assertEquals(0, watcher.getPlaysCount(commanderId));
+            Assert.assertEquals(0, watcher.getPlayerCount(player.getId()));
         });
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
