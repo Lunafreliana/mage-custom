@@ -273,6 +273,13 @@ Cards add a watcher to an ability/card only where registration is required; many
 
 A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, copy constructor, and `copy()`. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
 
+An ability on a runtime-added command or supplemental object can enter the game
+after the normal ability-watcher collection pass. If a reusable ability depends
+on historical state, verify that its watcher is available before such an object
+is activated; register a game-scoped watcher in the default game setup when the
+mechanic must support late-added sources. A null-safe lookup prevents a crash,
+but is not a substitute for recording the events needed for correct behavior.
+
 ### “One or more” simultaneous-event triggers
 
 Do not implement “whenever one or more” by listening to each individual event. If
@@ -412,12 +419,26 @@ whereas `setChoice` is used only for the separate ordering prompt when two or
 more cards remain on top. A mismatched command may be consumed by the following
 prompt and produce a misleading invalid-choice failure.
 
+Manifest dread likewise selects from a private temporary card collection with
+`Player.choose`, so tests must queue the card to manifest with `setChoice`, even
+though the engine represents that selection with `TargetCardInLibrary`. Using
+`addTarget` leaves the target command unconsumed and can corrupt the commands
+queued for the following ability.
+
 Rules-provided special actions are stored separately from ordinary playable
 abilities. A test for one must enable the game option or state that installs the
 special action instead of adding an old card-local compatibility ability. The
 test player can select non-mana special actions through `activateAbility`; match
 the action's current generated rules text rather than a legacy wrapper's cost or
 wording.
+
+Registering a special action does not make it available at every priority.
+Use `SpecialActions.getAvailableActions` for the GUI's Special button and its
+selection menu, so both consult each action's `canActivate` restrictions and
+preserve the distinction between ordinary actions and mana-payment actions.
+Do not put a blanket sorcery-timing restriction on the Special button: other
+actions can be legal during combat or payment. Test the `GameView` and available
+choices before activation, including forbidden timing and an occupied stack.
 
 Special actions may have no card source and therefore a null `sourceId`. Shared
 cost-modification effects must first reject ability kinds they do not modify and
@@ -453,6 +474,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 20. **Insufficient tests:** happy path passes but legality, cleanup, optional decline, multiple events, or copied state fails.
 21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
 22. **Command-zone source tested only at resolution:** a command-zone object's ability may resolve correctly while client view construction fails with that ability pending. For every new command-zone ability source type, construct player and spectator `GameView`s (including the copied-game server path) while its ability is on the stack, and verify source identity, rules, type, and image lookup metadata before testing resolution.
+23. **Historical counter reset implemented outside its watcher:** when card text resets a game-history value (for example, commander casts used for commander tax), expose and call a semantic reset operation on the authoritative watcher. Do not replace the watcher or mutate only one derived counter; all indexes and aggregates maintained by that watcher must remain consistent.
 
 ## 16. Reuse-first rule (mandatory)
 
