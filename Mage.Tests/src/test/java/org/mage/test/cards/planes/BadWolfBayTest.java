@@ -22,11 +22,12 @@ public class BadWolfBayTest extends CardTestPlayerBase {
         addTarget(playerA, "Grizzly Bears");
         checkExileCount("creature is exiled during combat", 1, PhaseStep.DECLARE_ATTACKERS,
                 playerB, "Grizzly Bears", 1);
-        checkPermanentCount("creature returns at the end step", 1, PhaseStep.END_TURN,
-                playerB, "Grizzly Bears", 1);
 
-        setStopAt(1, PhaseStep.END_TURN);
+        setStopAt(2, PhaseStep.UPKEEP);
         execute();
+
+        assertPermanentCount(playerB, "Grizzly Bears", 1);
+        assertExileCount(playerB, "Grizzly Bears", 0);
     }
 
     @Test
@@ -38,7 +39,7 @@ public class BadWolfBayTest extends CardTestPlayerBase {
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{U}: Exile Aetherling");
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{U}: exile {this}");
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
 
         setStopAt(2, PhaseStep.UPKEEP);
