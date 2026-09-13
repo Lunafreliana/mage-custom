@@ -171,6 +171,7 @@
 |PLANE:PCA|Plane - Academy at Tolaria West||AcademyAtTolariaWestPlane|
 |PLANE:PCA|Plane - Agyrem||AgyremPlane|
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
+|PLANE:WHO|Plane - Amy's Home||AmysHomePlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
