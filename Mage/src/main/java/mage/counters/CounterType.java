@@ -202,6 +202,7 @@ public enum CounterType {
     RIBBON("ribbon"),
     RITUAL("ritual"),
     ROPE("rope"),
+    SCROLL("scroll"),
     RUST("rust"),
     QUEST("quest"),
     SILVER("silver"),

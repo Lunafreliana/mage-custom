@@ -440,6 +440,11 @@ leave an arrival trigger pending alongside the first upkeep trigger. Test arriva
 separately with `game.planeswalk(...)` during a scheduled main phase, and test the
 starting Plane's upkeep without an artificial arrival or trigger-order choice.
 
+Counters on Plane cards belong to the runtime `Plane` command object, not to a
+temporary card or permanent representation. Plane counter state must be copied
+with the Plane for rollback/reconnect, and effects must resolve the source's
+face-up Plane by source ID before reading or changing its counters.
+
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of
 cards to put into the graveyard is a target-selection prompt and must be queued
