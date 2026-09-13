@@ -111,29 +111,37 @@ public class PhenomenonTest extends CardTestPlayerBase {
     }
 
     @Test
-    public void testAllPhenomenonEncounterTriggersHaveStackViews() {
+    public void testMutualEpiphanyEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new MutualEpiphanyPhenomenon());
+    }
+
+    @Test
+    public void testRealityShapingEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new RealityShapingPhenomenon());
+    }
+
+    @Test
+    public void testSpatialMergingEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new SpatialMergingPhenomenon());
+    }
+
+    private void assertPhenomenonEncounterStackViews(Phenomenon phenomenon) {
         prepareStartedPlanechaseGame();
-        runCode("inspect phenomenon encounter stack views", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
-            Phenomenon[] phenomena = {
-                    new MutualEpiphanyPhenomenon(),
-                    new RealityShapingPhenomenon(),
-                    new SpatialMergingPhenomenon()
-            };
-            for (Phenomenon phenomenon : phenomena) {
-                Assert.assertTrue(info, game.addPhenomenon(phenomenon, player.getId()));
-                game.checkStateAndTriggered();
+        runCode("inspect " + phenomenon.getName() + " encounter stack views",
+                1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(info, game.addPhenomenon(phenomenon, player.getId()));
+            game.checkStateAndTriggered();
 
-                StackAbility encounter = getOnlyStackAbility(info, game);
-                Assert.assertNotNull(info, game.getObject(encounter.getSourceId()));
-                Assert.assertTrue(info, game.getObject(encounter.getSourceId()) instanceof Phenomenon);
-                Phenomenon source = (Phenomenon) game.getObject(encounter.getSourceId());
-                Assert.assertEquals(info, phenomenon.getName(), source.getName());
-                assertPendingStackViews(info, game, encounter.getId(), source);
+            StackAbility encounter = getOnlyStackAbility(info, game);
+            Assert.assertNotNull(info, game.getObject(encounter.getSourceId()));
+            Assert.assertTrue(info, game.getObject(encounter.getSourceId()) instanceof Phenomenon);
+            Phenomenon source = (Phenomenon) game.getObject(encounter.getSourceId());
+            Assert.assertEquals(info, phenomenon.getName(), source.getName());
+            assertPendingStackViews(info, game, encounter.getId(), source);
 
-                game.getStack().remove(encounter, game);
-                game.checkStateAndTriggered();
-                Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
-            }
+            game.getStack().remove(encounter, game);
+            game.checkStateAndTriggered();
+            Assert.assertTrue(info, game.getState().getFaceUpPhenomena().isEmpty());
         });
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
