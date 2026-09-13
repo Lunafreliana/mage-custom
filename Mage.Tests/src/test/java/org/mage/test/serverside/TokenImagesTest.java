@@ -290,6 +290,28 @@ public class TokenImagesTest extends CardTestPlayerBase {
         Assert.assertEquals("client side", imagesNeed, imagesClient);
     }
 
+    private void assert_TokenOrCardImageNumbersAreValid(String tokenOrCardName, List<Integer> validImages) {
+        Set<Integer> serverStats = currentGame.getBattlefield().getAllPermanents()
+                .stream()
+                .filter(card -> card.getName().equals(tokenOrCardName))
+                .filter(MageObjectImpl.class::isInstance)
+                .map(MageObjectImpl.class::cast)
+                .map(MageObjectImpl::getImageNumber)
+                .collect(Collectors.toSet());
+
+        GameView gameView = new GameView(currentGame.getState(), currentGame, playerA.getId(), null);
+        Set<Integer> clientStats = gameView.getMyPlayer().getBattlefield().values()
+                .stream()
+                .filter(card -> card.getName().equals(tokenOrCardName))
+                .map(CardView::getImageNumber)
+                .collect(Collectors.toSet());
+
+        Assert.assertFalse("server must contain at least one image number", serverStats.isEmpty());
+        Assert.assertTrue("server contains an invalid image number: " + serverStats,
+                validImages.containsAll(serverStats));
+        Assert.assertEquals("server and client image numbers", serverStats, clientStats);
+    }
+
     private void assertFaceDownCharacteristics(String info, MageObject object, String faceDownTypeName) {
         String prefix = info + " - " + object;
 
@@ -680,13 +702,12 @@ public class TokenImagesTest extends CardTestPlayerBase {
         assert_SacredCat(3 + 5, "AKH=3", "AKR=5");
     }
 
-    @Test // it's ok for fail in 1 of 50
-    // TODO: implement mock or test command to setup "random" images in TokenImpl.generateTokenInfo
-    //  (see setFlipCoinResult and setDieRollResult), so no needs in big amount
+    @Test
     public void test_Abilities_Incubator_MustTransformWithSameSettings() {
         // bug with miss image data in transformed incubator token: https://github.com/magefree/mage/issues/11535
 
-        // make sure random images take all 3 diff images
+        // Use enough tokens to exercise multiple transformations. The randomly selected
+        // images do not need to include every available variant for the behavior to be valid.
         int needIncubatorTokens = 30;
         int needPhyrexianTokens = 30 / 2;
 
@@ -725,8 +746,9 @@ public class TokenImagesTest extends CardTestPlayerBase {
 
         // MOM-Incubator has 1 image (number is 0)
         assert_TokenOrCardImageNumber("Incubator Token", Arrays.asList(0));
-        // MOM-Phyrexian has 3 images
-        assert_TokenOrCardImageNumber("Phyrexian Token", Arrays.asList(1, 2, 3));
+        // Every transformed token must use one of MOM-Phyrexian's three valid images,
+        // and the client must preserve the server's selected image numbers.
+        assert_TokenOrCardImageNumbersAreValid("Phyrexian Token", Arrays.asList(1, 2, 3));
     }
 
     @Test // it's ok for fail in very rare random

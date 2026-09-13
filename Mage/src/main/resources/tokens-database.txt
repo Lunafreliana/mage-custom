@@ -171,22 +171,31 @@
 |PLANE:PCA|Plane - Academy at Tolaria West||AcademyAtTolariaWestPlane|
 |PLANE:PCA|Plane - Agyrem||AgyremPlane|
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
+|PLANE:WHO|Plane - Amy's Home||AmysHomePlane|
 |PLANE:WHO|Plane - Antarctic Research Base||AntarcticResearchBasePlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
 |PLANE:WHO|Plane - Bad Wolf Bay||BadWolfBayPlane|
+|PLANE:WHO|Plane - Coal Hill School||CoalHillSchoolPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
+|PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|
 |PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
+|PLANE:MOC|Plane - Esper||EsperPlane|
 |PLANE:PCA|Plane - Feeding Grounds||FeedingGroundsPlane|
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
 |PLANE:PCA|Plane - Glen Elendra||GlenElendraPlane|
+|PLANE:PCA|Plane - Grixis||GrixisPlane|
+|PLANE:PCA|Plane - Goldmeadow||GoldmeadowPlane|
+|PLANE:PCA|Plane - Grand Ossuary||GrandOssuaryPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
 |PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
+|PLANE:PCA|Plane - Immersturm||ImmersturmPlane|
 |PLANE:MOC|Plane - Kharasha Foothills||KharashaFoothillsPlane|
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
+|PLANE:PCA|Plane - Llanowar||LlanowarPlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
 |PLANE:WHO|Plane - Ood Sphere||OodSpherePlane|
@@ -199,16 +208,19 @@
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
+|PLANE:PCA|Plane - Takenuma||TakenumaPlane|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
 |PLANE:MOC|Plane - The Golden City of Orazca||TheGoldenCityOfOrazcaPlane|
 |PLANE:MOC|Plane - Inys Haen||InysHaenPlane|
+|PLANE:MOC|Plane - Nyx||NyxPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|
 |PLANE:WHO|Plane - The Pyramid of Mars||ThePyramidOfMarsPlane|
 |PLANE:MOC|Plane - Towashi||TowashiPlane|
 |PLANE:PCA|Plane - The Dark Barony||TheDarkBaronyPlane|
+|PLANE:MOC|Plane - The Aether Flues||TheAetherFluesPlane|
 |PLANE:PCA|Plane - The Eon Fog||TheEonFogPlane|
 |PLANE:PCA|Plane - The Great Forest||TheGreatForestPlane|
 |PLANE:PCA|Plane - The Maelstrom||TheMaelstromPlane|
