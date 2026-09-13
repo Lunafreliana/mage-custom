@@ -180,6 +180,7 @@
 |PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|
 |PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
+|PLANE:MOC|Plane - Esper||EsperPlane|
 |PLANE:PCA|Plane - Feeding Grounds||FeedingGroundsPlane|
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|

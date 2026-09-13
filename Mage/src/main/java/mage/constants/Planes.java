@@ -16,6 +16,7 @@ public enum Planes {
     PLANE_COAL_HILL_SCHOOL("CoalHillSchoolPlane", "Plane - Coal Hill School", "WHO"),
     PLANE_ELOREN_WILDS("ElorenWildsPlane", "Plane - Eloren Wilds"),
     PLANE_EDGE_OF_MALACOL("EdgeOfMalacolPlane", "Plane - Edge of Malacol"),
+    PLANE_ESPER("EsperPlane", "Plane - Esper", "MOC"),
     PLANE_FEEDING_GROUNDS("FeedingGroundsPlane", "Plane - Feeding Grounds"),
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
     PLANE_GAVONY("GavonyPlane", "Plane - Gavony"),
