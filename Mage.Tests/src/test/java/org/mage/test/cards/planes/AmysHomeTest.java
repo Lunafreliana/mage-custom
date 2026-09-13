@@ -53,7 +53,6 @@ public class AmysHomeTest extends CardTestPlayerBase {
         setChoice(playerA, TestPlayer.CHOICE_SKIP); // Skip the second optional suspend effect.
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         setChoice(playerA, "Grizzly Bears"); // Time travel: add a time counter.
-        setChoice(playerA, TestPlayer.CHOICE_SKIP); // Time travel: do not remove one.
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
