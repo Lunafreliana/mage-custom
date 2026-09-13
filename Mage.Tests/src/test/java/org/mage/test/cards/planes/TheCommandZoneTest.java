@@ -19,14 +19,17 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
     public void commanderAbilityTriggersTwiceDuringPlanarControllersTurn() {
         addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
         addCard(Zone.COMMAND, playerA, "Soul Warden");
+        addCard(Zone.HAND, playerA, "Memnite");
         addCard(Zone.BATTLEFIELD, playerA, "Plains");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Soul Warden");
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertLife(playerA, 22);
+        assertLife(playerA, 42);
     }
 
     @Test
