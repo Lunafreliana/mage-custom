@@ -48,6 +48,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
     public void testPlaneswalkAbilityDrawsForPlayerControllingCommander() {
         gameOptions.planeChase = true;
         gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_FIELDS_OF_SUMMER);
+        removeAllCardsFromHand(playerA);
 
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 1);
@@ -65,7 +66,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         execute();
 
         assertPermanentCount(playerA, "Daxos of Meletis", 1);
-        assertHandCount(playerA, 8);
+        assertHandCount(playerA, 1);
     }
 
     @Test
