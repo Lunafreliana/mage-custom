@@ -35,6 +35,8 @@ Planechase runtime objects use the common `PlanarCard` abstraction and remain co
 
 A deck-building representation may be a lightweight card/proxy object, but that object exists only to carry stable metadata and supplemental-deck identity through the deck editor and `.dck` serialization. At game initialization it is consumed and converted into the correct variant runtime object.
 
+Planar gameplay identity is independent from artwork and physical printing identity. A canonical Plane or Phenomenon definition may eventually offer several physical printings as art variants without creating additional gameplay cards. When a deck-building carrier has only synthetic printing metadata, the image subsystem may resolve a suitable real-card printing by the authoritative English card name and store it under the carrier's normal local cache identity.
+
 ### 2.2 Planar die and Planechase rules core
 
 The current rules flow is based on a game-level special action and semantic result handling:

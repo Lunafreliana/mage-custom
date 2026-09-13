@@ -13,6 +13,7 @@ import mage.client.remote.XmageURLConnection;
 import mage.client.util.CardLanguage;
 import mage.client.util.GUISizeHelper;
 import mage.client.util.sets.ConstructedFormats;
+import mage.game.command.PlanarCardRegistry;
 import mage.util.ThreadUtils;
 import mage.util.XmageThreadFactory;
 import net.java.truevfs.access.TFile;
@@ -413,7 +414,9 @@ public class DownloadPicturesService extends DefaultBoundedRangeModel implements
             } else {
                 if (!onlyTokens
                         && selectedSource.isCardSource()
-                        && selectedSource.isCardImageProvided(data.getSet(), data.getName())
+                        && ((data.isExactNameLookup() && selectedSource.isExactNameLookupSupported())
+                            || (!data.isExactNameLookup()
+                            && selectedSource.isCardImageProvided(data.getSet(), data.getName())))
                         && selectedSets.contains(data.getSet())) {
                     if (!onlyBasics
                             || basicList.contains(data.getName())) {
@@ -580,6 +583,18 @@ public class DownloadPicturesService extends DefaultBoundedRangeModel implements
                 } else {
                     logger.info("Card was not selected: " + card.getName());
                 }
+            });
+
+            // Planar deck-builder cards are registry-backed CardImpl carriers,
+            // not CardRepository printings and not tokens. Add them to the
+            // ordinary card-image queue, retaining their local cache identity
+            // while asking Scryfall to resolve a physical printing by name.
+            PlanarCardRegistry.getAvailableCards().forEach(metadata -> {
+                CardDownloadData card = CardDownloadData.forExactNameCard(
+                        metadata.getEnglishName(),
+                        metadata.getSetCode(),
+                        metadata.getId());
+                allCardsUrls.add(card);
             });
 
             // tokens
