@@ -24,6 +24,7 @@ import mage.abilities.keyword.*;
 import mage.abilities.mana.DelayedTriggeredManaAbility;
 import mage.abilities.mana.TriggeredManaAbility;
 import mage.abilities.special.RollPlanarDieSpecialAction;
+import mage.abilities.triggers.MainPhaseWatcher;
 import mage.cards.*;
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckCardInfo;
@@ -1656,6 +1657,7 @@ public abstract class GameImpl implements Game {
         newWatchers.add(new TemptedByTheRingWatcher()); // TEMPTED_BY_RING
         newWatchers.add(new SpellsCastWatcher()); // SPELL_CAST
         newWatchers.add(new AttackedOrBlockedThisCombatWatcher()); // required for tests
+        newWatchers.add(new MainPhaseWatcher()); // supports abilities introduced after initial watcher collection
 
         // runtime check - allows only GAME scope (one watcher per game)
         newWatchers.forEach(watcher -> {

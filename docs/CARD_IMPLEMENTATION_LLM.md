@@ -273,6 +273,13 @@ Cards add a watcher to an ability/card only where registration is required; many
 
 A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, copy constructor, and `copy()`. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
 
+An ability on a runtime-added command or supplemental object can enter the game
+after the normal ability-watcher collection pass. If a reusable ability depends
+on historical state, verify that its watcher is available before such an object
+is activated; register a game-scoped watcher in the default game setup when the
+mechanic must support late-added sources. A null-safe lookup prevents a crash,
+but is not a substitute for recording the events needed for correct behavior.
+
 ### “One or more” simultaneous-event triggers
 
 Do not implement “whenever one or more” by listening to each individual event. If
