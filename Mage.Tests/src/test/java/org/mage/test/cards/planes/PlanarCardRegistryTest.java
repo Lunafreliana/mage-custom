@@ -105,11 +105,15 @@ public class PlanarCardRegistryTest {
     @Test
     public void testSharedMinimumCapsAtFortyCards() {
         List<String> deck = new ArrayList<>();
-        Arrays.stream(Planes.values())
+        Arrays.stream(Planes.values()).limit(39)
                 .map(PlanarCardRegistry::getId)
                 .forEach(deck::add);
 
         Assert.assertTrue(SharedPlanarDeckValidator.validate(deck, 5).stream()
+                .anyMatch(error -> error.contains("at least 40")));
+
+        deck.add(PlanarCardRegistry.getId(Planes.values()[39]));
+        Assert.assertFalse(SharedPlanarDeckValidator.validate(deck, 5).stream()
                 .anyMatch(error -> error.contains("at least 40")));
     }
 

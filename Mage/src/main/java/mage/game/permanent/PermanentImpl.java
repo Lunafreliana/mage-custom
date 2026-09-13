@@ -643,7 +643,8 @@ public abstract class PermanentImpl extends CardImpl implements Permanent {
     @Override
     public boolean tap(boolean forCombat, Ability source, Game game) {
         //20091005 - 701.15a
-        if (!tapped && !replaceEvent(EventType.TAP, game)) {
+        GameEvent tapEvent = new GameEvent(EventType.TAP, objectId, source, controllerId, 0, forCombat);
+        if (!tapped && !game.replaceEvent(tapEvent)) {
             this.tapped = true;
             TappedEvent event = new TappedEvent(objectId, source, source == null ? null : source.getControllerId(), forCombat);
             game.fireEvent(event);
