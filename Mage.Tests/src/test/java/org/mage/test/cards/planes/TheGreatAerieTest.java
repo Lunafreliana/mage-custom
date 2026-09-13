@@ -19,7 +19,20 @@ import java.util.Collections;
 public class TheGreatAerieTest extends CardTestPlayerBase {
 
     @Test
-    public void planeswalkAndEachPlanarControllersUpkeepBolster() {
+    public void planeswalkToAndUpkeepBothBolster() {
+        addPlane(playerA, Planes.PLANE_THE_GREAT_AERIE);
+        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
+
+        setChoice(playerA, "When you planeswalk"); // Order the planeswalk and upkeep triggers.
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
+        execute();
+
+        assertCounterCount(playerA, "Grizzly Bears", CounterType.P1P1, 6);
+    }
+
+    @Test
+    public void eachPlanarControllersUpkeepBolsters() {
         useTheGreatAeriePlanechase();
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
@@ -28,8 +41,8 @@ public class TheGreatAerieTest extends CardTestPlayerBase {
         setStopAt(2, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
-        // Player A bolsters once for planeswalking and once during their upkeep.
-        assertCounterCount(playerA, "Grizzly Bears", CounterType.P1P1, 6);
+        // Starting-plane initialization is not a planeswalk, so player A bolsters only during their upkeep.
+        assertCounterCount(playerA, "Grizzly Bears", CounterType.P1P1, 3);
         // Planar control follows the active player, so player B bolsters during their upkeep.
         assertCounterCount(playerB, "Hill Giant", CounterType.P1P1, 3);
     }
