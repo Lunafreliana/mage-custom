@@ -24,7 +24,6 @@ public class TheGreatAerieTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
 
-        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
         setStrictChooseMode(true);
         setStopAt(2, PhaseStep.PRECOMBAT_MAIN);
         execute();
