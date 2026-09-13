@@ -3,7 +3,13 @@ package mage.cards.decks;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.constants.CardType;
+import mage.game.Game;
+import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Non-castable deck-building carrier for a registry-backed Plane or Phenomenon.
@@ -12,12 +18,19 @@ import mage.game.command.PlanarCardRegistry;
 public final class PlanarDeckCard extends CardImpl implements SupplementalDeckCard {
 
     private final String registryId;
+    private final List<String> planarRules;
 
     public PlanarDeckCard(String registryId) {
         super(null, requireMetadata(registryId).getEnglishName());
         PlanarCardRegistry.Metadata metadata = requireMetadata(registryId);
         this.registryId = registryId;
         this.cardType.add(metadata.getType());
+        PlanarCard planarCard = PlanarCardRegistry.create(registryId);
+        if (planarCard == null) {
+            throw new IllegalArgumentException("Unable to create planar card: " + registryId);
+        }
+        this.planarRules = Collections.unmodifiableList(new ArrayList<>(
+                planarCard.getAbilities().getRules(null, planarCard)));
         this.setExpansionSetCode(metadata.getSetCode());
         this.setCardNumber(registryId);
         this.extraDeckCard = true;
@@ -41,6 +54,7 @@ public final class PlanarDeckCard extends CardImpl implements SupplementalDeckCa
     private PlanarDeckCard(final PlanarDeckCard card) {
         super(card);
         this.registryId = card.registryId;
+        this.planarRules = card.planarRules;
     }
 
     private static PlanarCardRegistry.Metadata requireMetadata(String registryId) {
@@ -62,6 +76,16 @@ public final class PlanarDeckCard extends CardImpl implements SupplementalDeckCa
     @Override
     public String getSupplementalDeckId() {
         return registryId;
+    }
+
+    @Override
+    public List<String> getRules() {
+        return planarRules;
+    }
+
+    @Override
+    public List<String> getRules(Game game) {
+        return planarRules;
     }
 
     @Override

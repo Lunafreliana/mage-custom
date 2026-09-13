@@ -306,6 +306,13 @@ runtime object from restoring its printed effects when it becomes active again.
 Deactivate or remove the registered runtime copies, and preserve the printed
 ability graph.
 
+Keyword abilities are not necessarily battlefield-only. If a Plane or another
+command-zone object has a keyword whose reusable implementation defaults to
+`Zone.BATTLEFIELD`, add or use a zone-aware constructor on that shared keyword
+implementation rather than duplicating the keyword in the command object. Keep
+the battlefield constructor as the default for ordinary cards, and test that the
+keyword follows the current command-zone controller.
+
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A
 battlefield ability that has not yet triggered can still have
@@ -411,6 +418,28 @@ assertGraveyardCount(playerB, "Grizzly Bears", 1);
 
 The framework's actual overloads allow turn/step scheduling and choices. The base normally supplies `playerA` and `playerB` (special multiplayer bases configure more players); `addPlayer` is not the ordinary card-test setup call in this checkout. Common tools include `addCard(zone, player, name, count)`, `castSpell`, `activateAbility`, `setChoice`, `setModeChoice`, `setTarget`, `passPhase`, `setStopAt`, and `execute`. Assertions include `assertPermanentCount`, `assertLife`, `assertGraveyardCount`, `assertHandCount`, `assertLibraryCount`, `assertExileCount`, `assertTapped`, `assertPowerToughness`, `assertCounterCount`, `assertAbility`, and `assertPlayerHasAbility`.
 
+For exact library counts or a controlled mill/reveal sequence, call
+`removeAllCardsFromLibrary` for every relevant player before adding the fixture.
+`addCard(Zone.LIBRARY, ...)` adds to the default test deck; `skipInitShuffling()`
+only preserves order and does not empty it. Test mode skips opening-hand draws,
+but normal turn draws and triggered mills still change the counts. Use different
+card names for library filler and pre-seeded graveyard cards when testing which
+cards an effect returns.
+
+Commander test bases also load a default commander. Adding another card to
+`Zone.COMMAND` does not remove that commander. When asserting cast history or
+commander tax, identify the actual card being exercised (for example, through
+`getPermanent(cardName, player)` after it resolves); never select an arbitrary
+commander with `getCommandersIds(...).stream().findFirst()`.
+
+Planechase tests must distinguish startup from a real planeswalk. Configure
+`gameOptions.planeChase` and an explicit `gameOptions.sharedPlanarDeck` for the
+normal starting-plane procedure. The `addPlane` test helper enters the gameplay
+reveal path and already emits `PLANESWALKED`; calling it before `execute()` can
+leave an arrival trigger pending alongside the first upkeep trigger. Test arrival
+separately with `game.planeswalk(...)` during a scheduled main phase, and test the
+starting Plane's upkeep without an artificial arrival or trigger-order choice.
+
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of
 cards to put into the graveyard is a target-selection prompt and must be queued
@@ -475,6 +504,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
 22. **Command-zone source tested only at resolution:** a command-zone object's ability may resolve correctly while client view construction fails with that ability pending. For every new command-zone ability source type, construct player and spectator `GameView`s (including the copied-game server path) while its ability is on the stack, and verify source identity, rules, type, and image lookup metadata before testing resolution.
 23. **Historical counter reset implemented outside its watcher:** when card text resets a game-history value (for example, commander casts used for commander tax), expose and call a semantic reset operation on the authoritative watcher. Do not replace the watcher or mutate only one derived counter; all indexes and aggregates maintained by that watcher must remain consistent.
+24. **Tap prevention loses the combat exception:** effects that say a permanent cannot become tapped except while being declared as an attacker must inspect the prospective `TAP` event's combat flag. Preserve the `forCombat` context when creating the replacement event in `Permanent.tap`; checking only the current phase cannot distinguish an attack declaration from another effect that taps a permanent during that step.
 
 ## 16. Reuse-first rule (mandatory)
 
@@ -510,6 +540,11 @@ Also use `rg 'new CandidateEffect|CandidateEffect.getInstance' Mage.Sets/src/mag
 1. **Is it a spell instruction?** Add effects/targets to `getSpellAbility()` in printed order.
 2. **“When/Whenever/At …”** Use a triggered ability. “At the beginning of your upkeep/end step” suggests the matching reusable beginning trigger. Determine controller, active player, and trigger zone.
 3. **“When [this] enters”** use `EntersBattlefieldTriggeredAbility`; “dies” uses `DiesTriggeredAbility`; do not approximate dies with any graveyard move.
+   Planechase “when you planeswalk away from [this]” abilities use
+   `PlaneswalkAwayFromSourceTriggeredAbility`. The engine emits the departure
+   event after returning the planar object to its planar deck while its
+   command-zone triggers remain registered for the rules-required look back in
+   time; do not approximate this with the event for the destination Plane.
 4. **“If” in the trigger clause before the comma** may be intervening-if: use the trigger condition so it checks twice.
 5. **“As [this] enters” / “enters with”** search as-enters replacement/enters-with-counter abilities; an ETB trigger is too late.
 6. **“If … would … instead”** is a replacement effect matching the event, not a trigger after it.

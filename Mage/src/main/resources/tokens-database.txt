@@ -182,10 +182,13 @@
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
+|PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
+|PLANE:MOC|Plane - Kharasha Foothills||KharashaFoothillsPlane|
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
+|PLANE:WHO|Plane - Ood Sphere||OodSpherePlane|
 |PLANE:PCA|Plane - Panopticon||PanopticonPlane|
 |PLANE:PUNK|Plane - Pursued by Something||PursuedBySomethingPlane|
 |PLANE:PCA|Plane - Prahv||PrahvPlane|
@@ -197,6 +200,8 @@
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
+|PLANE:MOC|Plane - The Golden City of Orazca||TheGoldenCityOfOrazcaPlane|
+|PLANE:MOC|Plane - Inys Haen||InysHaenPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|
