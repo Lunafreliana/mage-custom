@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout custom branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up JDK 17
         uses: actions/setup-java@v6
@@ -159,7 +159,7 @@ jobs:
             --notes "Automatic custom XMage build from Lunafreliana/mage-custom@$shortSha."
 
       - name: Checkout launcher feed repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: Lunafreliana/xmage-custom-builds
           ref: main
