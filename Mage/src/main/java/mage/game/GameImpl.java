@@ -2268,8 +2268,9 @@ public abstract class GameImpl implements Game {
         if (!canPlaneswalk(playerId)) {
             return false;
         }
-        bottomFaceUpPlanarCards();
-        return turnTopPlanarCardFaceUp(playerId);
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
+        PlanarCard destination = deck == null ? null : deck.draw();
+        return destination != null && planeswalkToCards(context, Collections.singletonList(destination));
     }
 
     @Override
