@@ -49,7 +49,8 @@ public class UntapAllDuringEachOtherPlayersUntapStepEffect extends ContinuousEff
             }
             if (appliedTurn < game.getTurnNum()) {
                 game.getState().setValue(source.getSourceId() + "appliedTurn", game.getTurnNum());
-                for (Permanent permanent : game.getBattlefield().getAllActivePermanents(filter, source.getControllerId(), game)) {
+                for (Permanent permanent : game.getBattlefield().getActivePermanents(
+                        filter, source.getControllerId(), source, game)) {
                     boolean untap = true;
                     for (RestrictionEffect effect : game.getContinuousEffects().getApplicableRestrictionEffects(permanent, game).keySet()) {
                         untap &= effect.canBeUntapped(permanent, source, game, true);

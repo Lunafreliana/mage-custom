@@ -47,16 +47,16 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Balduvian Bears");
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN, playerA);
-        runCode("commander was cast once", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+        runCode("commander was cast once", 1, PhaseStep.BEGIN_COMBAT, playerA, (info, player, game) -> {
             UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
                     .stream().findFirst().orElse(null);
             CommanderPlaysCountWatcher watcher = game.getState().getWatcher(CommanderPlaysCountWatcher.class);
             Assert.assertNotNull(watcher);
             Assert.assertEquals(1, watcher.getPlaysCount(commanderId));
         });
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
-        runCode("commander tax reset", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
+        waitStackResolved(1, PhaseStep.POSTCOMBAT_MAIN);
+        runCode("commander tax reset", 1, PhaseStep.END_TURN, playerA, (info, player, game) -> {
             UUID commanderId = game.getCommandersIds(player, CommanderCardType.ANY, false)
                     .stream().findFirst().orElse(null);
             CommanderPlaysCountWatcher watcher = game.getState().getWatcher(CommanderPlaysCountWatcher.class);
@@ -64,7 +64,7 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
             Assert.assertEquals(0, watcher.getPlaysCount(commanderId));
         });
 
-        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(1, PhaseStep.END_TURN);
         execute();
     }
 
