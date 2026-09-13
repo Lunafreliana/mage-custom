@@ -211,6 +211,7 @@
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
 |PLANE:MOC|Plane - The Golden City of Orazca||TheGoldenCityOfOrazcaPlane|
 |PLANE:MOC|Plane - Inys Haen||InysHaenPlane|
+|PLANE:MOC|Plane - Nyx||NyxPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|
