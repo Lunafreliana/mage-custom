@@ -57,8 +57,9 @@ public class RaidersAllegianceTest extends CardTestPlayerBase {
 
         assertPermanentCount(playerA, "Treasure Token", 3);
         assertPermanentCount(playerB, "Treasure Token", 0);
-        // Two normal draw steps plus the three departure draws.
-        assertHandCount(playerA, "Island", 5);
+        // The starting player skips their first draw, then draws once on turn 3
+        // before drawing three cards from the departure trigger.
+        assertHandCount(playerA, "Island", 4);
         assertHandCount(playerB, "Mountain", 1);
         assertCounterCount(playerA, CounterType.POINT, 0);
         assertCounterCount(playerB, CounterType.POINT, 0);
@@ -72,12 +73,14 @@ public class RaidersAllegianceTest extends CardTestPlayerBase {
         addChaosSpell();
 
         attack(1, playerA, "Grizzly Bears");
-        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, playerA);
-        addTarget(playerA, playerA);
+        // Wait until the following turn so the raid trigger has resolved and
+        // created both the point counter and the second controlled Pirate.
+        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
+        setChoice(playerA, playerA.getName());
+        setChoice(playerA, playerA.getName());
 
         setStrictChooseMode(true);
-        setStopAt(1, PhaseStep.END_TURN);
+        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
         // The raid-created Pirate and Pirate Ship each cause one proliferation.
