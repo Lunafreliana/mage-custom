@@ -180,6 +180,7 @@
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
 |PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|
+|PLANE:PCA|Plane - Celestine Reef||CelestineReefPlane|
 |PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
 |PLANE:MOC|Plane - Esper||EsperPlane|
@@ -193,11 +194,13 @@
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
 |PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
 |PLANE:PCA|Plane - Immersturm||ImmersturmPlane|
+|PLANE:PCA|Plane - Izzet Steam Maze||IzzetSteamMazePlane|
 |PLANE:MOC|Plane - Kharasha Foothills||KharashaFoothillsPlane|
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
 |PLANE:PCA|Plane - Llanowar||LlanowarPlane|
 |PLANE:WHO|Plane - Mondassian Colony Ship||MondassianColonyShipPlane|
+|PLANE:PCA|Plane - Minamo||MinamoPlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
 |PLANE:WHO|Plane - Ood Sphere||OodSpherePlane|
@@ -215,6 +218,7 @@
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
 |PLANE:MOC|Plane - The Golden City of Orazca||TheGoldenCityOfOrazcaPlane|
 |PLANE:MOC|Plane - Inys Haen||InysHaenPlane|
+|PLANE:MOC|Plane - Isle of Vesuva||IsleOfVesuvaPlane|
 |PLANE:MOC|Plane - Nyx||NyxPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
