@@ -468,6 +468,9 @@ pattern and also observe `CAST_SPELL`. If the same resolving Plane ability
 creates a continuous effect and then planeswalks, snapshot the effect's
 controller during initialization when its rules require that control to
 persist after the source Plane leaves face up.
+Command-object initialization must register watchers attached to its abilities,
+just as card initialization does; otherwise watcher-backed static abilities can
+appear correctly in rules text while never recording their events.
 
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of
