@@ -180,6 +180,7 @@
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
 |PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|
+|PLANE:PCA|Plane - Celestine Reef||CelestineReefPlane|
 |PLANE:PCA|Plane - Eloren Wilds||ElorenWildsPlane|
 |PLANE:PCA|Plane - Edge of Malacol||EdgeOfMalacolPlane|
 |PLANE:MOC|Plane - Esper||EsperPlane|
