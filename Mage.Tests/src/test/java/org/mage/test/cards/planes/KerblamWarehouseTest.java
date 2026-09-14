@@ -39,6 +39,9 @@ public class KerblamWarehouseTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
+        // The granted ability is not available until both the spell and the
+        // resulting chaos trigger have finished resolving.
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN, playerA);
         // SacrificeSourceCost renders {this} as the actual source name in the
         // playable ability, so match the stable effect text rather than the
         // Oracle-style text supplied by the granting effect.
