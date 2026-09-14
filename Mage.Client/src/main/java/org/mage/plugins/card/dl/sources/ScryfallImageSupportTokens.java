@@ -1,6 +1,7 @@
 package org.mage.plugins.card.dl.sources;
 
 import mage.cards.repository.TokenRepository;
+import mage.cards.repository.TokenType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -3168,6 +3169,10 @@ public class ScryfallImageSupportTokens {
                     supportedSets.putIfAbsent(s[0], s[0]);
                 }
             }
+            TokenRepository.instance.getAll().stream()
+                    .filter(token -> token.getTokenType() == TokenType.PLANE
+                            || token.getTokenType() == TokenType.PHENOMENON)
+                    .forEach(token -> supportedSets.putIfAbsent(token.getSetCode(), token.getSetCode()));
         }
     };
 
@@ -3178,5 +3183,17 @@ public class ScryfallImageSupportTokens {
     public static String findTokenLink(String setCode, String tokenName, Integer imageNumber) {
         String search = setCode + "/" + tokenName + (!imageNumber.equals(0) ? "/" + imageNumber : "");
         return supportedCards.getOrDefault(search, null);
+    }
+
+    public static String getPlanarExactName(String tokenName) {
+        String planePrefix = "Plane - ";
+        String phenomenonPrefix = "Phenomenon - ";
+        if (tokenName.startsWith(planePrefix)) {
+            return tokenName.substring(planePrefix.length());
+        }
+        if (tokenName.startsWith(phenomenonPrefix)) {
+            return tokenName.substring(phenomenonPrefix.length());
+        }
+        return null;
     }
 }

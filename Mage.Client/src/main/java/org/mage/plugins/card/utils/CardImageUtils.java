@@ -1,6 +1,7 @@
 package org.mage.plugins.card.utils;
 
 import mage.cards.repository.TokenRepository;
+import mage.constants.CardType;
 import mage.client.constants.Constants;
 import mage.client.dialog.PreferencesDialog;
 import mage.view.CardView;
@@ -152,10 +153,13 @@ public final class CardImageUtils {
             return "ERROR: empty image file name, object type - " + card.getMageObjectType();
         }
 
-        boolean isTokenRepository = card.getMageObjectType().isUseTokensRepository()
+        boolean isPlanarCard = card.getCardTypes().contains(CardType.PLANE)
+                || card.getCardTypes().contains(CardType.PHENOMENON);
+        boolean isTokenRepository = isPlanarCard
+                || card.getMageObjectType().isUseTokensRepository()
                 || card.getExpansionSetCode().equals(TokenRepository.XMAGE_TOKENS_SET_CODE);
         // if token from a card then must use card repository instead
-        if (isTokenRepository && !card.getCardNumber().isEmpty()) {
+        if (isTokenRepository && !isPlanarCard && !card.getCardNumber().isEmpty()) {
             isTokenRepository = false;
         }
 

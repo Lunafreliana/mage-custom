@@ -440,6 +440,26 @@ leave an arrival trigger pending alongside the first upkeep trigger. Test arriva
 separately with `game.planeswalk(...)` during a scheduled main phase, and test the
 starting Plane's upkeep without an artificial arrival or trigger-order choice.
 
+Every new Plane or Phenomenon runtime class must also have a matching entry in
+`Mage/src/main/resources/tokens-database.txt`. Registration in `Planes` or
+`Phenomena` makes the card available through `PlanarCardRegistry`, but it does
+not supply the token metadata required by `addPlane` and the shared planar image
+lookup path. A registry metadata assertion alone therefore does not cover this
+integration requirement; focused tests that call `addPlane` do.
+
+Counters on Plane cards belong to the runtime `Plane` command object, not to a
+temporary card or permanent representation. Plane counter state must be copied
+with the Plane for rollback/reconnect, and effects must resolve the source's
+face-up Plane by source ID before reading or changing its counters.
+
+Some Planechase instructions cause chaos to ensue on a Plane revealed from the
+planar deck without turning that Plane face up. Use the game-level operation for
+that instruction: the revealed Plane's chaos ability must trigger, the current
+Plane's chaos ability must not retrigger, and every revealed planar card must
+remain associated with and return to the applicable individual or shared deck.
+Do not temporarily make the revealed Plane face up or route this through a
+planeswalk event.
+
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of
 cards to put into the graveyard is a target-selection prompt and must be queued
@@ -503,6 +523,7 @@ Use real tests such as [`LightningBoltTest.java`](../Mage.Tests/src/test/java/or
 20. **Insufficient tests:** happy path passes but legality, cleanup, optional decline, multiple events, or copied state fails.
 21. **Pregame action routed through gameplay semantics:** setup operations such as Planechase's starting-plane reveal may move the same objects as a normal gameplay action while explicitly not being that action. Use a dedicated semantic entry point and shared lower-level bookkeeping; do not call the gameplay path with a trigger-suppression boolean.
 22. **Command-zone source tested only at resolution:** a command-zone object's ability may resolve correctly while client view construction fails with that ability pending. For every new command-zone ability source type, construct player and spectator `GameView`s (including the copied-game server path) while its ability is on the stack, and verify source identity, rules, type, and image lookup metadata before testing resolution.
+    If a deck-building carrier represents the same runtime command object, it must copy the runtime image metadata and resolve to the same cache path; do not introduce an ordinary-card download entry solely for the carrier.
 23. **Historical counter reset implemented outside its watcher:** when card text resets a game-history value (for example, commander casts used for commander tax), expose and call a semantic reset operation on the authoritative watcher. Do not replace the watcher or mutate only one derived counter; all indexes and aggregates maintained by that watcher must remain consistent.
 24. **Tap prevention loses the combat exception:** effects that say a permanent cannot become tapped except while being declared as an attacker must inspect the prospective `TAP` event's combat flag. Preserve the `forCombat` context when creating the replacement event in `Permanent.tap`; checking only the current phase cannot distinguish an attack declaration from another effect that taps a permanent during that step.
 
@@ -564,6 +585,10 @@ Also use `rg 'new CandidateEffect|CandidateEffect.getInstance' Mage.Sets/src/mag
 20. **“Has/gains/loses [ability]”** use gain/lose ability continuous effects in the ability layer.
 21. **“Choose one/two”** use `Mode`; verify min/max selections, repeated modes, and target-per-mode behavior.
 22. **“Choose a color/type/name”** use the appropriate `Choice` and store it in game/ability state that copies correctly.
+    A choice nested in an instruction such as “put your choice of a vigilance, menace, or trample counter”
+    is normally made as the effect resolves, after its target was chosen. Do not encode the counter kind as
+    a mode or as part of target selection; use a resolution-time `Choice` such as
+    `AddCounterChoiceTargetEffect`.
 23. **“Additional cost”** call `addCost`; **“rather than pay”** requires an alternative-cost framework; **cost reduction** needs a cost-adjusting ability.
 24. **“Once each turn”** use a reusable max-usage/restriction pattern; **“first time each turn”** search first-event watchers/triggers.
 25. **“This turn” about past events** search Watchers; current state alone is usually insufficient.
