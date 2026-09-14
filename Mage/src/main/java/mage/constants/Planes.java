@@ -31,6 +31,7 @@ public enum Planes {
     PLANE_IMMERSTURM("ImmersturmPlane", "Plane - Immersturm"),
     PLANE_KHARASHA_FOOTHILLS("KharashaFoothillsPlane", "Plane - Kharasha Foothills", "MOC"),
     PLANE_INYS_HAEN("InysHaenPlane", "Plane - Inys Haen", "MOC"),
+    PLANE_ISLE_OF_VESUVA("IsleOfVesuvaPlane", "Plane - Isle of Vesuva", "MOC"),
     PLANE_LAKE_SILENCIO("LakeSilencioPlane", "Plane - Lake Silencio", "WHO"),
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
     PLANE_LLANOWAR("LlanowarPlane", "Plane - Llanowar"),
