@@ -570,6 +570,10 @@ Also use `rg 'new CandidateEffect|CandidateEffect.getInstance' Mage.Sets/src/mag
 20. **“Has/gains/loses [ability]”** use gain/lose ability continuous effects in the ability layer.
 21. **“Choose one/two”** use `Mode`; verify min/max selections, repeated modes, and target-per-mode behavior.
 22. **“Choose a color/type/name”** use the appropriate `Choice` and store it in game/ability state that copies correctly.
+    A choice nested in an instruction such as “put your choice of a vigilance, menace, or trample counter”
+    is normally made as the effect resolves, after its target was chosen. Do not encode the counter kind as
+    a mode or as part of target selection; use a resolution-time `Choice` such as
+    `AddCounterChoiceTargetEffect`.
 23. **“Additional cost”** call `addCost`; **“rather than pay”** requires an alternative-cost framework; **cost reduction** needs a cost-adjusting ability.
 24. **“Once each turn”** use a reusable max-usage/restriction pattern; **“first time each turn”** search first-event watchers/triggers.
 25. **“This turn” about past events** search Watchers; current state alone is usually insufficient.
