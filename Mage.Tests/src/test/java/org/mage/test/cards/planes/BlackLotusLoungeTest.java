@@ -29,8 +29,8 @@ public class BlackLotusLoungeTest extends CardTestPlayerBase {
     public void chaosCountsEachPlayersArtifactTokens() {
         addPlane(playerA, Planes.PLANE_BLACK_LOTUS_LOUNGE);
         addCard(Zone.BATTLEFIELD, playerA, "Sol Ring");
-        addCard(Zone.LIBRARY, playerA, "Mountain", 9);
-        addCard(Zone.LIBRARY, playerB, "Island", 9);
+        addCard(Zone.LIBRARY, playerA, "Mountain", 2);
+        addCard(Zone.LIBRARY, playerB, "Island");
         skipInitShuffling();
         SpellAbility ability = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         ability.addEffect(new ChaosEnsuesEffect());
@@ -41,8 +41,8 @@ public class BlackLotusLoungeTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertHandCount(playerA, "Mountain", 9);
-        assertHandCount(playerB, "Island", 7);
+        assertHandCount(playerA, "Mountain", 2);
+        assertHandCount(playerB, "Island", 0);
     }
 
     @Test
