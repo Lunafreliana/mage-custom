@@ -179,6 +179,7 @@
 |PLANE:WHO|Plane - Bad Wolf Bay||BadWolfBayPlane|
 |PLANE:WHO|Plane - Coal Hill School||CoalHillSchoolPlane|
 |PLANE:PUNK|Plane - Circus of the Sun||CircusOfTheSunPlane|
+|PLANE:PUNK|Plane - Black Lotus Lounge||BlackLotusLoungePlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
 |PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|

@@ -17,6 +17,7 @@ public enum Planes {
     PLANE_BAD_WOLF_BAY("BadWolfBayPlane", "Plane - Bad Wolf Bay", "WHO"),
     PLANE_BANT("BantPlane", "Plane - Bant"),
     PLANE_BESIEGED_VIKING_VILLAGE("BesiegedVikingVillagePlane", "Plane - Besieged Viking Village", "WHO"),
+    PLANE_BLACK_LOTUS_LOUNGE("BlackLotusLoungePlane", "Plane - Black Lotus Lounge", "PUNK"),
     PLANE_BOWIE_BASE_ONE("BowieBaseOnePlane", "Plane - Bowie Base One", "WHO"),
     PLANE_CELESTINE_REEF("CelestineReefPlane", "Plane - Celestine Reef"),
     PLANE_COAL_HILL_SCHOOL("CoalHillSchoolPlane", "Plane - Coal Hill School", "WHO"),
