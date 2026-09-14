@@ -69,7 +69,7 @@ public class RaidersAllegianceTest extends CardTestPlayerBase {
     public void chaosProliferatesOnceForEachControlledPirate() {
         addPlane(playerA, Planes.PLANE_RAIDERS_ALLEGIANCE);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
-        addCard(Zone.BATTLEFIELD, playerA, "Pirate Ship");
+        addCard(Zone.BATTLEFIELD, playerA, "Kitesail Corsair");
         addChaosSpell();
 
         attack(1, playerA, "Grizzly Bears");
@@ -83,7 +83,7 @@ public class RaidersAllegianceTest extends CardTestPlayerBase {
         setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        // The raid-created Pirate and Pirate Ship each cause one proliferation.
+        // The raid-created Pirate and Kitesail Corsair each cause one proliferation.
         assertCounterCount(playerA, CounterType.POINT, 3);
     }
 
