@@ -1,5 +1,6 @@
 package mage.client.game;
 
+import mage.components.ImagePanel;
 import mage.view.CardView;
 import mage.view.CommandObjectView;
 import mage.view.GameView;
@@ -11,9 +12,12 @@ import org.mage.plugins.card.images.ImageCache;
 import org.mage.plugins.card.utils.CardImageUtils;
 
 import javax.swing.SwingUtilities;
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executor;
@@ -28,6 +32,8 @@ final class PlanechaseBackground {
 
     private static final Logger LOGGER = Logger.getLogger(PlanechaseBackground.class);
     private static final long MISSING_IMAGE_RETRY_NANOS = TimeUnit.SECONDS.toNanos(5);
+    private static final float BACKGROUND_DARKEN_ALPHA = 0.25f;
+    private static final float BACKGROUND_MAX_HEIGHT_RATIO = 0.75f;
 
     private final boolean enabled;
     private final BufferedImage defaultImage;
@@ -146,15 +152,17 @@ final class PlanechaseBackground {
         // zipped image folders. Read it directly so a missing image cannot resolve
         // to a card back or remain in a negative cache after images are downloaded.
         String path = CardImageUtils.buildImagePathToCardView(plane);
-        return cropArtwork(ImageCache.loadImage(ImageCache.getTFile(path)));
+        return prepareArtwork(ImageCache.loadImage(ImageCache.getTFile(path)));
     }
 
-    static BufferedImage cropArtwork(BufferedImage image) {
+    static BufferedImage prepareArtwork(BufferedImage image) {
         if (image == null) {
             return null;
         }
-        // Planar scans are commonly stored in portrait orientation. Match BigCard's
-        // clockwise landscape presentation, while accepting already-landscape scans.
+
+        // Planar scans may be stored in portrait orientation. Match BigCard's
+        // clockwise landscape presentation, but keep the complete card frame,
+        // title and rules text instead of cropping down to just the illustration.
         if (image.getWidth() < image.getHeight()) {
             BufferedImage landscape = new BufferedImage(image.getHeight(), image.getWidth(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics = landscape.createGraphics();
@@ -167,12 +175,23 @@ final class PlanechaseBackground {
             }
             image = landscape;
         }
-        // The upper illustration inside the standard planar frame, without its
-        // title, type line or rules box. Relative bounds also work for small scans.
-        int x = (int) (image.getWidth() * 0.08);
-        int y = (int) (image.getHeight() * 0.18);
-        int width = Math.max(1, (int) (image.getWidth() * 0.84));
-        int height = Math.max(1, (int) (image.getHeight() * 0.38));
-        return image.getSubimage(x, y, width, height);
+
+        Hashtable<String, Object> properties = new Hashtable<>();
+        properties.put(ImagePanel.IMAGE_LAYOUT_PROPERTY, ImagePanel.IMAGE_LAYOUT_FIT_TOP_LEFT);
+        properties.put(ImagePanel.IMAGE_MAX_HEIGHT_RATIO_PROPERTY, BACKGROUND_MAX_HEIGHT_RATIO);
+        BufferedImage background = new BufferedImage(
+                image.getColorModel(), image.copyData(null), image.isAlphaPremultiplied(), properties);
+
+        // Slightly darken the Plane so cards, targeting overlays and client text stay
+        // readable while the Plane's own name and rules text remain visible.
+        Graphics2D graphics = background.createGraphics();
+        try {
+            graphics.setComposite(AlphaComposite.SrcOver.derive(BACKGROUND_DARKEN_ALPHA));
+            graphics.setColor(Color.BLACK);
+            graphics.fillRect(0, 0, background.getWidth(), background.getHeight());
+        } finally {
+            graphics.dispose();
+        }
+        return background;
     }
 }
