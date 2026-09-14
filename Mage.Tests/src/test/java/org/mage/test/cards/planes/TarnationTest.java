@@ -17,6 +17,8 @@ public class TarnationTest extends CardTestPlayerBase {
     @Test
     public void criminalMayDrawACard() {
         addPlane(playerA, Planes.PLANE_TARNATION);
+        removeAllCardsFromHand(playerB);
+        removeAllCardsFromLibrary(playerB);
         addCard(Zone.HAND, playerB, "Shock");
         addCard(Zone.BATTLEFIELD, playerB, "Mountain");
         addCard(Zone.LIBRARY, playerB, "Island", 2);
@@ -35,6 +37,8 @@ public class TarnationTest extends CardTestPlayerBase {
     @Test
     public void criminalMayDeclineToDraw() {
         addPlane(playerA, Planes.PLANE_TARNATION);
+        removeAllCardsFromHand(playerB);
+        removeAllCardsFromLibrary(playerB);
         addCard(Zone.HAND, playerB, "Shock");
         addCard(Zone.BATTLEFIELD, playerB, "Mountain");
         addCard(Zone.LIBRARY, playerB, "Island", 2);
@@ -56,6 +60,8 @@ public class TarnationTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, playerB);
+        // Targeting an opponent with Tarnation's chaos trigger is itself a crime.
+        setChoice(playerA, false);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
