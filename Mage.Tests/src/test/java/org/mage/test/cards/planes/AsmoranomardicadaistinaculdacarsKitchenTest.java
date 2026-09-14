@@ -20,7 +20,10 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
 
     @Test
     public void creatureEnteringCreatesFoodForCurrentPlanarController() {
-        addPlane(playerA, Planes.PLANE_ASMORANOMARDICADAISTINACULDACARS_KITCHEN);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Arrays.asList(
+                Planes.PLANE_ASMORANOMARDICADAISTINACULDACARS_KITCHEN
+        );
         addCard(Zone.HAND, playerA, "Memnite");
         addCard(Zone.HAND, playerB, "Memnite");
 
@@ -31,8 +34,7 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
         setStopAt(2, PhaseStep.END_TURN);
         execute();
 
-        // Player A also gets one Food from planeswalking here when the test Plane is installed.
-        assertPermanentCount(playerA, "Food Token", 2);
+        assertPermanentCount(playerA, "Food Token", 1);
         assertPermanentCount(playerB, "Food Token", 1);
     }
 
