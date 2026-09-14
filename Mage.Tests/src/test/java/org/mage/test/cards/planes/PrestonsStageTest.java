@@ -37,7 +37,7 @@ public class PrestonsStageTest extends CardTestPlayerBase {
     public void turningCreatureFaceUpCreatesHatForItsController() {
         addPlane(playerA, Planes.PLANE_PRESTONS_STAGE);
         addCard(Zone.HAND, playerB, "Pine Walker");
-        addCard(Zone.BATTLEFIELD, playerB, "Forest", 5);
+        addCard(Zone.BATTLEFIELD, playerB, "Forest", 8);
 
         castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Pine Walker using Morph");
         activateAbility(2, PhaseStep.POSTCOMBAT_MAIN, playerB,
@@ -58,7 +58,7 @@ public class PrestonsStageTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Shock", playerB);
         activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA,
-                "{1}, {T}, Sacrifice this artifact: Create a 1/1 white Rabbit creature token");
+                "{1}, {T}, Sacrifice this artifact");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.END_TURN);

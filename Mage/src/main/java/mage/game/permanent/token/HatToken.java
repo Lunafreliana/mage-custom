@@ -20,7 +20,7 @@ public final class HatToken extends TokenImpl {
                 new CreateTokenEffect(new RabbitToken()), new GenericManaCost(1)
         );
         ability.addCost(new TapSourceCost());
-        ability.addCost(new SacrificeSourceCost());
+        ability.addCost(new SacrificeSourceCost().setText("sacrifice this artifact"));
         this.addAbility(ability);
     }
 

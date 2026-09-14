@@ -1,19 +1,15 @@
 package mage.game.command.planes;
 
-import mage.abilities.Ability;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
-import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.Effect;
 import mage.abilities.effects.common.CreateTokenTargetEffect;
+import mage.abilities.effects.common.continuous.CastAsThoughItHadFlashAllEffect;
 import mage.abilities.keyword.FlashAbility;
-import mage.cards.Card;
+import mage.constants.AsThoughEffectType;
 import mage.constants.CardType;
 import mage.constants.Duration;
-import mage.constants.Layer;
-import mage.constants.Outcome;
 import mage.constants.Planes;
-import mage.constants.SubLayer;
 import mage.constants.Zone;
 import mage.filter.FilterSpell;
 import mage.filter.common.FilterCreatureCard;
@@ -41,7 +37,9 @@ public final class PrestonsStagePlane extends Plane {
 
         // Whenever chaos ensues, until your next turn, creature cards in your hand have flash.
         this.getAbilities().add(new ChaosEnsuesTriggeredAbility(
-                new PrestonsStageGrantFlashEffect(),
+                new CastAsThoughItHadFlashAllEffect(
+                        Duration.UntilYourNextTurn, new FilterCreatureCard("creature cards in your hand")
+                ).setText("until your next turn, creature cards in your hand have flash"),
                 false
         ));
     }
@@ -53,39 +51,6 @@ public final class PrestonsStagePlane extends Plane {
     @Override
     public PrestonsStagePlane copy() {
         return new PrestonsStagePlane(this);
-    }
-}
-
-class PrestonsStageGrantFlashEffect extends ContinuousEffectImpl {
-
-    private static final FilterCreatureCard FILTER = new FilterCreatureCard();
-
-    PrestonsStageGrantFlashEffect() {
-        super(Duration.UntilYourNextTurn, Layer.AbilityAddingRemovingEffects_6,
-                SubLayer.NA, Outcome.AddAbility);
-        staticText = "until your next turn, creature cards in your hand have flash";
-    }
-
-    private PrestonsStageGrantFlashEffect(final PrestonsStageGrantFlashEffect effect) {
-        super(effect);
-    }
-
-    @Override
-    public PrestonsStageGrantFlashEffect copy() {
-        return new PrestonsStageGrantFlashEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        if (game.getPlayer(source.getControllerId()) == null) {
-            return false;
-        }
-        for (Card card : game.getPlayer(source.getControllerId()).getHand().getCards(game)) {
-            if (FILTER.match(card, source.getControllerId(), source, game)) {
-                game.getState().addOtherAbility(card, FlashAbility.getInstance());
-            }
-        }
-        return true;
     }
 }
 
@@ -128,7 +93,11 @@ class PrestonsStageMagicTrickTriggeredAbility extends TriggeredAbilityImpl {
         boolean magicTrick;
         if (event.getType() == GameEvent.EventType.SPELL_CAST) {
             Spell spell = game.getStack().getSpell(event.getTargetId());
-            magicTrick = spell != null && MAGIC_TRICK_SPELL.match(spell, getControllerId(), this, game);
+            magicTrick = spell != null && (MAGIC_TRICK_SPELL.match(spell, getControllerId(), this, game)
+                    || spell.isCreature(game) && game.getContinuousEffects().asThough(
+                            spell.getSourceId(), AsThoughEffectType.CAST_AS_INSTANT,
+                            spell.getSpellAbility(), event.getPlayerId(), game
+                    ).stream().anyMatch(approver -> approver.getApprovingAbility().getSourceId().equals(getSourceId())));
         } else {
             // A successfully turned-up permanent was a face-down creature immediately before this event.
             magicTrick = game.getPermanent(event.getTargetId()) != null;
