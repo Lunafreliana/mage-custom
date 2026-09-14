@@ -34,6 +34,7 @@ public enum Planes {
     PLANE_LAKE_SILENCIO("LakeSilencioPlane", "Plane - Lake Silencio", "WHO"),
     PLANE_LETHE_LAKE("LetheLakePlane", "Plane - Lethe Lake"),
     PLANE_LLANOWAR("LlanowarPlane", "Plane - Llanowar"),
+    PLANE_MONDASSIAN_COLONY_SHIP("MondassianColonyShipPlane", "Plane - Mondassian Colony Ship", "WHO"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
     PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
     PLANE_NYX("NyxPlane", "Plane - Nyx", "MOC"),
