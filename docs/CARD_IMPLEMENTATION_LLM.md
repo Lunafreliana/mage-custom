@@ -280,7 +280,14 @@ A `Watcher` is copied game memory updated from events: cards drawn/cast, permane
 
 Cards add a watcher to an ability/card only where registration is required; many common abilities/conditions arrange it themselves. Search usages, not just the watcher definition. Tests in [`Mage.Tests/.../cards/watchers`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers) demonstrate expected reset/copy behavior. [`TempleOfPowerTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers/TempleOfPowerTest.java) and [`ZuberasTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers/ZuberasTest.java) are focused examples.
 
-A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, copy constructor, and `copy()`. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
+A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, and the inherited `Watcher.copy()` implementation. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
+
+Concrete watchers must extend `Watcher` directly, provide exactly one normal
+constructor, and inherit its generic `copy()` method. Do not add a watcher copy
+constructor or override `copy()`: the base implementation constructs the watcher
+reflectively and deep-copies its instance fields, including mutable collections.
+`VerifyCardDataTest.test_checkWatcherCopyMethods` rejects custom watcher copy
+methods and constructors even when card behavior tests pass.
 
 An ability on a runtime-added command or supplemental object can enter the game
 after the normal ability-watcher collection pass. If a reusable ability depends
@@ -402,7 +409,7 @@ public CardName copy() {
 }
 ```
 
-Do not call the public constructor from `copy()`: that loses runtime state and may duplicate initialization. Immutable singleton fields need not be cloned; mutable lists/maps/custom choices/watchers usually do. Every custom `EffectImpl`, `AbilityImpl`, `Watcher`, and mutable helper likewise needs a correct copy constructor and `copy()` where its base contract requires it.
+Do not call the public constructor from `copy()`: that loses runtime state and may duplicate initialization. Immutable singleton fields need not be cloned; mutable lists/maps/custom choices/watchers usually do. Every custom `EffectImpl`, `AbilityImpl`, and mutable helper likewise needs a correct copy constructor and `copy()` where its base contract requires it. Concrete `Watcher` subclasses are an exception: inherit the base class's reflective deep-copy implementation, as described in section 9.
 
 ## 13. Set registration
 
@@ -476,6 +483,22 @@ Plane's chaos ability must not retrigger, and every revealed planar card must
 remain associated with and return to the applicable individual or shared deck.
 Do not temporarily make the revealed Plane face up or route this through a
 planeswalk event.
+
+An effect that grants a triggered ability such as cascade to the first
+qualifying spell must identify that spell early enough for cast-trigger
+discovery. A watcher that observes only `SPELL_CAST` may update after the
+engine has already collected cast triggers; follow the established first-spell
+pattern and also observe `CAST_SPELL`. If the same resolving Plane ability
+creates a continuous effect and then planeswalks, remember that a planar-deck
+card is removed from the command collection when it is returned to its deck.
+An indefinite effect that must persist after that planeswalk therefore needs a
+self-managed `Duration.Custom`, not `Duration.EndOfGame`, because the generic
+`EndOfGame` cleanup removes effects whose source object is no longer available.
+Snapshot the effect's controller as well when its rules require control to
+persist after the source Plane leaves face up.
+Command-object initialization must register watchers attached to its abilities,
+just as card initialization does; otherwise watcher-backed static abilities can
+appear correctly in rules text while never recording their events.
 
 If a test queues an explicit target even when only one legal target exists,
 enable `setStrictChooseMode(true)` so automatic selection cannot leave the
