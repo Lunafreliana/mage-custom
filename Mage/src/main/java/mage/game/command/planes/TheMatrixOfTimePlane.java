@@ -1,6 +1,7 @@
 package mage.game.command.planes;
 
 import mage.MageIdentifier;
+import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
@@ -81,6 +82,13 @@ class TheMatrixOfTimeExileEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
+        MageObject sourceObject = source.getSourceObject(game);
+        if (sourceObject == null) {
+            return false;
+        }
+        UUID exileZoneId = CardUtil.getExileZoneId(
+                game, sourceObject.getId(), sourceObject.getZoneChangeCounter(game)
+        );
         for (UUID playerId : game.getPlayerList()) {
             Player player = game.getPlayer(playerId);
             if (player == null) {
@@ -89,8 +97,7 @@ class TheMatrixOfTimeExileEffect extends OneShotEffect {
             Card card = player.getLibrary().getFromTop(game);
             if (card != null) {
                 player.moveCardsToExile(
-                        card, source, game, true,
-                        CardUtil.getExileZoneId(game, source), CardUtil.getSourceName(game, source)
+                        card, source, game, true, exileZoneId, CardUtil.getSourceName(game, source)
                 );
             }
         }
@@ -116,11 +123,18 @@ class TheMatrixOfTimePlayEffect extends AsThoughEffectImpl {
 
     @Override
     public boolean applies(UUID sourceId, Ability source, UUID affectedControllerId, Game game) {
-        if (!game.isActivePlayer(affectedControllerId)
+        if (!source.isControlledBy(affectedControllerId)
+                || !game.isActivePlayer(affectedControllerId)
                 || game.getState().getZone(CardUtil.getMainCardId(game, sourceId)) != Zone.EXILED) {
             return false;
         }
-        ExileZone exileZone = game.getExile().getExileZone(CardUtil.getExileZoneId(game, source));
+        MageObject sourceObject = source.getSourceObject(game);
+        if (sourceObject == null) {
+            return false;
+        }
+        ExileZone exileZone = game.getExile().getExileZone(CardUtil.getExileZoneId(
+                game, sourceObject.getId(), sourceObject.getZoneChangeCounter(game)
+        ));
         return exileZone != null && exileZone.contains(CardUtil.getMainCardId(game, sourceId));
     }
 
@@ -198,9 +212,15 @@ class TheMatrixOfTimeOwnerEffect extends OneShotEffect {
         owner.loseLife(3, game, source, false);
         Card card = owner.getLibrary().getFromTop(game);
         if (card != null) {
+            MageObject sourceObject = source.getSourceObject(game);
+            if (sourceObject == null) {
+                return false;
+            }
             owner.moveCardsToExile(
                     card, source, game, true,
-                    CardUtil.getExileZoneId(game, source), CardUtil.getSourceName(game, source)
+                    CardUtil.getExileZoneId(
+                            game, sourceObject.getId(), sourceObject.getZoneChangeCounter(game)
+                    ), CardUtil.getSourceName(game, source)
             );
         }
         return true;
