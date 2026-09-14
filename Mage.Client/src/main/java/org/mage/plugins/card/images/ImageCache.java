@@ -5,6 +5,7 @@ import mage.client.constants.Constants;
 import mage.client.util.ImageCaches;
 import mage.client.util.SoftValuesLoadingCache;
 import mage.client.util.TransformedImageCache;
+import mage.constants.CardType;
 import mage.view.CardView;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileInputStream;
@@ -232,15 +233,18 @@ public final class ImageCache {
      * @param cardName  - can be alternative name
      * @param imageSize - size info, 0 to use original image (with max size)
      */
-    private static String getKey(CardView card, String cardName, int imageSize) {
+    static String getKey(CardView card, String cardName, int imageSize) {
         String imageFileName = card.getImageFileName();
         if (imageFileName.isEmpty()) {
             imageFileName = cardName;
         }
+        boolean isPlanarCard = card.getCardTypes().contains(CardType.PLANE)
+                || card.getCardTypes().contains(CardType.PHENOMENON);
+        String imageCardNumber = isPlanarCard ? "" : card.getCardNumber();
         return imageFileName.replace(" Token", "")
                 + '#' + card.getExpansionSetCode()
                 + '#' + card.getImageNumber()
-                + '#' + card.getCardNumber()
+                + '#' + imageCardNumber
                 + '#' + imageSize
                 + (card.getUsesVariousArt() ? "#usesVariousArt" : "");
     }
