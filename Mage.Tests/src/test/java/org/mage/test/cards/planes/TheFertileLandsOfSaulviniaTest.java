@@ -52,7 +52,7 @@ public class TheFertileLandsOfSaulviniaTest extends CardTestPlayerBase {
                         Plane.createPlane(Planes.PLANE_LLANOWAR),
                         Plane.createPlane(Planes.PLANE_BANT)), false));
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        setChoice(playerA, "Plane - Mutual Epiphany");
+        setChoice(playerA, "Phenomenon - Mutual Epiphany");
         runCode("check revealed cards were bottomed", 1, PhaseStep.POSTCOMBAT_MAIN, playerA,
                 (info, player, game) -> {
                     PlanarCard top = game.getState().getSharedPlanarDeck().draw();

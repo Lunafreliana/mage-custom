@@ -8,6 +8,7 @@ import mage.abilities.effects.mana.AddManaOfAnyTypeProducedEffect;
 import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.constants.SetTargetPointer;
+import mage.constants.Zone;
 import mage.filter.common.FilterLandPermanent;
 import mage.game.Game;
 import mage.game.command.Plane;
@@ -21,7 +22,7 @@ public final class TheFertileLandsOfSaulviniaPlane extends Plane {
         this.setPlaneType(Planes.PLANE_THE_FERTILE_LANDS_OF_SAULVINIA);
 
         // Whenever a player taps a land for mana, that player adds one mana of any type that land produced.
-        this.getAbilities().add(new TapForManaAllTriggeredManaAbility(
+        this.getAbilities().add(new TapForManaAllTriggeredManaAbility(Zone.COMMAND,
                 new AddManaOfAnyTypeProducedEffect(),
                 new FilterLandPermanent("a player taps a land"),
                 SetTargetPointer.PERMANENT));
