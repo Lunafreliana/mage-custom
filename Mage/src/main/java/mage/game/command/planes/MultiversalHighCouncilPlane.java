@@ -15,7 +15,6 @@ import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.permanent.Permanent;
 import mage.target.common.TargetCardInYourGraveyard;
-import mage.target.targetpointer.EachTargetPointer;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -47,7 +46,7 @@ public final class MultiversalHighCouncilPlane extends Plane {
         // Whenever chaos ensues, for each universe, return up to one target card from that
         // Universe from your graveyard to your hand.
         Ability ability = new ChaosEnsuesTriggeredAbility(
-                new ReturnFromGraveyardToHandTargetEffect().setTargetPointer(new EachTargetPointer()), false);
+                new ReturnFromGraveyardToHandTargetEffect(), false);
         ability.addTarget(new MultiversalHighCouncilTarget());
         this.getAbilities().add(ability);
     }
@@ -129,6 +128,7 @@ class MultiversalHighCouncilTarget extends TargetCardInYourGraveyard {
         Card candidate = game.getCard(id);
         CardUniverse universe = CardUniverse.from(candidate);
         return targets.keySet().stream()
+                .filter(targetId -> !targetId.equals(id))
                 .map(game::getCard)
                 .noneMatch(card -> CardUniverse.from(card) == universe);
     }
@@ -141,6 +141,7 @@ class MultiversalHighCouncilTarget extends TargetCardInYourGraveyard {
         Card candidate = game.getCard(id);
         CardUniverse universe = CardUniverse.from(candidate);
         return targets.keySet().stream()
+                .filter(targetId -> !targetId.equals(id))
                 .map(game::getCard)
                 .noneMatch(card -> CardUniverse.from(card) == universe);
     }
