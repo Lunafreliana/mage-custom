@@ -27,7 +27,6 @@ public class GlenElendraTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, "Glory Seeker");
 
         attack(1, playerA, "Runeclaw Bear", playerB);
-        setChoice(playerA, true);
         addTarget(playerA, "Runeclaw Bear");
         addTarget(playerA, "Glory Seeker");
 
@@ -54,7 +53,6 @@ public class GlenElendraTest extends CardTestPlayerBase {
 
         castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Steal", "Runeclaw Bear");
         castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, "Runeclaw Bear");
 
         setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
         execute();
