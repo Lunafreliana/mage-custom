@@ -1,5 +1,7 @@
 package mage.client.game;
 
+import mage.components.ImagePanel;
+import mage.components.ImagePanelStyle;
 import mage.game.command.Plane;
 import mage.game.command.planes.AgyremPlane;
 import mage.game.command.planes.AkoumPlane;
@@ -144,20 +146,22 @@ public class PlanechaseBackgroundTest {
     }
 
     @Test
-    public void artworkCropAcceptsBothOrientationsAndExcludesTheCardFrame() {
-        BufferedImage landscape = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_RGB);
+    public void fullPlaneBackgroundPreservesCardAndLeavesBlackRightAndHandAreas() {
+        // Match the actual Plane image size used by the client download path.
+        BufferedImage landscape = new BufferedImage(936, 672, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = landscape.createGraphics();
         try {
-            graphics.setColor(Color.MAGENTA); // Title, frame and rules are not artwork.
-            graphics.fillRect(0, 0, 1000, 700);
-            graphics.setColor(Color.GREEN);
-            graphics.fillRect(70, 110, 860, 300);
-            graphics.setColor(Color.BLUE);
-            graphics.fillRect(480, 240, 40, 40);
+            graphics.setColor(Color.MAGENTA); // title/frame
+            graphics.fillRect(0, 0, 936, 672);
+            graphics.setColor(Color.GREEN); // illustration
+            graphics.fillRect(70, 100, 796, 340);
+            graphics.setColor(Color.YELLOW); // type/rules/chaos text area
+            graphics.fillRect(0, 500, 936, 172);
         } finally {
             graphics.dispose();
         }
-        BufferedImage portrait = new BufferedImage(700, 1000, BufferedImage.TYPE_INT_RGB);
+
+        BufferedImage portrait = new BufferedImage(672, 936, BufferedImage.TYPE_INT_RGB);
         // The stored scan is counterclockwise relative to its readable landscape view.
         for (int x = 0; x < landscape.getWidth(); x++) {
             for (int y = 0; y < landscape.getHeight(); y++) {
@@ -165,18 +169,43 @@ public class PlanechaseBackgroundTest {
             }
         }
 
-        BufferedImage cropped = PlanechaseBackground.cropArtwork(landscape);
-        BufferedImage rotatedCrop = PlanechaseBackground.cropArtwork(portrait);
-        Assert.assertEquals(cropped.getWidth(), rotatedCrop.getWidth());
-        Assert.assertEquals(cropped.getHeight(), rotatedCrop.getHeight());
-        Assert.assertEquals(Color.GREEN.getRGB(), cropped.getRGB(0, 0));
-        Assert.assertEquals(Color.GREEN.getRGB(), cropped.getRGB(cropped.getWidth() - 1, cropped.getHeight() - 1));
-        Assert.assertEquals(Color.BLUE.getRGB(), cropped.getRGB(cropped.getWidth() / 2, cropped.getHeight() / 2));
-        Assert.assertArrayEquals(cropped.getRGB(0, 0, cropped.getWidth(), cropped.getHeight(), null, 0, cropped.getWidth()),
-                rotatedCrop.getRGB(0, 0, rotatedCrop.getWidth(), rotatedCrop.getHeight(), null, 0, rotatedCrop.getWidth()));
-        Assert.assertEquals(Color.MAGENTA.getRGB(), landscape.getRGB(0, 0));
-        Assert.assertNull(PlanechaseBackground.cropArtwork(null));
-        Assert.assertNotNull(PlanechaseBackground.cropArtwork(new BufferedImage(1, 2, BufferedImage.TYPE_INT_RGB)));
+        BufferedImage prepared = PlanechaseBackground.prepareArtwork(landscape);
+        BufferedImage rotatedPrepared = PlanechaseBackground.prepareArtwork(portrait);
+        Assert.assertEquals(936, prepared.getWidth());
+        Assert.assertEquals(672, prepared.getHeight());
+        Assert.assertEquals(ImagePanel.IMAGE_LAYOUT_FIT_TOP_LEFT,
+                prepared.getProperty(ImagePanel.IMAGE_LAYOUT_PROPERTY));
+        Assert.assertEquals(0.75f,
+                ((Number) prepared.getProperty(ImagePanel.IMAGE_MAX_HEIGHT_RATIO_PROPERTY)).floatValue(), 0.0f);
+        Assert.assertArrayEquals(
+                prepared.getRGB(0, 0, prepared.getWidth(), prepared.getHeight(), null, 0, prepared.getWidth()),
+                rotatedPrepared.getRGB(0, 0, rotatedPrepared.getWidth(), rotatedPrepared.getHeight(), null, 0, rotatedPrepared.getWidth()));
+
+        // The former crop discarded the frame/title/rules area. All of it must now survive.
+        Color title = new Color(prepared.getRGB(0, 0), true);
+        Color art = new Color(prepared.getRGB(100, 150), true);
+        Color rules = new Color(prepared.getRGB(100, 600), true);
+        Assert.assertTrue(title.getRed() > 0 && title.getBlue() > 0);
+        Assert.assertTrue(art.getGreen() > 0);
+        Assert.assertTrue(rules.getRed() > 0 && rules.getGreen() > 0);
+
+        // Even though the hosting ImagePanel normally uses COVER, Plane backgrounds
+        // opt into native-size top-left rendering with intentional black fill.
+        ImagePanel panel = new ImagePanel(prepared, ImagePanelStyle.COVER);
+        panel.setSize(1600, 1000);
+        BufferedImage rendered = new BufferedImage(1600, 1000, BufferedImage.TYPE_INT_RGB);
+        Graphics2D renderedGraphics = rendered.createGraphics();
+        try {
+            panel.paint(renderedGraphics);
+        } finally {
+            renderedGraphics.dispose();
+        }
+
+        Assert.assertNotEquals(Color.BLACK.getRGB(), rendered.getRGB(935, 671));
+        Assert.assertEquals(Color.BLACK.getRGB(), rendered.getRGB(936, 671));
+        Assert.assertEquals(Color.BLACK.getRGB(), rendered.getRGB(1200, 100));
+        Assert.assertEquals(Color.BLACK.getRGB(), rendered.getRGB(100, 800));
+        Assert.assertNull(PlanechaseBackground.prepareArtwork(null));
     }
 
     private static CardView view(Plane plane) {
