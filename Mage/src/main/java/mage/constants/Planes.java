@@ -60,6 +60,7 @@ public enum Planes {
     PLANE_TAKENUMA("TakenumaPlane", "Plane - Takenuma"),
     PLANE_TAZEEM("TazeemPlane", "Plane - Tazeem"),
     PLANE_TEN_WIZARDS_MOUNTAIN("TenWizardsMountainPlane", "Plane - Ten Wizards Mountain", "MOC"),
+    PLANE_TEMPLE_OF_ATROPOS("TempleOfAtroposPlane", "Plane - Temple of Atropos", "WHO"),
     PLANE_THE_GOLDEN_CITY_OF_ORAZCA("TheGoldenCityOfOrazcaPlane", "Plane - The Golden City of Orazca", "MOC"),
     PLANE_THE_GREAT_AERIE("TheGreatAeriePlane", "Plane - The Great Aerie", "MOC"),
     PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone", "PUNK"),
