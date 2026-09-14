@@ -16,6 +16,8 @@ public class ArtistAlleyTest extends CardTestPlayerBase {
 
     @Test
     public void planeswalkAndUpkeepExileCardsThatCanBePlayed() {
+        removeAllCardsFromLibrary(playerA);
+        skipInitShuffling();
         addPlane(playerA, Planes.PLANE_ARTIST_ALLEY);
         addCard(Zone.LIBRARY, playerA, "Mountain", 2);
 
@@ -29,8 +31,18 @@ public class ArtistAlleyTest extends CardTestPlayerBase {
 
     @Test
     public void chaosLetsOpponentChooseSpellAndControllerCastItForFree() {
+        removeAllCardsFromLibrary(playerA);
+        skipInitShuffling();
         addPlane(playerA, Planes.PLANE_ARTIST_ALLEY);
-        addCard(Zone.LIBRARY, playerA, "Lightning Bolt", 8);
+        // Cards are added bottom-to-top. The Mountains are exiled by the planeswalk and upkeep
+        // triggers, leaving six differently named spells for the chaos trigger.
+        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
+        addCard(Zone.LIBRARY, playerA, "Shock");
+        addCard(Zone.LIBRARY, playerA, "Opt");
+        addCard(Zone.LIBRARY, playerA, "Unsummon");
+        addCard(Zone.LIBRARY, playerA, "Duress");
+        addCard(Zone.LIBRARY, playerA, "Giant Growth");
+        addCard(Zone.LIBRARY, playerA, "Mountain", 2);
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
@@ -46,12 +58,14 @@ public class ArtistAlleyTest extends CardTestPlayerBase {
         execute();
 
         assertLife(playerB, 17);
-        assertExileCount(playerA, "Lightning Bolt", 7);
+        assertExileCount(playerA, 7);
         assertGraveyardCount(playerA, "Lightning Bolt", 1);
     }
 
     @Test
     public void chaosDoesNothingFurtherWhenOnlyLandsAreExiled() {
+        removeAllCardsFromLibrary(playerA);
+        skipInitShuffling();
         addPlane(playerA, Planes.PLANE_ARTIST_ALLEY);
         addCard(Zone.LIBRARY, playerA, "Mountain", 8);
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
