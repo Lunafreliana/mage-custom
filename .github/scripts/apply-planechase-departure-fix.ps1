@@ -52,6 +52,8 @@ $newLeave = @'
         }
         if (checkIfGameIsOver()) {
 '@
+$oldLeave = $oldLeave.Replace("`r`n", "`n")
+$newLeave = $newLeave.Replace("`r`n", "`n")
 if (-not $gameImpl.Contains($oldLeave)) {
     throw 'GameImpl leave block not found'
 }
@@ -78,6 +80,8 @@ $newDeckMethods = @'
 
     public void setPlayerPlanarDeck(UUID playerId, Collection<? extends PlanarCard> cards, boolean shuffle) {
 '@
+$oldDeckMethods = $oldDeckMethods.Replace("`r`n", "`n")
+$newDeckMethods = $newDeckMethods.Replace("`r`n", "`n")
 if (-not $gameState.Contains($oldDeckMethods)) {
     throw 'GameState planar deck block not found'
 }
