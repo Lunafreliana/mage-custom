@@ -76,20 +76,21 @@ public class AgyremEndStepInteractionTest extends CardTestPlayerBase {
         runCode("four end-step triggers are pending", 1, PhaseStep.END_TURN, playerA,
                 (info, player, game) -> Assert.assertEquals(info, 4, game.getStack().size()));
 
-        checkPermanentCount("first Agyrem return", 1, PhaseStep.CLEANUP,
-                playerA, "Savannah Lions", 1);
-        checkPermanentCount("second Agyrem return", 1, PhaseStep.CLEANUP,
-                playerA, "Silvercoat Lion", 1);
-        checkGraveyardCount("Savannah returned", 1, PhaseStep.CLEANUP,
-                playerA, "Savannah Lions", 0);
-        checkGraveyardCount("Silvercoat returned", 1, PhaseStep.CLEANUP,
-                playerA, "Silvercoat Lion", 0);
-        checkPermanentCount("Ocelot created its Cat", 1, PhaseStep.CLEANUP,
-                playerA, "Cat Token", 1);
-        checkPermanentTapped("Caetus untapped attacking Ocelot", 1, PhaseStep.CLEANUP,
-                playerA, "Ocelot Pride", false, 1);
-
-        setStopAt(1, PhaseStep.CLEANUP);
+        // Cleanup normally has no priority, so inspect the resolved state on the
+        // following turn instead of scheduling test commands in cleanup.
+        setStopAt(2, PhaseStep.UPKEEP);
         execute();
+
+        assertPermanentCount(playerA, "Savannah Lions", 1);
+        assertPermanentCount(playerA, "Silvercoat Lion", 1);
+        assertGraveyardCount(playerA, "Savannah Lions", 0);
+        assertGraveyardCount(playerA, "Silvercoat Lion", 0);
+        assertPermanentCount(playerA, "Cat Token", 1);
+
+        Permanent ocelot = currentGame.getBattlefield().getAllActivePermanents(playerA.getId()).stream()
+                .filter(permanent -> permanent.getName().equals("Ocelot Pride"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Ocelot Pride not found after the end step"));
+        Assert.assertFalse("Caetus must untap Ocelot Pride at the end step", ocelot.isTapped());
     }
 }
