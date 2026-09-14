@@ -455,6 +455,14 @@ public abstract class GameImpl implements Game {
             }
         }
 
+        // Face-down planar cards remain command-zone-associated objects while
+        // stored in a planar deck. Delayed abilities keep the original source id,
+        // so views such as trigger ordering must still be able to resolve it.
+        object = state.getPlanarCardInDeck(objectId);
+        if (object != null) {
+            return object;
+        }
+
         object = getCard(objectId);
 
         if (object == null) {
@@ -3778,15 +3786,39 @@ public abstract class GameImpl implements Game {
             return;
         }
         logger.debug("Start leave game: " + player.getName());
-        if (state.isPlaneChase() && playerId.equals(getPlanarControllerId(null))) {
-            UUID successorId = getActivePlayerId();
-            if (playerId.equals(successorId)) {
-                Player successor = state.getPlayerList(playerId).getNext(this, false);
-                successorId = successor == null ? null : successor.getId();
+        boolean revealReplacementPlane = false;
+        UUID replacementPlanarPlayerId = null;
+        if (state.isPlaneChase()) {
+            if (playerId.equals(getPlanarControllerId(null))) {
+                UUID successorId = getActivePlayerId();
+                if (playerId.equals(successorId)) {
+                    Player successor = state.getPlayerList(playerId).getNext(this, false);
+                    successorId = successor == null ? null : successor.getId();
+                }
+                setPlanarControllerId(successorId);
             }
-            setPlanarControllerId(successorId);
+            replacementPlanarPlayerId = getPlanarControllerId(null);
+            if (state.getPlanarDeckMode() == PlanarDeckMode.INDIVIDUAL) {
+                for (PlanarCard planarCard : new ArrayList<>(state.getFaceUpPlanarCards())) {
+                    if (!playerId.equals(planarCard.getPlanarDeckOwnerId())) {
+                        continue;
+                    }
+                    state.getCommand().remove(planarCard);
+                    // The new planar controller takes control before the owner's Plane leaves,
+                    // so planeswalk-away abilities are controlled by the surviving player.
+                    fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                            planarCard.getId(), (Ability) null, replacementPlanarPlayerId, 0, true));
+                    state.removeTriggersOfSourceId(planarCard.getId());
+                    revealReplacementPlane = true;
+                }
+                // Rule 800.4a also removes the rest of that player's planar deck.
+                state.removePlayerPlanarDeck(playerId);
+            }
         }
         player.leave();
+        if (revealReplacementPlane && replacementPlanarPlayerId != null) {
+            turnTopPlanarCardFaceUp(replacementPlanarPlayerId);
+        }
         if (checkIfGameIsOver()) {
             // no need to remove objects if only one player is left so the game is over
             return;

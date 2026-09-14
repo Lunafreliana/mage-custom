@@ -85,6 +85,20 @@ public final class SharedPlanarDeck implements Serializable, Copyable<SharedPlan
         return Collections.unmodifiableList(result);
     }
 
+    /**
+     * Internal identity lookup for effects and views that retain a planar card's
+     * source id after that card is put back into the planar deck.
+     */
+    public PlanarCard findById(UUID cardId) {
+        if (cardId == null) {
+            return null;
+        }
+        return cards.stream()
+                .filter(card -> cardId.equals(card.getId()))
+                .findFirst()
+                .orElse(null);
+    }
+
     public void clear() {
         cards.clear();
     }
