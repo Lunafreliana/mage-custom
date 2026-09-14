@@ -112,7 +112,7 @@ public class DckDeckImportTest {
 
     private static DeckCardInfo planarCardInfo(Planes plane) {
         PlanarDeckCard card = new PlanarDeckCard(PlanarCardRegistry.getId(plane));
-        return new DeckCardInfo(card.getName(), card.getCardNumber(), card.getSetCode());
+        return new DeckCardInfo(card.getName(), card.getCardNumber(), card.getExpansionSetCode());
     }
 
     @Test
