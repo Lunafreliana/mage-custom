@@ -13,14 +13,18 @@ import mage.constants.Layer;
 import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.constants.SubLayer;
+import mage.constants.WatcherScope;
 import mage.constants.Zone;
 import mage.game.Game;
 import mage.game.command.Plane;
+import mage.game.events.GameEvent;
 import mage.game.stack.Spell;
 import mage.game.stack.StackObject;
 import mage.target.common.TargetArtifactPermanent;
-import mage.watchers.common.SpellsCastWatcher;
+import mage.watchers.Watcher;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -32,13 +36,14 @@ public final class TardisBayPlane extends Plane {
         this.setPlaneType(Planes.PLANE_TARDIS_BAY);
 
         // The first spell you cast during each of your turns with mana value 2 or greater has cascade.
-        this.getAbilities().add(new SimpleStaticAbility(
-                Zone.COMMAND, new TardisBayCascadeEffect()
-        ));
+        this.getAbilities().add(
+                new SimpleStaticAbility(Zone.COMMAND, new TardisBayCascadeEffect()),
+                new TardisBayFirstQualifyingSpellWatcher()
+        );
 
         // When chaos ensues, gain control of target artifact. Then planeswalk.
         Ability ability = new ChaosEnsuesTriggeredAbility(
-                new GainControlTargetEffect(Duration.EndOfGame), false
+                new GainControlTargetEffect(Duration.EndOfGame, true), false
         );
         ability.addTarget(new TargetArtifactPermanent());
         ability.addEffect(new PlaneswalkEffect(false).concatBy("Then"));
@@ -83,15 +88,12 @@ class TardisBayCascadeEffect extends ContinuousEffectImpl {
                 .noneMatch(card -> card.getId().equals(source.getSourceId()))) {
             return false;
         }
-        SpellsCastWatcher watcher = game.getState().getWatcher(SpellsCastWatcher.class);
+        TardisBayFirstQualifyingSpellWatcher watcher = game.getState()
+                .getWatcher(TardisBayFirstQualifyingSpellWatcher.class);
         if (watcher == null) {
             return false;
         }
-        UUID firstQualifyingSpellId = watcher.getSpellsCastThisTurn(controllerId).stream()
-                .filter(spell -> spell.getManaValue() >= 2)
-                .map(Spell::getId)
-                .findFirst()
-                .orElse(null);
+        UUID firstQualifyingSpellId = watcher.getFirstQualifyingSpellId(controllerId);
         if (firstQualifyingSpellId == null) {
             return true;
         }
@@ -106,5 +108,49 @@ class TardisBayCascadeEffect extends ContinuousEffectImpl {
             }
         }
         return true;
+    }
+}
+
+class TardisBayFirstQualifyingSpellWatcher extends Watcher {
+
+    private final Map<UUID, UUID> firstQualifyingSpellByPlayer = new HashMap<>();
+
+    TardisBayFirstQualifyingSpellWatcher() {
+        super(WatcherScope.GAME);
+    }
+
+    private TardisBayFirstQualifyingSpellWatcher(final TardisBayFirstQualifyingSpellWatcher watcher) {
+        super(watcher);
+        this.firstQualifyingSpellByPlayer.putAll(watcher.firstQualifyingSpellByPlayer);
+    }
+
+    @Override
+    public TardisBayFirstQualifyingSpellWatcher copy() {
+        return new TardisBayFirstQualifyingSpellWatcher(this);
+    }
+
+    @Override
+    public void watch(GameEvent event, Game game) {
+        if (event.getType() != GameEvent.EventType.CAST_SPELL
+                && event.getType() != GameEvent.EventType.SPELL_CAST) {
+            return;
+        }
+        Spell spell = (Spell) game.getObject(event.getTargetId());
+        if (spell == null
+                || spell.getManaValue() < 2
+                || !spell.getControllerId().equals(game.getActivePlayerId())) {
+            return;
+        }
+        firstQualifyingSpellByPlayer.putIfAbsent(spell.getControllerId(), spell.getId());
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        firstQualifyingSpellByPlayer.clear();
+    }
+
+    UUID getFirstQualifyingSpellId(UUID playerId) {
+        return firstQualifyingSpellByPlayer.get(playerId);
     }
 }

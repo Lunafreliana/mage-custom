@@ -460,6 +460,15 @@ remain associated with and return to the applicable individual or shared deck.
 Do not temporarily make the revealed Plane face up or route this through a
 planeswalk event.
 
+An effect that grants a triggered ability such as cascade to the first
+qualifying spell must identify that spell early enough for cast-trigger
+discovery. A watcher that observes only `SPELL_CAST` may update after the
+engine has already collected cast triggers; follow the established first-spell
+pattern and also observe `CAST_SPELL`. If the same resolving Plane ability
+creates a continuous effect and then planeswalks, snapshot the effect's
+controller during initialization when its rules require that control to
+persist after the source Plane leaves face up.
+
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of
 cards to put into the graveyard is a target-selection prompt and must be queued
