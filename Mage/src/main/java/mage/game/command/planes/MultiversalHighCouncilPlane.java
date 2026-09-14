@@ -17,7 +17,9 @@ import mage.game.permanent.Permanent;
 import mage.target.common.TargetCardInYourGraveyard;
 
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author The XMage Developers
@@ -105,6 +107,17 @@ class MultiversalHighCouncilTarget extends TargetCardInYourGraveyard {
     @Override
     public MultiversalHighCouncilTarget copy() {
         return new MultiversalHighCouncilTarget(this);
+    }
+
+    @Override
+    public Set<UUID> possibleTargets(UUID sourceControllerId, Ability source, Game game) {
+        EnumSet<CardUniverse> selectedUniverses = targets.keySet().stream()
+                .map(game::getCard)
+                .map(CardUniverse::from)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(CardUniverse.class)));
+        return super.possibleTargets(sourceControllerId, source, game).stream()
+                .filter(id -> !selectedUniverses.contains(CardUniverse.from(game.getCard(id))))
+                .collect(Collectors.toSet());
     }
 
     @Override
