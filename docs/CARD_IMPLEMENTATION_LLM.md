@@ -219,6 +219,15 @@ Separate `addTarget` calls create separate target groups. A target with `(min, m
 
 Common errors: using `TargetPlayer` where Oracle says opponent; using battlefield target for a graveyard card; forgetting “you control”; targeting when Oracle says “choose” (hexproof should not interfere); missing `another`; allowing the same object twice; and assuming effect 2 automatically uses effect 1's target.
 
+When one target depends on an earlier target, remember that
+`AbilityImpl.canChooseTargetAbility` checks all target slots before any target
+has been selected. The dependent target's `canChoose` must check whether a
+complete legal pair exists in that state, then apply its selected-first-target
+restriction during actual selection and resolution. Do not temporarily choose
+targets on the live ability to perform this check. Include ordinary targeting
+restrictions such as hexproof when finding pairs, and test both a legal pair and
+a battlefield with no legal second target.
+
 ## 6. Filters and predicates
 
 Filters describe eligible objects and build readable rules text. Bases include `FilterPermanent`, `FilterCreaturePermanent`, `FilterControlledCreaturePermanent`, `FilterCard`, `FilterSpell`, `FilterPlayer`, and common prebuilt filters in [`mage/filter/common`](../Mage/src/main/java/mage/filter/common).
@@ -271,7 +280,14 @@ A `Watcher` is copied game memory updated from events: cards drawn/cast, permane
 
 Cards add a watcher to an ability/card only where registration is required; many common abilities/conditions arrange it themselves. Search usages, not just the watcher definition. Tests in [`Mage.Tests/.../cards/watchers`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers) demonstrate expected reset/copy behavior. [`TempleOfPowerTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers/TempleOfPowerTest.java) and [`ZuberasTest.java`](../Mage.Tests/src/test/java/org/mage/test/cards/watchers/ZuberasTest.java) are focused examples.
 
-A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, copy constructor, and `copy()`. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
+A card-local custom watcher is appropriate only for truly card-specific historical data; search `extends Watcher` under `Mage.Sets/src/mage/cards` for live examples and study its `watch`, reset scope, and the inherited `Watcher.copy()` implementation. Common mistakes are registering it too late, wrong event type, comparing the wrong player/source, failing turn reset, failing to deep-copy collections, recording replaced events, or using a watcher for facts available from `Game` right now.
+
+Concrete watchers must extend `Watcher` directly, provide exactly one normal
+constructor, and inherit its generic `copy()` method. Do not add a watcher copy
+constructor or override `copy()`: the base implementation constructs the watcher
+reflectively and deep-copies its instance fields, including mutable collections.
+`VerifyCardDataTest.test_checkWatcherCopyMethods` rejects custom watcher copy
+methods and constructors even when card behavior tests pass.
 
 An ability on a runtime-added command or supplemental object can enter the game
 after the normal ability-watcher collection pass. If a reusable ability depends
@@ -279,6 +295,14 @@ on historical state, verify that its watcher is available before such an object
 is activated; register a game-scoped watcher in the default game setup when the
 mechanic must support late-added sources. A null-safe lookup prevents a crash,
 but is not a substitute for recording the events needed for correct behavior.
+
+A watcher for "this combat" must retain first-strike and regular combat damage
+until end of combat, but must also clear for a new combat and at turn reset.
+Ending a turn or combat phase can skip the ordinary end-of-combat step (CR 724,
+[current rules](https://magic.wizards.com/en/rules), checked 2026-09-14), so
+clearing only on `END_COMBAT_STEP_POST` can carry stale history forward. Test
+an interrupted combat and ensure resetting a copied watcher does not modify
+the original.
 
 ### “One or more” simultaneous-event triggers
 
@@ -385,7 +409,7 @@ public CardName copy() {
 }
 ```
 
-Do not call the public constructor from `copy()`: that loses runtime state and may duplicate initialization. Immutable singleton fields need not be cloned; mutable lists/maps/custom choices/watchers usually do. Every custom `EffectImpl`, `AbilityImpl`, `Watcher`, and mutable helper likewise needs a correct copy constructor and `copy()` where its base contract requires it.
+Do not call the public constructor from `copy()`: that loses runtime state and may duplicate initialization. Immutable singleton fields need not be cloned; mutable lists/maps/custom choices/watchers usually do. Every custom `EffectImpl`, `AbilityImpl`, and mutable helper likewise needs a correct copy constructor and `copy()` where its base contract requires it. Concrete `Watcher` subclasses are an exception: inherit the base class's reflective deep-copy implementation, as described in section 9.
 
 ## 13. Set registration
 
@@ -475,6 +499,14 @@ persist after the source Plane leaves face up.
 Command-object initialization must register watchers attached to its abilities,
 just as card initialization does; otherwise watcher-backed static abilities can
 appear correctly in rules text while never recording their events.
+
+If a test queues an explicit target even when only one legal target exists,
+enable `setStrictChooseMode(true)` so automatic selection cannot leave the
+command unused. A must-attack requirement may declare an attacker before the
+test player receives an attacker-selection prompt; test that forced attack
+through its results instead of queuing a redundant `attack(...)` command.
+In two-player tests, the starting player skips their first draw step; account
+for this separately from the test harness's skipped opening-hand draws.
 
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of

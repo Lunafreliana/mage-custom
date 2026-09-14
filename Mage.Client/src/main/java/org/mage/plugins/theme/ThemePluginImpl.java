@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import mage.client.dialog.PreferencesDialog;
+import mage.client.game.GamePanel;
 import mage.components.ImagePanel;
 import mage.components.ImagePanelStyle;
 import mage.interfaces.plugin.ThemePlugin;
@@ -63,8 +64,10 @@ public class ThemePluginImpl implements ThemePlugin {
     @Override
     public void applyInGame(Map<String, JComponent> ui) {
         BufferedImage backgroundImage;
+        boolean useDefaultBackground = PreferencesDialog.getCachedValue(
+                PreferencesDialog.KEY_BATTLEFIELD_IMAGE_DEFAULT, "true").equals("true");
         try {
-            if (PreferencesDialog.getCachedValue(PreferencesDialog.KEY_BATTLEFIELD_IMAGE_DEFAULT, "true").equals("true")) {
+            if (useDefaultBackground) {
                 backgroundImage = loadbuffer_default();
             } else if (PreferencesDialog.getCachedValue(PreferencesDialog.KEY_BATTLEFIELD_IMAGE_RANDOM, "true").equals("true")) {
                 backgroundImage = loadbuffer_random();
@@ -98,6 +101,10 @@ public class ThemePluginImpl implements ThemePlugin {
                 ui.get("gamePanel").remove(ui.get("jLayeredPane"));
                 bgPanel.add(ui.get("jLayeredPane"));
                 ui.get("gamePanel").add(bgPanel);
+                if (ui.get("gamePanel") instanceof GamePanel) {
+                    ((GamePanel) ui.get("gamePanel")).setBattlefieldBackground(
+                            bgPanel, backgroundImage, useDefaultBackground);
+                }
             } else {
                 log.error("error: no components");
             }

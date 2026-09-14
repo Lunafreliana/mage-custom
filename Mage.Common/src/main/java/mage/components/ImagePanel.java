@@ -30,6 +30,12 @@ public class ImagePanel extends JPanel {
         setOpaque(true);
     }
 
+    /** Replace the background on the Swing event dispatch thread. */
+    public void setImage(BufferedImage image) {
+        this.image = image;
+        repaint();
+    }
+
     public void setImageAlignmentX(float alignmentX) {
         this.alignmentX = alignmentX > 1.0f ? 1.0f : alignmentX < 0.0f ? 0.0f : alignmentX;
     }

@@ -118,16 +118,6 @@ class TardisBayFirstQualifyingSpellWatcher extends Watcher {
         super(WatcherScope.GAME);
     }
 
-    private TardisBayFirstQualifyingSpellWatcher(final TardisBayFirstQualifyingSpellWatcher watcher) {
-        super(watcher);
-        this.firstQualifyingSpellByPlayer.putAll(watcher.firstQualifyingSpellByPlayer);
-    }
-
-    @Override
-    public TardisBayFirstQualifyingSpellWatcher copy() {
-        return new TardisBayFirstQualifyingSpellWatcher(this);
-    }
-
     @Override
     public void watch(GameEvent event, Game game) {
         if (event.getType() != GameEvent.EventType.CAST_SPELL
