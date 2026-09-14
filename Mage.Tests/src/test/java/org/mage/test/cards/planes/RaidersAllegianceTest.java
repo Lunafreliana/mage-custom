@@ -73,8 +73,8 @@ public class RaidersAllegianceTest extends CardTestPlayerBase {
 
         attack(1, playerA, "Grizzly Bears");
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Cause Chaos");
-        setChoice(playerA, playerA.getName());
-        setChoice(playerA, playerA.getName());
+        addTarget(playerA, playerA);
+        addTarget(playerA, playerA);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.END_TURN);

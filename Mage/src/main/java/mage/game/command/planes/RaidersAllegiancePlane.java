@@ -10,22 +10,15 @@ import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.constants.SubType;
 import mage.constants.TargetController;
-import mage.constants.WatcherScope;
 import mage.constants.Zone;
 import mage.counters.CounterType;
 import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.game.Game;
 import mage.game.command.Plane;
-import mage.game.events.DamagedEvent;
-import mage.game.events.GameEvent;
 import mage.game.permanent.token.PirateToken;
 import mage.game.permanent.token.TreasureToken;
 import mage.players.Player;
-import mage.watchers.Watcher;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import mage.watchers.common.PlayersDealtCombatDamageThisTurnWatcher;
 
 /**
  * @author The XMage Developers
@@ -43,7 +36,6 @@ public final class RaidersAllegiancePlane extends Plane {
         Ability ability = new BeginningOfSecondMainTriggeredAbility(
                 Zone.COMMAND, TargetController.YOU, new RaidersAllegianceRaidEffect(), false
         );
-        ability.addWatcher(new RaidersAllegianceWatcher());
         this.getAbilities().add(ability);
 
         // Whenever you planeswalk away from here, each player with the most point counters or tied
@@ -89,11 +81,12 @@ class RaidersAllegianceRaidEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         Player controller = game.getPlayer(source.getControllerId());
-        RaidersAllegianceWatcher watcher = game.getState().getWatcher(RaidersAllegianceWatcher.class);
+        PlayersDealtCombatDamageThisTurnWatcher watcher
+                = game.getState().getWatcher(PlayersDealtCombatDamageThisTurnWatcher.class);
         if (controller == null || watcher == null) {
             return false;
         }
-        int count = watcher.getPlayersDealtCombatDamageCount();
+        int count = watcher.getCount();
         if (count > 0) {
             controller.addCounters(CounterType.POINT.createInstance(count), controller.getId(), source, game);
             new PirateToken().putOntoBattlefield(count, game, source);
@@ -164,32 +157,5 @@ class RaidersAllegianceChaosEffect extends OneShotEffect {
             new ProliferateEffect(false).apply(game, source);
         }
         return true;
-    }
-}
-
-class RaidersAllegianceWatcher extends Watcher {
-
-    private final Set<UUID> players = new HashSet<>();
-
-    RaidersAllegianceWatcher() {
-        super(WatcherScope.GAME);
-    }
-
-    @Override
-    public void watch(GameEvent event, Game game) {
-        if (event.getType() == GameEvent.EventType.DAMAGED_PLAYER
-                && ((DamagedEvent) event).isCombatDamage()) {
-            players.add(event.getTargetId());
-        }
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-        players.clear();
-    }
-
-    int getPlayersDealtCombatDamageCount() {
-        return players.size();
     }
 }
