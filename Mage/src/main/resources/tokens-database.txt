@@ -195,6 +195,7 @@
 |PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
 |PLANE:PCA|Plane - Immersturm||ImmersturmPlane|
 |PLANE:PCA|Plane - Izzet Steam Maze||IzzetSteamMazePlane|
+|PLANE:MOC|Plane - Ketria||KetriaPlane|
 |PLANE:MOC|Plane - Kharasha Foothills||KharashaFoothillsPlane|
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|

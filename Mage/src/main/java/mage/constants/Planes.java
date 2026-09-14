@@ -31,6 +31,7 @@ public enum Planes {
     PLANE_HORIZON_BOUGHS("HorizonBoughsPlane", "Plane - Horizon Boughs"),
     PLANE_IMMERSTURM("ImmersturmPlane", "Plane - Immersturm"),
     PLANE_IZZET_STEAM_MAZE("IzzetSteamMazePlane", "Plane - Izzet Steam Maze"),
+    PLANE_KETRIA("KetriaPlane", "Plane - Ketria", "MOC"),
     PLANE_KHARASHA_FOOTHILLS("KharashaFoothillsPlane", "Plane - Kharasha Foothills", "MOC"),
     PLANE_INYS_HAEN("InysHaenPlane", "Plane - Inys Haen", "MOC"),
     PLANE_ISLE_OF_VESUVA("IsleOfVesuvaPlane", "Plane - Isle of Vesuva", "MOC"),
