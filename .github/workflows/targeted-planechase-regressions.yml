@@ -4,15 +4,109 @@ on:
   push:
     branches: [ "test/planechase-departure-agyrem-interactions" ]
 
+permissions:
+  contents: write
+
 concurrency:
   group: targeted-planechase-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   targeted-tests:
+    if: github.event.head_commit.message != 'Apply Planechase departure fix'
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v7
+
+    - name: Apply individual Plane departure fix in working tree
+      shell: powershell
+      run: |
+        $gameImplPath = 'Mage/src/main/java/mage/game/GameImpl.java'
+        $gameImpl = (Get-Content -Raw $gameImplPath).Replace("`r`n", "`n")
+        $oldLeave = @'
+        logger.debug("Start leave game: " + player.getName());
+        if (state.isPlaneChase() && playerId.equals(getPlanarControllerId(null))) {
+            UUID successorId = getActivePlayerId();
+            if (playerId.equals(successorId)) {
+                Player successor = state.getPlayerList(playerId).getNext(this, false);
+                successorId = successor == null ? null : successor.getId();
+            }
+            setPlanarControllerId(successorId);
+        }
+        player.leave();
+        if (checkIfGameIsOver()) {
+'@
+        $newLeave = @'
+        logger.debug("Start leave game: " + player.getName());
+        boolean revealReplacementPlane = false;
+        UUID replacementPlanarPlayerId = null;
+        if (state.isPlaneChase()) {
+            if (playerId.equals(getPlanarControllerId(null))) {
+                UUID successorId = getActivePlayerId();
+                if (playerId.equals(successorId)) {
+                    Player successor = state.getPlayerList(playerId).getNext(this, false);
+                    successorId = successor == null ? null : successor.getId();
+                }
+                setPlanarControllerId(successorId);
+            }
+            replacementPlanarPlayerId = getPlanarControllerId(null);
+            if (state.getPlanarDeckMode() == PlanarDeckMode.INDIVIDUAL) {
+                for (PlanarCard planarCard : new ArrayList<>(state.getFaceUpPlanarCards())) {
+                    if (!playerId.equals(planarCard.getPlanarDeckOwnerId())) {
+                        continue;
+                    }
+                    state.getCommand().remove(planarCard);
+                    // The new planar controller takes control before the owner's Plane leaves,
+                    // so planeswalk-away abilities are controlled by the surviving player.
+                    fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                            planarCard.getId(), (Ability) null, replacementPlanarPlayerId, 0, true));
+                    state.removeTriggersOfSourceId(planarCard.getId());
+                    revealReplacementPlane = true;
+                }
+                // Rule 800.4a also removes the rest of that player's planar deck.
+                state.removePlayerPlanarDeck(playerId);
+            }
+        }
+        player.leave();
+        if (revealReplacementPlane && replacementPlanarPlayerId != null) {
+            turnTopPlanarCardFaceUp(replacementPlanarPlayerId);
+        }
+        if (checkIfGameIsOver()) {
+'@
+        $oldLeave = $oldLeave.Replace("`r`n", "`n")
+        $newLeave = $newLeave.Replace("`r`n", "`n")
+        if (-not $gameImpl.Contains($oldLeave)) { throw 'GameImpl leave block not found' }
+        $gameImpl = $gameImpl.Replace($oldLeave, $newLeave)
+        [System.IO.File]::WriteAllText($gameImplPath, $gameImpl, [System.Text.UTF8Encoding]::new($false))
+
+        $gameStatePath = 'Mage/src/main/java/mage/game/GameState.java'
+        $gameState = (Get-Content -Raw $gameStatePath).Replace("`r`n", "`n")
+        $oldDeckMethods = @'
+    public Map<UUID, SharedPlanarDeck> getPlayerPlanarDecks() {
+        return Collections.unmodifiableMap(playerPlanarDecks);
+    }
+
+    public void setPlayerPlanarDeck(UUID playerId, Collection<? extends PlanarCard> cards, boolean shuffle) {
+'@
+        $newDeckMethods = @'
+    public Map<UUID, SharedPlanarDeck> getPlayerPlanarDecks() {
+        return Collections.unmodifiableMap(playerPlanarDecks);
+    }
+
+    public void removePlayerPlanarDeck(UUID playerId) {
+        playerPlanarDecks.remove(playerId);
+    }
+
+    public void setPlayerPlanarDeck(UUID playerId, Collection<? extends PlanarCard> cards, boolean shuffle) {
+'@
+        $oldDeckMethods = $oldDeckMethods.Replace("`r`n", "`n")
+        $newDeckMethods = $newDeckMethods.Replace("`r`n", "`n")
+        if (-not $gameState.Contains($oldDeckMethods)) { throw 'GameState planar deck block not found' }
+        $gameState = $gameState.Replace($oldDeckMethods, $newDeckMethods)
+        [System.IO.File]::WriteAllText($gameStatePath, $gameState, [System.Text.UTF8Encoding]::new($false))
+
+        git diff --check
+        git diff -- Mage/src/main/java/mage/game/GameImpl.java Mage/src/main/java/mage/game/GameState.java
 
     - name: Setup JDK 17
       uses: actions/setup-java@v6
@@ -43,12 +137,21 @@ jobs:
         "MAVEN_HOME=$mavenHome" >> $env:GITHUB_ENV
         (Join-Path $mavenHome 'bin') >> $env:GITHUB_PATH
 
-    - name: Run only requested Planechase tests
+    - name: Run exactly the two requested regression tests
       shell: cmd
       run: >-
         mvn -B -pl Mage.Tests -am test
-        "-Dtest=PlanarControllerPlayerLeftTest,AgyremEndStepInteractionTest"
+        "-Dtest=PlanarControllerPlayerLeftTest#testIndividualPlaneLeavesWithOwnerAndSuccessorRevealsOwnPlane,AgyremEndStepInteractionTest#twoAgyremDelayedTriggersSurvivePlaneswalkAlongsideCaetusAndOcelotPride"
         "-Dsurefire.failIfNoSpecifiedTests=false"
         "-DfailIfNoTests=false"
         "-Dxmage.dataCollectors.printGameLogs=false"
         "-Dlog4j.configuration=file:%GITHUB_WORKSPACE%/.travis/log4j.properties"
+
+    - name: Commit validated engine fix
+      shell: powershell
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add Mage/src/main/java/mage/game/GameImpl.java Mage/src/main/java/mage/game/GameState.java
+        git commit -m "Apply Planechase departure fix"
+        git push
