@@ -657,6 +657,16 @@ available image is displayed normally; when a planar card image is unavailable,
 the name, type line, complete rules, chaos ability, and encounter ability remain
 readable. Normal cards and tokens retain their existing missing-image behavior.
 
+When the client uses the default battlefield background, face-up Plane artwork
+automatically replaces the theme image and follows the public game view on each
+update, including rollback and reconnect. Random and custom backgrounds opt out
+through the existing background selection; no separate Planechase setting is
+required. Artwork loads off the Swing event thread from the same token image file
+as the command-zone card. Missing artwork or no face-up Plane restores the theme
+image. If several Planes are face up, the last Plane in public view order supplies
+the background only; this presentation choice does not change gameplay or hide
+any command-zone objects. Phenomena do not supply battlefield backgrounds.
+
 ### Phase 10 — Rules-Default Individual Planar Deck Gameplay
 
 Implement the normal Planechase model described in sections 3 and 4.
