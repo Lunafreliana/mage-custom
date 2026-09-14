@@ -219,6 +219,15 @@ Separate `addTarget` calls create separate target groups. A target with `(min, m
 
 Common errors: using `TargetPlayer` where Oracle says opponent; using battlefield target for a graveyard card; forgetting “you control”; targeting when Oracle says “choose” (hexproof should not interfere); missing `another`; allowing the same object twice; and assuming effect 2 automatically uses effect 1's target.
 
+When one target depends on an earlier target, remember that
+`AbilityImpl.canChooseTargetAbility` checks all target slots before any target
+has been selected. The dependent target's `canChoose` must check whether a
+complete legal pair exists in that state, then apply its selected-first-target
+restriction during actual selection and resolution. Do not temporarily choose
+targets on the live ability to perform this check. Include ordinary targeting
+restrictions such as hexproof when finding pairs, and test both a legal pair and
+a battlefield with no legal second target.
+
 ## 6. Filters and predicates
 
 Filters describe eligible objects and build readable rules text. Bases include `FilterPermanent`, `FilterCreaturePermanent`, `FilterControlledCreaturePermanent`, `FilterCard`, `FilterSpell`, `FilterPlayer`, and common prebuilt filters in [`mage/filter/common`](../Mage/src/main/java/mage/filter/common).
@@ -279,6 +288,14 @@ on historical state, verify that its watcher is available before such an object
 is activated; register a game-scoped watcher in the default game setup when the
 mechanic must support late-added sources. A null-safe lookup prevents a crash,
 but is not a substitute for recording the events needed for correct behavior.
+
+A watcher for "this combat" must retain first-strike and regular combat damage
+until end of combat, but must also clear for a new combat and at turn reset.
+Ending a turn or combat phase can skip the ordinary end-of-combat step (CR 724,
+[current rules](https://magic.wizards.com/en/rules), checked 2026-09-14), so
+clearing only on `END_COMBAT_STEP_POST` can carry stale history forward. Test
+an interrupted combat and ensure resetting a copied watcher does not modify
+the original.
 
 ### “One or more” simultaneous-event triggers
 
@@ -459,6 +476,14 @@ Plane's chaos ability must not retrigger, and every revealed planar card must
 remain associated with and return to the applicable individual or shared deck.
 Do not temporarily make the revealed Plane face up or route this through a
 planeswalk event.
+
+If a test queues an explicit target even when only one legal target exists,
+enable `setStrictChooseMode(true)` so automatic selection cannot leave the
+command unused. A must-attack requirement may declare an attacker before the
+test player receives an attacker-selection prompt; test that forced attack
+through its results instead of queuing a redundant `attack(...)` command.
+In two-player tests, the starting player skips their first draw step; account
+for this separately from the test harness's skipped opening-hand draws.
 
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of

@@ -193,6 +193,7 @@
 |PLANE:PCA|Plane - Fields of Summer||FieldsOfSummerPlane|
 |PLANE:PCA|Plane - Gavony||GavonyPlane|
 |PLANE:PCA|Plane - Grove of the Dreampods||GroveOfTheDreampodsPlane|
+|PLANE:PCA|Plane - Glen Elendra||GlenElendraPlane|
 |PLANE:WHO|Plane - Gardens of Tranquil Repose||GardensOfTranquilReposePlane|
 |PLANE:PUNK|Plane - Game Knights Live||GameKnightsLivePlane|
 |PLANE:PCA|Plane - Grixis||GrixisPlane|
