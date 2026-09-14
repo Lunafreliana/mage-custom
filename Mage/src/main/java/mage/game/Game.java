@@ -511,6 +511,12 @@ public interface Game extends MageItem, Serializable, Copyable<Game> {
     /** Reveals the top card of the player's applicable planar deck. */
     boolean revealTopPlanarCard(UUID playerId, boolean mayPutOnBottom, Ability source);
 
+    /**
+     * Reveals through the player's applicable planar deck to the next Plane,
+     * causes chaos to ensue specifically on it, then bottoms all revealed cards.
+     */
+    boolean chaosEnsuesOnNextPlane(UUID playerId, Ability source);
+
     void addCommander(Commander commander);
 
     Dungeon addDungeon(Dungeon dungeon, UUID playerId);

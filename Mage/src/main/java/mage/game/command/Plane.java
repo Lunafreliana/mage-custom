@@ -18,6 +18,8 @@ import mage.constants.CardType;
 import mage.constants.Planes;
 import mage.constants.SubType;
 import mage.constants.SuperType;
+import mage.counters.Counter;
+import mage.counters.Counters;
 import mage.game.Game;
 import mage.game.events.ZoneChangeEvent;
 import mage.util.SubTypes;
@@ -46,6 +48,7 @@ public abstract class Plane extends CommandObjectImpl implements PlanarCard {
     private UUID planarDeckOwnerId;
     private boolean faceUp;
     private int planarZoneChangeCounter;
+    private Counters counters = new Counters();
 
     public Plane() {
         super("");
@@ -65,6 +68,7 @@ public abstract class Plane extends CommandObjectImpl implements PlanarCard {
         this.planarDeckOwnerId = plane.planarDeckOwnerId;
         this.faceUp = plane.faceUp;
         this.planarZoneChangeCounter = plane.planarZoneChangeCounter;
+        this.counters = plane.counters.copy();
     }
 
     @Override
@@ -152,6 +156,14 @@ public abstract class Plane extends CommandObjectImpl implements PlanarCard {
 
     public Planes getPlaneType() {
         return this.planeType;
+    }
+
+    public Counters getCounters() {
+        return counters;
+    }
+
+    public void addCounter(Counter counter) {
+        counters.addCounter(counter);
     }
 
     @Override

@@ -29,10 +29,13 @@ public final class PlanarDeckCard extends CardImpl implements SupplementalDeckCa
         if (planarCard == null) {
             throw new IllegalArgumentException("Unable to create planar card: " + registryId);
         }
+        planarCard.setSourceObjectAndInitImage();
         this.planarRules = Collections.unmodifiableList(new ArrayList<>(
                 planarCard.getAbilities().getRules(null, planarCard)));
-        this.setExpansionSetCode(metadata.getSetCode());
+        this.setExpansionSetCode(planarCard.getExpansionSetCode());
         this.setCardNumber(registryId);
+        this.setImageFileName(metadata.getImageName());
+        this.setImageNumber(planarCard.getImageNumber());
         this.extraDeckCard = true;
     }
 

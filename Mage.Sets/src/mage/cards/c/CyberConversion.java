@@ -1,15 +1,9 @@
 package mage.cards.c;
 
-import mage.MageObjectReference;
-import mage.abilities.Ability;
-import mage.abilities.effects.OneShotEffect;
-import mage.abilities.effects.common.continuous.BecomesCybermanEffect;
+import mage.abilities.effects.common.TurnFaceDownCybermanTargetEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
-import mage.constants.Outcome;
-import mage.game.Game;
-import mage.game.permanent.Permanent;
 import mage.target.common.TargetCreaturePermanent;
 
 import java.util.UUID;
@@ -20,7 +14,8 @@ public final class CyberConversion extends CardImpl {
         super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{U}{U}");
 
         // Turn target creature face down. It's a 2/2 Cyberman artifact creature.
-        this.getSpellAbility().addEffect(new CyberConversionEffect());
+        this.getSpellAbility().addEffect(new TurnFaceDownCybermanTargetEffect()
+                .setText("turn target creature face down. It's a 2/2 Cyberman artifact creature"));
         this.getSpellAbility().addTarget(new TargetCreaturePermanent());
     }
 
@@ -31,33 +26,5 @@ public final class CyberConversion extends CardImpl {
     @Override
     public CyberConversion copy() {
         return new CyberConversion(this);
-    }
-}
-
-class CyberConversionEffect extends OneShotEffect {
-
-    CyberConversionEffect() {
-        super(Outcome.Detriment);
-        this.staticText = "turn target creature face down. It's a 2/2 Cyberman artifact creature";
-    }
-
-    private CyberConversionEffect(final CyberConversionEffect effect) {
-        super(effect);
-    }
-
-    @Override
-    public CyberConversionEffect copy() {
-        return new CyberConversionEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        Permanent permanent = game.getPermanent(getTargetPointer().getFirst(game, source));
-        if (permanent == null || permanent.isTransformable()) {
-            return false;
-        }
-        MageObjectReference objectReference = new MageObjectReference(permanent, game);
-        game.addEffect(new BecomesCybermanEffect(objectReference), source);
-        return true;
     }
 }
