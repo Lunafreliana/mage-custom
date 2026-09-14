@@ -24,6 +24,7 @@ public enum Planes {
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
     PLANE_GAVONY("GavonyPlane", "Plane - Gavony"),
     PLANE_GARDENS_OF_TRANQUIL_REPOSE("GardensOfTranquilReposePlane", "Plane - Gardens of Tranquil Repose", "WHO"),
+    PLANE_GAME_KNIGHTS_LIVE("GameKnightsLivePlane", "Plane - Game Knights Live", "PUNK"),
     PLANE_GRIXIS("GrixisPlane", "Plane - Grixis"),
     PLANE_GOLDMEADOW("GoldmeadowPlane", "Plane - Goldmeadow"),
     PLANE_GRAND_OSSUARY("GrandOssuaryPlane", "Plane - Grand Ossuary"),

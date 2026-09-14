@@ -440,6 +440,13 @@ leave an arrival trigger pending alongside the first upkeep trigger. Test arriva
 separately with `game.planeswalk(...)` during a scheduled main phase, and test the
 starting Plane's upkeep without an artificial arrival or trigger-order choice.
 
+Every new Plane or Phenomenon runtime class must also have a matching entry in
+`Mage/src/main/resources/tokens-database.txt`. Registration in `Planes` or
+`Phenomena` makes the card available through `PlanarCardRegistry`, but it does
+not supply the token metadata required by `addPlane` and the shared planar image
+lookup path. A registry metadata assertion alone therefore does not cover this
+integration requirement; focused tests that call `addPlane` do.
+
 Counters on Plane cards belong to the runtime `Plane` command object, not to a
 temporary card or permanent representation. Plane counter state must be copied
 with the Plane for rollback/reconnect, and effects must resolve the source's
