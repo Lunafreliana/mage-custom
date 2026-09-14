@@ -41,6 +41,9 @@ public class GroveOfTheDreampodsTest extends CardTestPlayerBase {
         );
         removeAllCardsFromLibrary(playerA);
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
+        // Leave the creature in the library after the turn-one draw so Grove's
+        // planeswalk trigger can reveal it and put it onto the battlefield.
+        addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
         skipInitShuffling();
 
         runCode("planeswalk to Grove of the Dreampods", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
