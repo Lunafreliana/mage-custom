@@ -2594,7 +2594,7 @@ public abstract class GameImpl implements Game {
         }
         if (ability instanceof TriggeredManaAbility || ability instanceof DelayedTriggeredManaAbility) {
             // 20110715 - 605.4
-            // 605.4a  A triggered mana ability doesn’t go on the stack, so it can’t be targeted,
+            // 605.4a  A triggered mana ability doesnâ€™t go on the stack, so it canâ€™t be targeted,
             // countered, or otherwise responded to. Rather, it resolves immediately after the mana
             // ability that triggered it, without waiting for priority.
             Ability manaAbility = ability.copy();
@@ -2708,9 +2708,9 @@ public abstract class GameImpl implements Game {
     /**
      * 117.5. Each time a player would get priority, the game first performs all
      * applicable state-based actions as a single event (see rule 704,
-     * “State-Based Actions”), then repeats this process until no state-based
+     * â€œState-Based Actionsâ€), then repeats this process until no state-based
      * actions are performed. Then triggered abilities are put on the stack (see
-     * rule 603, “Handling Triggered Abilities”). These steps repeat in order
+     * rule 603, â€œHandling Triggered Abilitiesâ€). These steps repeat in order
      * until no further state-based actions are performed and no abilities
      * trigger. Then the player who would have received priority does so.
      */
@@ -2776,9 +2776,9 @@ public abstract class GameImpl implements Game {
     /**
      * 117.5. Each time a player would get priority, the game first performs all
      * applicable state-based actions as a single event (see rule 704,
-     * “State-Based Actions”), then repeats this process until no state-based
+     * â€œState-Based Actionsâ€), then repeats this process until no state-based
      * actions are performed. Then triggered abilities are put on the stack (see
-     * rule 603, “Handling Triggered Abilities”). These steps repeat in order
+     * rule 603, â€œHandling Triggered Abilitiesâ€). These steps repeat in order
      * until no further state-based actions are performed and no abilities
      * trigger. Then the player who would have received priority does so.
      */
@@ -3010,7 +3010,7 @@ public abstract class GameImpl implements Game {
                     boolean usePowerInsteadOfToughnessForDamageLethality = usePowerInsteadOfToughnessForDamageLethalityFilters.stream()
                             .anyMatch(filter -> filter.match(perm, this));
                     int lethalDamageThreshold = usePowerInsteadOfToughnessForDamageLethality
-                            ? // Zilortha, Strength Incarnate, 2020-04-17: A creature with 0 power isn’t destroyed unless it has at least 1 damage marked on it.
+                            ? // Zilortha, Strength Incarnate, 2020-04-17: A creature with 0 power isnâ€™t destroyed unless it has at least 1 damage marked on it.
                             Math.max(perm.getPower().getValue(), 1) : perm.getToughness().getValue();
                     if (lethalDamageThreshold <= perm.getDamage() || perm.isDeathtouched()) {
                         if (perm.destroy(null, this, false)) {
@@ -3383,7 +3383,7 @@ public abstract class GameImpl implements Game {
                     controllerIdOfNewest.clear();
                     controllerIdOfNewest.add(permanent.getControllerId());
                 } else if (newestCard == permanent.getCreateOrder()) {
-                    //  In the event of a tie for the shortest amount of time, all are put into their owners’ graveyards. This is called the “world rule.”
+                    //  In the event of a tie for the shortest amount of time, all are put into their ownersâ€™ graveyards. This is called the â€œworld rule.â€
                     newestPermanent = null;
                     controllerIdOfNewest.add(permanent.getControllerId());
                 }
@@ -3778,15 +3778,39 @@ public abstract class GameImpl implements Game {
             return;
         }
         logger.debug("Start leave game: " + player.getName());
-        if (state.isPlaneChase() && playerId.equals(getPlanarControllerId(null))) {
-            UUID successorId = getActivePlayerId();
-            if (playerId.equals(successorId)) {
-                Player successor = state.getPlayerList(playerId).getNext(this, false);
-                successorId = successor == null ? null : successor.getId();
+        boolean revealReplacementPlane = false;
+        UUID replacementPlanarPlayerId = null;
+        if (state.isPlaneChase()) {
+            if (playerId.equals(getPlanarControllerId(null))) {
+                UUID successorId = getActivePlayerId();
+                if (playerId.equals(successorId)) {
+                    Player successor = state.getPlayerList(playerId).getNext(this, false);
+                    successorId = successor == null ? null : successor.getId();
+                }
+                setPlanarControllerId(successorId);
             }
-            setPlanarControllerId(successorId);
+            replacementPlanarPlayerId = getPlanarControllerId(null);
+            if (state.getPlanarDeckMode() == PlanarDeckMode.INDIVIDUAL) {
+                for (PlanarCard planarCard : new ArrayList<>(state.getFaceUpPlanarCards())) {
+                    if (!playerId.equals(planarCard.getPlanarDeckOwnerId())) {
+                        continue;
+                    }
+                    state.getCommand().remove(planarCard);
+                    // The new planar controller takes control before the owner's Plane leaves,
+                    // so planeswalk-away abilities are controlled by the surviving player.
+                    fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                            planarCard.getId(), (Ability) null, replacementPlanarPlayerId, 0, true));
+                    state.removeTriggersOfSourceId(planarCard.getId());
+                    revealReplacementPlane = true;
+                }
+                // Rule 800.4a also removes the rest of that player's planar deck.
+                state.removePlayerPlanarDeck(playerId);
+            }
         }
         player.leave();
+        if (revealReplacementPlane && replacementPlanarPlayerId != null) {
+            turnTopPlanarCardFaceUp(replacementPlanarPlayerId);
+        }
         if (checkIfGameIsOver()) {
             // no need to remove objects if only one player is left so the game is over
             return;
@@ -3906,7 +3930,7 @@ public abstract class GameImpl implements Game {
                 }
             }
         }
-        // 801.2c The particular players within each player‘s range of influence are determined as each turn begins.
+        // 801.2c The particular players within each playerâ€˜s range of influence are determined as each turn begins.
         // So no update of range if influence yet
     }
 

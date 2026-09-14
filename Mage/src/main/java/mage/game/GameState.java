@@ -585,6 +585,10 @@ public class GameState implements Serializable, Copyable<GameState> {
         return Collections.unmodifiableMap(playerPlanarDecks);
     }
 
+    public void removePlayerPlanarDeck(UUID playerId) {
+        playerPlanarDecks.remove(playerId);
+    }
+
     public void setPlayerPlanarDeck(UUID playerId, Collection<? extends PlanarCard> cards, boolean shuffle) {
         SharedPlanarDeck deck = new SharedPlanarDeck();
         deck.setPlanes(cards, shuffle);
