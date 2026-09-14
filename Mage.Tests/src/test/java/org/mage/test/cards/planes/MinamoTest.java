@@ -50,8 +50,8 @@ public class MinamoTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         setChoice(playerA, false); // Minamo's spell-cast trigger
-        addTarget(playerA, "Merfolk of the Pearl Trident");
-        addTarget(playerB, "Coral Merfolk");
+        setChoice(playerA, "Merfolk of the Pearl Trident");
+        setChoice(playerB, "Coral Merfolk");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
