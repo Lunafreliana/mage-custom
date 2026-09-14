@@ -21,6 +21,8 @@ public enum Planes {
     PLANE_EDGE_OF_MALACOL("EdgeOfMalacolPlane", "Plane - Edge of Malacol"),
     PLANE_ESPER("EsperPlane", "Plane - Esper", "MOC"),
     PLANE_FEEDING_GROUNDS("FeedingGroundsPlane", "Plane - Feeding Grounds"),
+    PLANE_THE_FERTILE_LANDS_OF_SAULVINIA(
+            "TheFertileLandsOfSaulviniaPlane", "Plane - The Fertile Lands of Saulvinia", "MOC"),
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
     PLANE_GAVONY("GavonyPlane", "Plane - Gavony"),
     PLANE_GARDENS_OF_TRANQUIL_REPOSE("GardensOfTranquilReposePlane", "Plane - Gardens of Tranquil Repose", "WHO"),

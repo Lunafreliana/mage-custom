@@ -22,7 +22,12 @@ public class TapForManaAllTriggeredManaAbility extends TriggeredManaAbility {
     private final SetTargetPointer setTargetPointer;
 
     public TapForManaAllTriggeredManaAbility(ManaEffect effect, FilterPermanent filter, SetTargetPointer setTargetPointer) {
-        super(Zone.BATTLEFIELD, effect);
+        this(Zone.BATTLEFIELD, effect, filter, setTargetPointer);
+    }
+
+    public TapForManaAllTriggeredManaAbility(Zone zone, ManaEffect effect, FilterPermanent filter,
+                                             SetTargetPointer setTargetPointer) {
+        super(zone, effect);
         this.filter = filter;
         this.setTargetPointer = setTargetPointer;
         setTriggerPhrase("Whenever " + filter.getMessage() + " for mana, ");
