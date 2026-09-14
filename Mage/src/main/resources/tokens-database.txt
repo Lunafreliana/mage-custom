@@ -197,6 +197,7 @@
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
 |PLANE:PCA|Plane - Llanowar||LlanowarPlane|
+|PLANE:PCA|Plane - Minamo||MinamoPlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
 |PLANE:WHO|Plane - Ood Sphere||OodSpherePlane|
