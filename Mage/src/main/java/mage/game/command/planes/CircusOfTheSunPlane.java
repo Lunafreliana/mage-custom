@@ -10,8 +10,6 @@ import mage.abilities.effects.common.continuous.AddCardSubTypeTargetEffect;
 import mage.abilities.effects.common.counter.AddCountersTargetEffect;
 import mage.abilities.keyword.FlyingAbility;
 import mage.abilities.triggers.BeginningOfUpkeepTriggeredAbility;
-import mage.cards.Cards;
-import mage.cards.CardsImpl;
 import mage.constants.Duration;
 import mage.constants.Outcome;
 import mage.constants.Planes;
@@ -20,18 +18,22 @@ import mage.constants.SubType;
 import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.counters.CounterType;
-import mage.filter.FilterCard;
+import mage.filter.FilterPermanent;
 import mage.filter.common.FilterCreaturePermanent;
+import mage.filter.predicate.Predicates;
 import mage.filter.predicate.mageobject.AbilityPredicate;
+import mage.filter.predicate.permanent.PermanentIdPredicate;
 import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.permanent.Permanent;
 import mage.game.permanent.token.PerformerToken;
 import mage.players.Player;
-import mage.target.TargetCard;
+import mage.target.TargetPermanent;
 import mage.target.common.TargetCreaturePermanent;
 
-import java.util.Objects;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author The XMage Developers
@@ -105,17 +107,19 @@ class CircusOfTheSunReturnEffect extends OneShotEffect {
         if (controller == null) {
             return false;
         }
-        Cards candidates = new CardsImpl();
-        getTargetPointer().getTargets(game, source).stream()
-                .map(game::getPermanent)
-                .filter(Objects::nonNull)
-                .forEach(candidates::add);
-        if (candidates.isEmpty()) {
+        List<UUID> candidateIds = getTargetPointer().getTargets(game, source).stream()
+                .filter(id -> game.getPermanent(id) != null)
+                .collect(Collectors.toList());
+        if (candidateIds.isEmpty()) {
             return false;
         }
-        TargetCard choice = new TargetCard(Zone.BATTLEFIELD, new FilterCard("creature to return"));
+        FilterPermanent filter = new FilterPermanent("creature to return");
+        filter.add(Predicates.or(candidateIds.stream()
+                .map(PermanentIdPredicate::new)
+                .collect(Collectors.toList())));
+        TargetPermanent choice = new TargetPermanent(filter);
         choice.withNotTarget(true);
-        if (!controller.choose(Outcome.ReturnToHand, candidates, choice, source, game)) {
+        if (!controller.choose(Outcome.ReturnToHand, choice, source, game)) {
             return false;
         }
         Permanent permanent = game.getPermanent(choice.getFirstTarget());
