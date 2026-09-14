@@ -20,6 +20,7 @@ public enum Planes {
     PLANE_BOWIE_BASE_ONE("BowieBaseOnePlane", "Plane - Bowie Base One", "WHO"),
     PLANE_CELESTINE_REEF("CelestineReefPlane", "Plane - Celestine Reef"),
     PLANE_COAL_HILL_SCHOOL("CoalHillSchoolPlane", "Plane - Coal Hill School", "WHO"),
+    PLANE_CIRCUS_OF_THE_SUN("CircusOfTheSunPlane", "Plane - Circus of the Sun", "PUNK"),
     PLANE_ELOREN_WILDS("ElorenWildsPlane", "Plane - Eloren Wilds"),
     PLANE_EDGE_OF_MALACOL("EdgeOfMalacolPlane", "Plane - Edge of Malacol"),
     PLANE_ESPER("EsperPlane", "Plane - Esper", "MOC"),
