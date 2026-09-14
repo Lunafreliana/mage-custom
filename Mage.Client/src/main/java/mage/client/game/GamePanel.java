@@ -26,6 +26,7 @@ import mage.client.util.*;
 import mage.client.util.audio.AudioManager;
 import mage.client.util.gui.ArrowBuilder;
 import mage.client.util.gui.MageDialogState;
+import mage.components.ImagePanel;
 import mage.constants.*;
 import mage.game.events.PlayerQueryEvent;
 import mage.players.PlayableObjectStats;
@@ -47,6 +48,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -115,6 +117,7 @@ public final class GamePanel extends javax.swing.JPanel {
     private final PickNumberDialog pickNumber;
     private final PickMultiNumberDialog pickMultiNumber;
     private JLayeredPane jLayeredPane;
+    private PlanechaseBackground planechaseBackground;
     private String chosenHandKey = "You";
     private final skipButtonsList skipButtons = new skipButtonsList();
 
@@ -391,7 +394,17 @@ public final class GamePanel extends javax.swing.JPanel {
         return components;
     }
 
+    public void setBattlefieldBackground(ImagePanel panel, BufferedImage image, boolean useDefaultBackground) {
+        if (planechaseBackground != null) {
+            planechaseBackground.dispose();
+        }
+        planechaseBackground = new PlanechaseBackground(useDefaultBackground, image, panel::setImage);
+    }
+
     public void cleanUp() {
+        if (planechaseBackground != null) {
+            planechaseBackground.dispose();
+        }
         MageFrame.removeGame(gameId);
 
         this.gameChatPanel.cleanUp();
@@ -1083,6 +1096,9 @@ public final class GamePanel extends javax.swing.JPanel {
     }
 
     public synchronized void updateGame() {
+        if (planechaseBackground != null) {
+            planechaseBackground.update(lastGameData.game);
+        }
         if (playerId == null && lastGameData.game.getWatchedHands().isEmpty()) {
             this.handContainer.setVisible(false);
         } else {

@@ -41,8 +41,8 @@ public class GroveOfTheDreampodsTest extends CardTestPlayerBase {
         );
         removeAllCardsFromLibrary(playerA);
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
-        // Leave the creature in the library after the turn-one draw so Grove's
-        // planeswalk trigger can reveal it and put it onto the battlefield.
+        // Player A skips the first draw step in this duel. The noncreature
+        // remains in the library after Grove puts the creature onto the battlefield.
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
         skipInitShuffling();
 
@@ -52,7 +52,8 @@ public class GroveOfTheDreampodsTest extends CardTestPlayerBase {
         execute();
 
         assertPermanentCount(playerA, "Grizzly Bears", 1);
-        assertLibraryCount(playerA, 0);
+        assertLibraryCount(playerA, 1);
+        assertHandCount(playerA, "Lightning Bolt", 0);
     }
 
     @Test
@@ -73,11 +74,11 @@ public class GroveOfTheDreampodsTest extends CardTestPlayerBase {
 
     @Test
     public void chaosReturnsCreatureFromPlanarControllersGraveyard() {
+        setStrictChooseMode(true);
         useGroveOfTheDreampodsPlanechase();
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears");
         removeAllCardsFromLibrary(playerA);
-        // Keep a noncreature card available for the turn-one draw. The upkeep
-        // trigger returns it to the library, so the player reaches main phase.
+        // The upkeep reveals this noncreature and returns it to the library.
         addCard(Zone.LIBRARY, playerA, "Lightning Bolt");
         skipInitShuffling();
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
