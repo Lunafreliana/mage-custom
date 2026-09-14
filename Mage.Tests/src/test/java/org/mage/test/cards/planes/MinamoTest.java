@@ -17,18 +17,23 @@ public class MinamoTest extends CardTestPlayerBase {
 
     @Test
     public void spellCasterMayDraw() {
+        removeAllCardsFromHand(playerA);
+        removeAllCardsFromLibrary(playerA);
+        removeAllCardsFromHand(playerB);
+        removeAllCardsFromLibrary(playerB);
         addPlane(playerA, Planes.PLANE_MINAMO);
         addCard(Zone.HAND, playerB, "Memnite");
+        addCard(Zone.LIBRARY, playerB, "Island", 2);
 
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerB, "Memnite");
+        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Memnite");
         setChoice(playerB, true);
 
         setStrictChooseMode(true);
-        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
         assertHandCount(playerA, 0);
-        assertHandCount(playerB, 1);
+        assertHandCount(playerB, "Island", 2);
     }
 
     @Test
@@ -44,6 +49,7 @@ public class MinamoTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
+        setChoice(playerA, false); // Minamo's spell-cast trigger
         addTarget(playerA, "Merfolk of the Pearl Trident");
         addTarget(playerB, "Coral Merfolk");
 
