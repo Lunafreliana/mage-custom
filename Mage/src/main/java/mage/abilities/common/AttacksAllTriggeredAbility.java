@@ -37,7 +37,13 @@ public class AttacksAllTriggeredAbility extends TriggeredAbilityImpl {
     }
 
     public AttacksAllTriggeredAbility(Effect effect, boolean optional, FilterCreaturePermanent filter, SetTargetPointer setTargetPointer, boolean attacksYouOrYourPlaneswalker, boolean controller) {
-        super(Zone.BATTLEFIELD, effect, optional);
+        this(Zone.BATTLEFIELD, effect, optional, filter, setTargetPointer, attacksYouOrYourPlaneswalker, controller);
+    }
+
+    public AttacksAllTriggeredAbility(Zone zone, Effect effect, boolean optional, FilterCreaturePermanent filter,
+                                      SetTargetPointer setTargetPointer, boolean attacksYouOrYourPlaneswalker,
+                                      boolean controller) {
+        super(zone, effect, optional);
         this.filter = filter;
         this.attacksYouOrYourPlaneswalker = attacksYouOrYourPlaneswalker;
         this.setTargetPointer = setTargetPointer;

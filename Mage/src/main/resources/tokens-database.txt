@@ -199,6 +199,7 @@
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
 |PLANE:PCA|Plane - Llanowar||LlanowarPlane|
+|PLANE:WHO|Plane - Mondassian Colony Ship||MondassianColonyShipPlane|
 |PLANE:PCA|Plane - Minamo||MinamoPlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
