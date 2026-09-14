@@ -39,8 +39,10 @@ public class KerblamWarehouseTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA,
-                "{T}, Sacrifice this artifact: Flip a coin", playerB);
+        // SacrificeSourceCost renders {this} as the actual source name in the
+        // playable ability, so match the stable effect text rather than the
+        // Oracle-style text supplied by the granting effect.
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Flip a coin", playerB);
         setFlipCoinResult(playerA, true);
 
         setStrictChooseMode(true);
