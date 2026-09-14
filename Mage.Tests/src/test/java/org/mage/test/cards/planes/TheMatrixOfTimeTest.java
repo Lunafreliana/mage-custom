@@ -39,9 +39,10 @@ public class TheMatrixOfTimeTest extends CardTestPlayerBase {
 
         runCode("planeswalk to The Matrix of Time", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
                 (info, player, game) -> Assert.assertTrue(info, game.planeswalk(player.getId())));
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
+        // Use a later step so the planeswalk-to trigger has resolved before checking play permissions.
+        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Memnite");
 
-        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(1, PhaseStep.END_TURN);
         execute();
 
         assertPermanentCount(playerA, "Memnite", 1);
@@ -58,9 +59,10 @@ public class TheMatrixOfTimeTest extends CardTestPlayerBase {
 
         runCode("planeswalk to The Matrix of Time", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
                 (info, player, game) -> Assert.assertTrue(info, game.planeswalk(player.getId())));
-        playLand(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Island");
+        // Use a later step so the planeswalk-to trigger has resolved before checking play permissions.
+        playLand(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Island");
 
-        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(1, PhaseStep.END_TURN);
         execute();
 
         assertPermanentCount(playerA, "Island", 1);
