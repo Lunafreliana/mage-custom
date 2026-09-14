@@ -146,8 +146,8 @@ public class PlanechaseBackgroundTest {
     }
 
     @Test
-    public void fullPlaneBackgroundPreservesCardAndLeavesBlackRightAndHandAreas() {
-        // Match the actual Plane image size used by the client download path.
+    public void fullPlaneBackgroundPreservesCardStretchesToPanelAndHasNoBlackBars() {
+        // Match the standard landscape Plane image size used by the client download path.
         BufferedImage landscape = new BufferedImage(936, 672, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = landscape.createGraphics();
         try {
@@ -173,24 +173,22 @@ public class PlanechaseBackgroundTest {
         BufferedImage rotatedPrepared = PlanechaseBackground.prepareArtwork(portrait);
         Assert.assertEquals(936, prepared.getWidth());
         Assert.assertEquals(672, prepared.getHeight());
-        Assert.assertEquals(ImagePanel.IMAGE_LAYOUT_FIT_TOP_LEFT,
+        Assert.assertEquals(ImagePanel.IMAGE_LAYOUT_STRETCH,
                 prepared.getProperty(ImagePanel.IMAGE_LAYOUT_PROPERTY));
-        Assert.assertEquals(0.75f,
-                ((Number) prepared.getProperty(ImagePanel.IMAGE_MAX_HEIGHT_RATIO_PROPERTY)).floatValue(), 0.0f);
         Assert.assertArrayEquals(
                 prepared.getRGB(0, 0, prepared.getWidth(), prepared.getHeight(), null, 0, prepared.getWidth()),
                 rotatedPrepared.getRGB(0, 0, rotatedPrepared.getWidth(), rotatedPrepared.getHeight(), null, 0, rotatedPrepared.getWidth()));
 
-        // The former crop discarded the frame/title/rules area. All of it must now survive.
+        // The complete title/art/rules regions survive preparation, but are visibly darkened.
         Color title = new Color(prepared.getRGB(0, 0), true);
         Color art = new Color(prepared.getRGB(100, 150), true);
         Color rules = new Color(prepared.getRGB(100, 600), true);
-        Assert.assertTrue(title.getRed() > 0 && title.getBlue() > 0);
-        Assert.assertTrue(art.getGreen() > 0);
-        Assert.assertTrue(rules.getRed() > 0 && rules.getGreen() > 0);
+        Assert.assertTrue(title.getRed() > 100 && title.getRed() < 200 && title.getBlue() > 100 && title.getBlue() < 200);
+        Assert.assertTrue(art.getGreen() > 100 && art.getGreen() < 200);
+        Assert.assertTrue(rules.getRed() > 100 && rules.getRed() < 200 && rules.getGreen() > 100 && rules.getGreen() < 200);
 
-        // Even though the hosting ImagePanel normally uses COVER, Plane backgrounds
-        // opt into native-size top-left rendering with intentional black fill.
+        // Plane backgrounds deliberately override the hosting panel's normal COVER behavior
+        // and stretch the complete card to every edge of the battlefield.
         ImagePanel panel = new ImagePanel(prepared, ImagePanelStyle.COVER);
         panel.setSize(1600, 1000);
         BufferedImage rendered = new BufferedImage(1600, 1000, BufferedImage.TYPE_INT_RGB);
@@ -201,10 +199,10 @@ public class PlanechaseBackgroundTest {
             renderedGraphics.dispose();
         }
 
-        Assert.assertNotEquals(Color.BLACK.getRGB(), rendered.getRGB(935, 671));
-        Assert.assertEquals(Color.BLACK.getRGB(), rendered.getRGB(936, 671));
-        Assert.assertEquals(Color.BLACK.getRGB(), rendered.getRGB(1200, 100));
-        Assert.assertEquals(Color.BLACK.getRGB(), rendered.getRGB(100, 800));
+        Color topRight = new Color(rendered.getRGB(1599, 10));
+        Color bottomLeft = new Color(rendered.getRGB(10, 999));
+        Assert.assertTrue(topRight.getRed() > 0 || topRight.getGreen() > 0 || topRight.getBlue() > 0);
+        Assert.assertTrue(bottomLeft.getRed() > 0 || bottomLeft.getGreen() > 0 || bottomLeft.getBlue() > 0);
         Assert.assertNull(PlanechaseBackground.prepareArtwork(null));
     }
 
