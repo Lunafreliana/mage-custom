@@ -42,7 +42,7 @@ public final class TardisBayPlane extends Plane {
 
         // When chaos ensues, gain control of target artifact. Then planeswalk.
         ability = new ChaosEnsuesTriggeredAbility(
-                new GainControlTargetEffect(Duration.EndOfGame, true), false
+                new GainControlTargetEffect(Duration.Custom, true), false
         );
         ability.addTarget(new TargetArtifactPermanent());
         ability.addEffect(new PlaneswalkEffect(false).concatBy("Then"));
