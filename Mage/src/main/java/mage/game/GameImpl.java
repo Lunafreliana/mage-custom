@@ -1716,6 +1716,7 @@ public abstract class GameImpl implements Game {
         newWatchers.add(new SpellsCastWatcher()); // SPELL_CAST
         newWatchers.add(new AttackedOrBlockedThisCombatWatcher()); // required for tests
         newWatchers.add(new MainPhaseWatcher()); // supports abilities introduced after initial watcher collection
+        newWatchers.add(new PlayersDealtCombatDamageThisTurnWatcher());
 
         // runtime check - allows only GAME scope (one watcher per game)
         newWatchers.forEach(watcher -> {
