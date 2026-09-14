@@ -8,6 +8,9 @@ public enum Planes {
     PLANE_AGYREM("AgyremPlane", "Plane - Agyrem"),
     PLANE_AKOUM("AkoumPlane", "Plane - Akoum"),
     PLANE_AMYS_HOME("AmysHomePlane", "Plane - Amy's Home", "WHO"),
+    PLANE_ASMORANOMARDICADAISTINACULDACARS_KITCHEN(
+            "AsmoranomardicadaistinaculdacarsKitchenPlane",
+            "Plane - Asmoranomardicadaistinaculdacar's Kitchen", "PUNK"),
     PLANE_ANTARCTIC_RESEARCH_BASE("AntarcticResearchBasePlane", "Plane - Antarctic Research Base", "WHO"),
     PLANE_ARETOPOLIS("AretopolisPlane", "Plane - Aretopolis"),
     PLANE_ASTRAL_ARENA("AstralArenaPlane", "Plane - Astral Arena"),
