@@ -11,6 +11,7 @@ import mage.constants.Zone;
 import mage.game.command.PlanarCardRegistry;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mage.test.player.TestPlayer;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
 import java.util.Arrays;
@@ -18,7 +19,7 @@ import java.util.Arrays;
 public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerBase {
 
     @Test
-    public void creatureEnteringUnderPlanarControllersControlCreatesFood() {
+    public void creatureEnteringCreatesFoodForCurrentPlanarController() {
         addPlane(playerA, Planes.PLANE_ASMORANOMARDICADAISTINACULDACARS_KITCHEN);
         addCard(Zone.HAND, playerA, "Memnite");
         addCard(Zone.HAND, playerB, "Memnite");
@@ -30,8 +31,9 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
         setStopAt(2, PhaseStep.END_TURN);
         execute();
 
-        assertPermanentCount(playerA, "Food Token", 1);
-        assertPermanentCount(playerB, "Food Token", 0);
+        // Player A also gets one Food from planeswalking here when the test Plane is installed.
+        assertPermanentCount(playerA, "Food Token", 2);
+        assertPermanentCount(playerB, "Food Token", 1);
     }
 
     @Test
@@ -42,6 +44,7 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
         addCustomCardWithSpell(playerA, gainLife, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Gain life");
+        addTarget(playerA, playerB);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -63,6 +66,7 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         setChoice(playerA, "Memnite^Grizzly Bears");
+        setChoice(playerA, TestPlayer.CHOICE_SKIP);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
