@@ -43,6 +43,7 @@ public enum MageIdentifier {
     ZaffaiAndTheTempestsWatcher("Without paying manacost"),
     MikeyAndDonWatcher,
     TheEighthDoctorWatcher,
+    TheMatrixOfTimeWatcher,
 
     // ----------------------------//
     //       alternate casts       //
