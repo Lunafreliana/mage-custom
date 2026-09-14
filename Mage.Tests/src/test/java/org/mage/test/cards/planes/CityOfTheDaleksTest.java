@@ -16,6 +16,7 @@ public class CityOfTheDaleksTest extends CardTestPlayerBase {
 
     @Test
     public void attackingOpponentLosesLifeForControlledArtifacts() {
+        setStrictChooseMode(true);
         addPlane(playerA, Planes.PLANE_CITY_OF_THE_DALEKS);
         addCard(Zone.BATTLEFIELD, playerA, "Memnite", 2);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
@@ -32,13 +33,14 @@ public class CityOfTheDaleksTest extends CardTestPlayerBase {
 
     @Test
     public void chaosCreatesHastyDalekThatMustAttackAndIsSacrificed() {
+        setStrictChooseMode(true);
         addPlane(playerA, Planes.PLANE_CITY_OF_THE_DALEKS);
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        attack(1, playerA, "Dalek Token", playerB);
+        // The attack requirement declares the Dalek automatically; no manual attack command.
         addTarget(playerA, playerB); // City's attack trigger.
 
         setStopAt(2, PhaseStep.UPKEEP);
