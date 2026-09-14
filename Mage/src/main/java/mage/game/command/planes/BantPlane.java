@@ -36,7 +36,7 @@ public class BantPlane extends Plane {
         filter2.add(Predicates.or(new ColorPredicate(ObjectColor.GREEN), new ColorPredicate(ObjectColor.WHITE), new ColorPredicate(ObjectColor.BLUE)));
     }
 
-    private static final String rule = "{this} has indestructible as long as it has a divinity counter on it";
+    private static final String rule = "that creature gains indestructible for as long as it has a divinity counter on it";
     private static final String exaltedRule = "All creatures have exalted";
 
     public BantPlane() {
