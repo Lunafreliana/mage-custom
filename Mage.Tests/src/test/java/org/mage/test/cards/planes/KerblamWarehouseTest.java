@@ -42,10 +42,10 @@ public class KerblamWarehouseTest extends CardTestPlayerBase {
         // The granted ability is not available until both the spell and the
         // resulting chaos trigger have finished resolving.
         waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN, playerA);
-        // SacrificeSourceCost renders {this} as the actual source name in the
-        // playable ability, so match the stable effect text rather than the
-        // Oracle-style text supplied by the granting effect.
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Flip a coin", playerB);
+        // Ability commands match from the beginning of the generated rule.
+        // SacrificeSourceCost renders {this} as the actual source name.
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                "{T}, sacrifice Sol Ring: Flip a coin", playerB);
         setFlipCoinResult(playerA, true);
 
         setStrictChooseMode(true);
