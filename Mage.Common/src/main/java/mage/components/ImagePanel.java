@@ -12,6 +12,10 @@ import javax.swing.JViewport;
  */
 public class ImagePanel extends JPanel {
 
+    /** Optional BufferedImage property used by special backgrounds that must not be cropped or upscaled. */
+    public static final String IMAGE_LAYOUT_PROPERTY = "xmage.imagePanel.layout";
+    public static final String IMAGE_LAYOUT_FIT_TOP_LEFT = "fit-top-left";
+    public static final String IMAGE_MAX_HEIGHT_RATIO_PROPERTY = "xmage.imagePanel.maxHeightRatio";
 
     private BufferedImage image;
     private ImagePanelStyle style;
@@ -73,6 +77,11 @@ public class ImagePanel extends JPanel {
         if (image == null)
             return;
 
+        if (IMAGE_LAYOUT_FIT_TOP_LEFT.equals(image.getProperty(IMAGE_LAYOUT_PROPERTY))) {
+            drawFitTopLeft(g);
+            return;
+        }
+
         switch (style) {
             case TILED:
                 drawTiled(g);
@@ -128,5 +137,37 @@ public class ImagePanel extends JPanel {
         int y = (d.height - scaledHeight) / 2;
 
         g.drawImage(image, x, y, scaledWidth, scaledHeight, null);
+    }
+
+    private void drawFitTopLeft(Graphics g) {
+        Dimension d = getSize();
+        int imageWidth = image.getWidth(null);
+        int imageHeight = image.getHeight(null);
+
+        Graphics2D graphics = (Graphics2D) g.create();
+        try {
+            graphics.setColor(Color.BLACK);
+            graphics.fillRect(0, 0, d.width, d.height);
+
+            double maxHeightRatio = 1.0;
+            Object maxHeightProperty = image.getProperty(IMAGE_MAX_HEIGHT_RATIO_PROPERTY);
+            if (maxHeightProperty instanceof Number) {
+                maxHeightRatio = Math.max(0.0, Math.min(1.0, ((Number) maxHeightProperty).doubleValue()));
+            }
+
+            // Never upscale these images. They are meant to stay sharp and leave
+            // intentional black space around the unused parts of the game panel.
+            double scaleX = (double) d.width / imageWidth;
+            double scaleY = (d.height * maxHeightRatio) / imageHeight;
+            double scale = Math.min(1.0, Math.min(scaleX, scaleY));
+            int scaledWidth = Math.max(1, (int) Math.round(imageWidth * scale));
+            int scaledHeight = Math.max(1, (int) Math.round(imageHeight * scale));
+
+            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            graphics.drawImage(image, 0, 0, scaledWidth, scaledHeight, this);
+        } finally {
+            graphics.dispose();
+        }
     }
 }
