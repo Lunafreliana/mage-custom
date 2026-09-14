@@ -39,7 +39,7 @@ public class CircusOfTheSunTest extends CardTestPlayerBase {
         setChoice(playerA, "When you planeswalk");
         attack(1, playerA, "Wind Drake");
         setChoice(playerA, true);
-        addTarget(playerA, "Wind Drake");
+        setChoice(playerA, "Wind Drake");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
