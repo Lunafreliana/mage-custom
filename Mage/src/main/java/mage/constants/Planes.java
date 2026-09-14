@@ -13,6 +13,7 @@ public enum Planes {
             "Plane - Asmoranomardicadaistinaculdacar's Kitchen", "PUNK"),
     PLANE_ANTARCTIC_RESEARCH_BASE("AntarcticResearchBasePlane", "Plane - Antarctic Research Base", "WHO"),
     PLANE_ARETOPOLIS("AretopolisPlane", "Plane - Aretopolis"),
+    PLANE_ARTIST_ALLEY("ArtistAlleyPlane", "Plane - Artist Alley", "PUNK"),
     PLANE_ASTRAL_ARENA("AstralArenaPlane", "Plane - Astral Arena"),
     PLANE_BAD_WOLF_BAY("BadWolfBayPlane", "Plane - Bad Wolf Bay", "WHO"),
     PLANE_BANT("BantPlane", "Plane - Bant"),

@@ -173,6 +173,7 @@
 |PLANE:PCA|Plane - Akoum||AkoumPlane|
 |PLANE:WHO|Plane - Amy's Home||AmysHomePlane|
 |PLANE:PUNK|Plane - Asmoranomardicadaistinaculdacar's Kitchen||AsmoranomardicadaistinaculdacarsKitchenPlane|
+|PLANE:PUNK|Plane - Artist Alley||ArtistAlleyPlane|
 |PLANE:WHO|Plane - Antarctic Research Base||AntarcticResearchBasePlane|
 |PLANE:PCA|Plane - Aretopolis||AretopolisPlane|
 |PLANE:PCA|Plane - Astral Arena||AstralArenaPlane|
