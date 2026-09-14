@@ -8,13 +8,12 @@ import mage.constants.CardType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
-import mage.game.command.Plane;
 import mage.game.command.PlanarCardRegistry;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerBase {
 
@@ -25,8 +24,9 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
         addCard(Zone.HAND, playerB, "Memnite");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
-        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerB, "Memnite");
+        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Memnite");
 
+        setStrictChooseMode(true);
         setStopAt(2, PhaseStep.END_TURN);
         execute();
 
@@ -42,8 +42,8 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
         addCustomCardWithSpell(playerA, gainLife, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Gain life");
-        addTarget(playerA, playerB);
 
+        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
@@ -62,8 +62,9 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, "Memnite^Grizzly Bears");
+        setChoice(playerA, "Memnite^Grizzly Bears");
 
+        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
@@ -77,19 +78,16 @@ public class AsmoranomardicadaistinaculdacarsKitchenTest extends CardTestPlayerB
 
     @Test
     public void planeswalkingHereFromSharedDeckCreatesFood() {
-        addPlane(playerA, Planes.PLANE_FIELDS_OF_SUMMER);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Arrays.asList(
+                Planes.PLANE_FIELDS_OF_SUMMER,
+                Planes.PLANE_ASMORANOMARDICADAISTINACULDACARS_KITCHEN
+        );
 
-        runCode("put Kitchen on top and planeswalk", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
-                (info, player, game) -> {
-                    Plane kitchen = Plane.createPlane(
-                            Planes.PLANE_ASMORANOMARDICADAISTINACULDACARS_KITCHEN
-                    );
-                    game.getState().getSharedPlanarDeck().setPlanes(
-                            Collections.singletonList(kitchen), false
-                    );
-                    Assert.assertTrue(info, game.planeswalk(player.getId()));
-                });
+        runCode("planeswalk to Kitchen", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> Assert.assertTrue(info, game.planeswalk(player.getId())));
 
+        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
