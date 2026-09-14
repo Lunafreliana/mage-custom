@@ -32,8 +32,7 @@ final class PlanechaseBackground {
 
     private static final Logger LOGGER = Logger.getLogger(PlanechaseBackground.class);
     private static final long MISSING_IMAGE_RETRY_NANOS = TimeUnit.SECONDS.toNanos(5);
-    private static final float BACKGROUND_DARKEN_ALPHA = 0.25f;
-    private static final float BACKGROUND_MAX_HEIGHT_RATIO = 0.75f;
+    private static final float BACKGROUND_DARKEN_ALPHA = 0.45f;
 
     private final boolean enabled;
     private final BufferedImage defaultImage;
@@ -176,14 +175,15 @@ final class PlanechaseBackground {
             image = landscape;
         }
 
+        // Mark Planechase backgrounds for full-panel stretching. This deliberately
+        // fills the battlefield without cropping any part of the Plane card.
         Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put(ImagePanel.IMAGE_LAYOUT_PROPERTY, ImagePanel.IMAGE_LAYOUT_FIT_TOP_LEFT);
-        properties.put(ImagePanel.IMAGE_MAX_HEIGHT_RATIO_PROPERTY, BACKGROUND_MAX_HEIGHT_RATIO);
+        properties.put(ImagePanel.IMAGE_LAYOUT_PROPERTY, ImagePanel.IMAGE_LAYOUT_STRETCH);
         BufferedImage background = new BufferedImage(
                 image.getColorModel(), image.copyData(null), image.isAlphaPremultiplied(), properties);
 
-        // Slightly darken the Plane so cards, targeting overlays and client text stay
-        // readable while the Plane's own name and rules text remain visible.
+        // Darken the Plane so cards, targeting overlays and client text stay readable
+        // while the Plane's own name and rules text remain visible underneath.
         Graphics2D graphics = background.createGraphics();
         try {
             graphics.setComposite(AlphaComposite.SrcOver.derive(BACKGROUND_DARKEN_ALPHA));
