@@ -39,17 +39,16 @@ public class KerblamWarehouseTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        // The granted ability is not available until both the spell and the
-        // resulting chaos trigger have finished resolving.
-        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN, playerA);
+        // Activate in a later step so the chaos event and its resulting
+        // triggered ability have unambiguously finished resolving.
         // Ability commands match from the beginning of the generated rule.
         // SacrificeSourceCost renders {this} as the actual source name.
-        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA,
+        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA,
                 "{T}, sacrifice Sol Ring: Flip a coin", playerB);
         setFlipCoinResult(playerA, true);
 
         setStrictChooseMode(true);
-        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(1, PhaseStep.END_TURN);
         execute();
 
         assertPermanentCount(playerA, "Sol Ring", 0);
