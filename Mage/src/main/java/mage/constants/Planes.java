@@ -56,6 +56,7 @@ public enum Planes {
     PLANE_PANOPTICON("PanopticonPlane", "Plane - Panopticon"),
     PLANE_PURSUED_BY_SOMETHING("PursuedBySomethingPlane", "Plane - Pursued by Something", "PUNK"),
     PLANE_PRAHV("PrahvPlane", "Plane - Prahv"),
+    PLANE_PRESTONS_STAGE("PrestonsStagePlane", "Plane - Preston's Stage", "PUNK"),
     PLANE_RAIDERS_ALLEGIANCE("RaidersAllegiancePlane", "Plane - Raiders' Allegiance", "PUNK"),
     PLANE_SELESNYA_LOFT_GARDENS("SelesnyaLoftGardensPlane", "Plane - Selesnya Loft Gardens"),
     PLANE_SOKENZAN("SokenzanPlane", "Plane - Sokenzan", "MOC"),
