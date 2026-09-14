@@ -73,6 +73,7 @@ public enum Planes {
     PLANE_THE_GREAT_AERIE("TheGreatAeriePlane", "Plane - The Great Aerie", "MOC"),
     PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone", "PUNK"),
     PLANE_THE_LUX_FOUNDATION_LIBRARY("TheLuxFoundationLibraryPlane", "Plane - The Lux Foundation Library", "WHO"),
+    PLANE_THE_MATRIX_OF_TIME("TheMatrixOfTimePlane", "Plane - The Matrix of Time", "WHO"),
     PLANE_THE_PYRAMID_OF_MARS("ThePyramidOfMarsPlane", "Plane - The Pyramid of Mars", "WHO"),
     PLANE_TOWASHI("TowashiPlane", "Plane - Towashi", "MOC"),
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
