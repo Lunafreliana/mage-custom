@@ -445,6 +445,14 @@ temporary card or permanent representation. Plane counter state must be copied
 with the Plane for rollback/reconnect, and effects must resolve the source's
 face-up Plane by source ID before reading or changing its counters.
 
+Some Planechase instructions cause chaos to ensue on a Plane revealed from the
+planar deck without turning that Plane face up. Use the game-level operation for
+that instruction: the revealed Plane's chaos ability must trigger, the current
+Plane's chaos ability must not retrigger, and every revealed planar card must
+remain associated with and return to the applicable individual or shared deck.
+Do not temporarily make the revealed Plane face up or route this through a
+planeswalk event.
+
 Match queued test commands to the prompt API used by the implementation, not
 merely to the English word "choose." In particular, surveil's selection of
 cards to put into the graveyard is a target-selection prompt and must be queued
