@@ -214,6 +214,7 @@
 |PLANE:PUNK|Plane - Raiders' Allegiance||RaidersAllegiancePlane|
 |PLANE:PCA|Plane - Prahv||PrahvPlane|
 |PLANE:PCA|Plane - Selesnya Loft Gardens||SelesnyaLoftGardensPlane|
+|PLANE:MOC|Plane - Sokenzan||SokenzanPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
 |PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
