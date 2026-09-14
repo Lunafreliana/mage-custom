@@ -27,7 +27,8 @@ public class CombatDamageToPlayerThisCombatWatcher extends Watcher {
 
     @Override
     public void watch(GameEvent event, Game game) {
-        if (event.getType() == GameEvent.EventType.END_COMBAT_STEP_POST) {
+        if (event.getType() == GameEvent.EventType.BEGIN_COMBAT_STEP_PRE
+                || event.getType() == GameEvent.EventType.END_COMBAT_STEP_POST) {
             damagedPlayers.clear();
             return;
         }
@@ -39,6 +40,13 @@ public class CombatDamageToPlayerThisCombatWatcher extends Watcher {
         if (permanent != null && permanent.isCreature(game)) {
             damagedPlayers.put(new MageObjectReference(permanent, game), event.getPlayerId());
         }
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        // Ending the turn during combat can skip END_COMBAT_STEP_POST.
+        damagedPlayers.clear();
     }
 
     public UUID getDamagedPlayer(UUID permanentId, Game game) {

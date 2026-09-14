@@ -111,7 +111,9 @@ class GlenElendraDamagingCreatureTarget extends TargetControlledCreaturePermanen
         Set<UUID> possibleTargets = new HashSet<>(super.possibleTargets(sourceControllerId, source, game));
         CombatDamageToPlayerThisCombatWatcher watcher = game.getState()
                 .getWatcher(CombatDamageToPlayerThisCombatWatcher.class);
-        possibleTargets.removeIf(id -> watcher == null || watcher.getDamagedPlayer(id, game) == null);
+        possibleTargets.removeIf(id -> watcher == null || watcher.getDamagedPlayer(id, game) == null
+                || !GlenElendraDamagedPlayersCreatureTarget.canChooseForCreature(
+                        id, sourceControllerId, source, game));
         return possibleTargets;
     }
 
@@ -129,6 +131,30 @@ class GlenElendraDamagedPlayersCreatureTarget extends TargetCreaturePermanent {
 
     private GlenElendraDamagedPlayersCreatureTarget(final GlenElendraDamagedPlayersCreatureTarget target) {
         super(target);
+    }
+
+    @Override
+    public boolean canChoose(UUID sourceControllerId, Ability source, Game game) {
+        // The engine checks every target before choosing the first one. Check
+        // that a complete legal pair exists without changing the actual targets.
+        if (source.getTargets().get(0).getFirstTarget() == null) {
+            return !source.getTargets().get(0).possibleTargets(sourceControllerId, source, game).isEmpty();
+        }
+        return super.canChoose(sourceControllerId, source, game);
+    }
+
+    static boolean canChooseForCreature(UUID creatureId, UUID sourceControllerId, Ability source, Game game) {
+        CombatDamageToPlayerThisCombatWatcher watcher = game.getState()
+                .getWatcher(CombatDamageToPlayerThisCombatWatcher.class);
+        UUID damagedPlayerId = watcher == null ? null : watcher.getDamagedPlayer(creatureId, game);
+        if (damagedPlayerId == null) {
+            return false;
+        }
+        // Use the ordinary target implementation here to include protection,
+        // hexproof and shroud without recursing into the dependent target.
+        return new TargetCreaturePermanent().possibleTargets(sourceControllerId, source, game).stream()
+                .map(game::getPermanent)
+                .anyMatch(permanent -> permanent != null && permanent.isControlledBy(damagedPlayerId));
     }
 
     @Override
