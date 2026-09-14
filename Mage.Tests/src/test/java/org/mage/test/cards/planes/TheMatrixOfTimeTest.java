@@ -12,15 +12,19 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
+import java.util.Arrays;
+
 public class TheMatrixOfTimeTest extends CardTestPlayerBase {
 
     @Test
     public void arrivalExilesTopCardOfEachLibrary() {
-        addPlane(playerA, Planes.PLANE_THE_MATRIX_OF_TIME);
+        useMatrixOfTimeAsPlaneswalkDestination();
         addCard(Zone.LIBRARY, playerA, "Memnite");
         addCard(Zone.LIBRARY, playerB, "Ornithopter");
 
-        setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
+        runCode("planeswalk to The Matrix of Time", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> Assert.assertTrue(info, game.planeswalk(player.getId())));
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
         assertExileCount(playerA, "Memnite", 1);
@@ -29,11 +33,12 @@ public class TheMatrixOfTimeTest extends CardTestPlayerBase {
 
     @Test
     public void activePlayerMayCastLinkedCardAndItsOwnerPaysAndExiles() {
-        addPlane(playerA, Planes.PLANE_THE_MATRIX_OF_TIME);
+        useMatrixOfTimeAsPlaneswalkDestination();
         addCard(Zone.LIBRARY, playerB, "Island");
         addCard(Zone.LIBRARY, playerB, "Memnite");
-        skipInitShuffling();
 
+        runCode("planeswalk to The Matrix of Time", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> Assert.assertTrue(info, game.planeswalk(player.getId())));
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -47,11 +52,12 @@ public class TheMatrixOfTimeTest extends CardTestPlayerBase {
 
     @Test
     public void activePlayerMayPlayLinkedLandAndItsOwnerPaysAndExiles() {
-        addPlane(playerA, Planes.PLANE_THE_MATRIX_OF_TIME);
+        useMatrixOfTimeAsPlaneswalkDestination();
         addCard(Zone.LIBRARY, playerA, "Memnite");
         addCard(Zone.LIBRARY, playerA, "Island");
-        skipInitShuffling();
 
+        runCode("planeswalk to The Matrix of Time", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> Assert.assertTrue(info, game.planeswalk(player.getId())));
         playLand(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Island");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -87,5 +93,13 @@ public class TheMatrixOfTimeTest extends CardTestPlayerBase {
         Assert.assertEquals("Plane - The Matrix of Time", metadata.getImageName());
         Assert.assertEquals("WHO", metadata.getSetCode());
         Assert.assertNotNull(PlanarCardRegistry.create(id));
+    }
+
+    private void useMatrixOfTimeAsPlaneswalkDestination() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Arrays.asList(
+                Planes.PLANE_AKOUM, Planes.PLANE_THE_MATRIX_OF_TIME
+        );
+        skipInitShuffling();
     }
 }
