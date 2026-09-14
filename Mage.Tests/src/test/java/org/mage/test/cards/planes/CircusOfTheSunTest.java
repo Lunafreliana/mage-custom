@@ -20,7 +20,7 @@ public class CircusOfTheSunTest extends CardTestPlayerBase {
     public void planeswalkAndUpkeepCreatePerformers() {
         addPlane(playerA, Planes.PLANE_CIRCUS_OF_THE_SUN);
 
-        setChoice(playerA, "Whenever you planeswalk");
+        setChoice(playerA, "When you planeswalk");
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
         execute();
@@ -36,7 +36,7 @@ public class CircusOfTheSunTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Wind Drake"); // 2/2 with flying
         addCard(Zone.LIBRARY, playerA, "Mountain", 2);
 
-        setChoice(playerA, "Whenever you planeswalk");
+        setChoice(playerA, "When you planeswalk");
         attack(1, playerA, "Wind Drake");
         setChoice(playerA, true);
         addTarget(playerA, "Wind Drake");
@@ -54,7 +54,7 @@ public class CircusOfTheSunTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_CIRCUS_OF_THE_SUN);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
 
-        setChoice(playerA, "Whenever you planeswalk");
+        setChoice(playerA, "When you planeswalk");
         attack(1, playerA, "Grizzly Bears");
 
         setStrictChooseMode(true);
@@ -72,7 +72,7 @@ public class CircusOfTheSunTest extends CardTestPlayerBase {
         ability.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, ability, null, CardType.SORCERY);
 
-        setChoice(playerA, "Whenever you planeswalk");
+        setChoice(playerA, "When you planeswalk");
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Grizzly Bears");
 
