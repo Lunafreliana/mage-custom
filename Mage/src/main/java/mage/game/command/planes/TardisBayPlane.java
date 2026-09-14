@@ -36,13 +36,12 @@ public final class TardisBayPlane extends Plane {
         this.setPlaneType(Planes.PLANE_TARDIS_BAY);
 
         // The first spell you cast during each of your turns with mana value 2 or greater has cascade.
-        this.getAbilities().add(
-                new SimpleStaticAbility(Zone.COMMAND, new TardisBayCascadeEffect()),
-                new TardisBayFirstQualifyingSpellWatcher()
-        );
+        Ability ability = new SimpleStaticAbility(Zone.COMMAND, new TardisBayCascadeEffect());
+        ability.addWatcher(new TardisBayFirstQualifyingSpellWatcher());
+        this.getAbilities().add(ability);
 
         // When chaos ensues, gain control of target artifact. Then planeswalk.
-        Ability ability = new ChaosEnsuesTriggeredAbility(
+        ability = new ChaosEnsuesTriggeredAbility(
                 new GainControlTargetEffect(Duration.EndOfGame, true), false
         );
         ability.addTarget(new TargetArtifactPermanent());
