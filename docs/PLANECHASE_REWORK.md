@@ -719,6 +719,7 @@ Each card must:
 
 * verify current Oracle text, Comprehensive Rules, official rulings/release notes where relevant, and current XMage mechanic patterns;
 * use the common `PlanarCard` runtime and registry;
+* add its runtime class to `Mage/src/main/resources/tokens-database.txt`, whose token metadata is also required by the test harness and image lookup path;
 * have focused behavioral tests;
 * have registry/metadata/deck-editor coverage;
 * work in individual mode and shared mode unless the card rules genuinely require a mode-specific restriction;
