@@ -83,6 +83,9 @@ public class DeckEditorPanel extends javax.swing.JPanel {
             public void approveSelection() {
                 // confirm overwrite
                 File selectedFile = getSelectedFile();
+                if (selectedFile == null) {
+                    return;
+                }
                 if (selectedFile.exists() && getDialogType() == SAVE_DIALOG) {
                     int result = JOptionPane.showConfirmDialog(this,
                         "File \"" + selectedFile.getName() + "\" already exists.\nReplace it?",

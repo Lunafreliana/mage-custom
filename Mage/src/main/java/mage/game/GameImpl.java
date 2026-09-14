@@ -6,6 +6,7 @@ import mage.MageObjectReference;
 import mage.abilities.*;
 import mage.abilities.common.AttachableToRestrictedAbility;
 import mage.abilities.common.CantHaveMoreThanAmountCountersSourceAbility;
+import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.SagaAbility;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.common.delayed.ReflexiveTriggeredAbility;
@@ -1618,6 +1619,61 @@ public abstract class GameImpl implements Game {
         return true;
     }
 
+    @Override
+    public boolean chaosEnsuesOnNextPlane(UUID playerId, Ability source) {
+        Player player = getPlayer(playerId);
+        SharedPlanarDeck deck = getPlanarDeckForPlayer(playerId);
+        if (player == null || deck == null) {
+            return false;
+        }
+        List<PlanarCard> revealed = new ArrayList<>();
+        PlanarCard revealedPlane = null;
+        int cardsToCheck = deck.size();
+        while (cardsToCheck-- > 0 && revealedPlane == null) {
+            PlanarCard card = deck.draw();
+            if (card == null) {
+                break;
+            }
+            revealed.add(card);
+            informPlayers(player.getLogName() + " revealed " + card.getLogName());
+            if (card.getPlanarCardType() == CardType.PLANE) {
+                revealedPlane = card;
+            }
+        }
+        if (revealedPlane == null) {
+            revealed.forEach(deck::putOnBottom);
+            return false;
+        }
+
+        GameEvent chaosEvent = new GameEvent(GameEvent.EventType.CHAOS_ENSUES,
+                revealedPlane.getId(), source, state.getPlanarControllerId());
+        fireEvent(chaosEvent);
+        for (Ability ability : revealedPlane.getAbilities()) {
+            if (ability instanceof ChaosEnsuesTriggeredAbility) {
+                TriggeredAbility chaosAbility = (TriggeredAbility) ability;
+                chaosAbility.setControllerId(state.getPlanarControllerId());
+                addTriggeredAbility(chaosAbility, chaosEvent);
+            }
+        }
+
+        while (revealed.size() > 1) {
+            Choice choice = new ChoiceImpl(true, ChoiceHintType.CARD);
+            choice.setMessage("Choose the next card to put on the bottom of your planar deck");
+            choice.setChoices(revealed.stream().map(PlanarCard::getName)
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+            player.choose(Outcome.Neutral, choice, this);
+            String chosenName = choice.getChoice();
+            PlanarCard chosen = revealed.stream()
+                    .filter(card -> card.getName().equals(chosenName))
+                    .findFirst()
+                    .orElse(revealed.get(0));
+            revealed.remove(chosen);
+            deck.putOnBottom(chosen);
+        }
+        revealed.forEach(deck::putOnBottom);
+        return true;
+    }
+
     private void putPlanarCardFaceUp(PlanarCard planarCard) {
         planarCard.setControllerId(state.getPlanarControllerId());
         planarCard.setFaceUp(true);
@@ -1661,6 +1717,7 @@ public abstract class GameImpl implements Game {
         newWatchers.add(new AttackedOrBlockedThisCombatWatcher()); // required for tests
         newWatchers.add(new MainPhaseWatcher()); // supports abilities introduced after initial watcher collection
         newWatchers.add(new CombatDamageToPlayerThisCombatWatcher()); // supports late-added command-zone sources
+        newWatchers.add(new PlayersDealtCombatDamageThisTurnWatcher());
 
         // runtime check - allows only GAME scope (one watcher per game)
         newWatchers.forEach(watcher -> {

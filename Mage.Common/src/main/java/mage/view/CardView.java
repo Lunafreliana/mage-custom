@@ -960,8 +960,8 @@ public class CardView extends SimpleCardView {
         this.frameStyle = FrameStyle.M15_NORMAL;
         this.expansionSetCode = plane.getExpansionSetCode();
         this.cardNumber = "";
-        this.imageFileName = "";
-        this.imageNumber = 0;
+        this.imageFileName = plane.getImageFileName();
+        this.imageNumber = plane.getImageNumber();
         this.rarity = Rarity.SPECIAL;
 
         this.playableStats = plane.playableStats.copy();

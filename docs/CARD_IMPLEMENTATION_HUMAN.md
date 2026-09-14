@@ -283,6 +283,7 @@ Most effects below live in [`Mage/src/main/java/mage/abilities/effects/common`](
 | “Each/all…” | Usually a filter-based non-target effect; hexproof should not stop it. |
 | “Choose one/two…” | Modes, each with its own effects and perhaps targets. |
 | “Choose a color/type…” | A `Choice`, not necessarily a target. |
+| “Put your choice of a [kind] counter…” | Choose the counter kind as the effect resolves; the target is selected separately. |
 | “Additional cost…” | An added `Cost`; it is paid while casting/activating. |
 | “Without paying…” | Alternate casting cost infrastructure, not manual free movement. |
 | “That creature/card/amount…” | The code must preserve the earlier object/value correctly, sometimes using game history or last known information. |
