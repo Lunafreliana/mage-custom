@@ -2,16 +2,26 @@ package org.mage.test.decks.importer;
 
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckCardLists;
+import mage.cards.decks.DeckCardInfo;
+import mage.cards.decks.DeckCardLayout;
+import mage.cards.decks.PlanarDeckCard;
 import mage.cards.decks.SupplementalDeckCard;
+import mage.cards.decks.exporter.XmageDeckExporter;
 import mage.cards.decks.importer.CardLookup;
 import mage.cards.decks.importer.DckDeckImporter;
+import mage.constants.Planes;
+import mage.game.command.PlanarCardRegistry;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class DckDeckImportTest {
 
@@ -63,6 +73,46 @@ public class DckDeckImportTest {
         } finally {
             Files.deleteIfExists(file);
         }
+    }
+
+    @Test
+    public void sideboardLayoutWithPlanarCardsRoundTripsWithoutMismatch() throws Exception {
+        DeckCardInfo ordinaryCard = new DeckCardInfo("Akoum Hellhound", "133", "ZNR");
+        DeckCardInfo akoum = planarCardInfo(Planes.PLANE_AKOUM);
+        DeckCardInfo agyrem = planarCardInfo(Planes.PLANE_AGYREM);
+        DeckCardInfo academy = planarCardInfo(Planes.PLANE_ACADEMY_AT_TOLARIA_WEST);
+        DeckCardLists original = new DeckCardLists();
+        original.getSideboard().addAll(Arrays.asList(ordinaryCard, akoum, agyrem, academy));
+        original.setCardLayout(new DeckCardLayout(new ArrayList<>(), "(NONE,false,50)"));
+        original.setSideboardLayout(new DeckCardLayout(
+                Collections.singletonList(Collections.singletonList(
+                        Arrays.asList(ordinaryCard, akoum, agyrem, academy)
+                )),
+                "(NONE,false,50)"
+        ));
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        new XmageDeckExporter().writeDeck(output, original);
+        Path file = Files.createTempFile("planar-layout", ".dck");
+        try {
+            Files.write(file, output.toByteArray());
+            StringBuilder errors = new StringBuilder();
+            DeckCardLists imported = new DckDeckImporter().importDeck(file.toString(), errors, false);
+
+            Assert.assertEquals("", errors.toString());
+            Assert.assertEquals(4, imported.getSideboard().size());
+            Assert.assertNotNull(imported.getSideboardLayout());
+            Assert.assertEquals(4, imported.getSideboardLayout().getCards().get(0).get(0).size());
+            Assert.assertEquals("plane:plane_akoum",
+                    imported.getSideboardLayout().getCards().get(0).get(0).get(1).getCardNumber());
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    private static DeckCardInfo planarCardInfo(Planes plane) {
+        PlanarDeckCard card = new PlanarDeckCard(PlanarCardRegistry.getId(plane));
+        return new DeckCardInfo(card.getName(), card.getCardNumber(), card.getSetCode());
     }
 
     @Test
