@@ -1,7 +1,10 @@
 package org.mage.test.cards.planes;
 
+import mage.abilities.SpellAbility;
+import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.constants.CardType;
 import mage.constants.MageObjectType;
+import mage.constants.Outcome;
 import mage.constants.PhaseStep;
 import mage.constants.Phenomena;
 import mage.constants.Planes;
@@ -12,6 +15,7 @@ import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.PlanarDeckMode;
 import mage.game.command.Plane;
+import mage.game.command.phenomena.ChaoticAetherPhenomenon;
 import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
@@ -22,6 +26,7 @@ import mage.game.stack.StackObject;
 import mage.view.CardView;
 import mage.view.GameView;
 import mage.view.StackAbilityView;
+import mage.watchers.common.ChaoticAetherWatcher;
 import mage.watchers.common.PlaneswalkedWatcher;
 import org.junit.Assert;
 import org.junit.Test;
@@ -357,6 +362,53 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals("Phenomenon - Interplanar Tunnel", metadata.getImageName());
         Assert.assertEquals("PCA", metadata.getSetCode());
         Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof InterplanarTunnelPhenomenon);
+    }
+
+    @Test
+    public void testChaoticAetherChangesBlankRollsUntilLeavingAPlane() {
+        prepareStartedPlanechaseGame();
+        runCode("resolve Chaotic Aether and roll blanks", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> {
+                    Assert.assertTrue(info, game.addPhenomenon(new ChaoticAetherPhenomenon(), player.getId()));
+                    game.checkStateAndTriggered();
+                    game.getStack().resolve(game);
+
+                    ChaoticAetherWatcher watcher = game.getState().getWatcher(ChaoticAetherWatcher.class);
+                    Assert.assertNotNull(info, watcher);
+                    Assert.assertTrue(info, watcher.conditionMet());
+
+                    SpellAbility source = new SpellAbility(new ManaCostsImpl<>("{0}"), "test planar roll");
+                    source.setControllerId(player.getId());
+                    Assert.assertEquals(info, mage.constants.PlanarDieRollResult.CHAOS_ROLL,
+                            player.rollPlanarDie(Outcome.Benefit, source, game, 0, 0));
+
+                    game.fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                            UUID.randomUUID(), null, player.getId(), CardType.PHENOMENON.ordinal(), true));
+                    Assert.assertTrue(info, watcher.conditionMet());
+                    Assert.assertEquals(info, mage.constants.PlanarDieRollResult.CHAOS_ROLL,
+                            player.rollPlanarDie(Outcome.Benefit, source, game, 0, 0));
+
+                    game.fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                            UUID.randomUUID(), null, player.getId(), CardType.PLANE.ordinal(), true));
+                    Assert.assertFalse(info, watcher.conditionMet());
+                    Assert.assertEquals(info, mage.constants.PlanarDieRollResult.BLANK_ROLL,
+                            player.rollPlanarDie(Outcome.Benefit, source, game, 0, 0));
+                });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testChaoticAetherRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.CHAOTIC_AETHER));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Chaotic Aether", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Chaotic Aether", metadata.getImageName());
+        Assert.assertEquals("PCA", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof ChaoticAetherPhenomenon);
     }
 
     private void prepareStartedPlanechaseGame() {

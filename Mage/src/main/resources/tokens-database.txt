@@ -231,6 +231,7 @@
 |PLANE:MOC|Plane - Sokenzan||SokenzanPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
 |PLANE:MOC|Plane - Stronghold Furnace||StrongholdFurnacePlane|
+|PHENOMENON:PCA|Phenomenon - Chaotic Aether||ChaoticAetherPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
