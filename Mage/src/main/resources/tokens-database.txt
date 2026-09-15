@@ -212,6 +212,7 @@
 |PLANE:WHO|Plane - Kerblam! Warehouse||KerblamWarehousePlane|
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
+|PLANE:MOC|Plane - Littjara||LittjaraPlane|
 |PLANE:PCA|Plane - Llanowar||LlanowarPlane|
 |PLANE:MOC|Plane - Megaflora Jungle||MegafloraJunglePlane|
 |PLANE:WHO|Plane - Mondassian Colony Ship||MondassianColonyShipPlane|
