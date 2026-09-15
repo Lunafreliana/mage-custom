@@ -15,7 +15,7 @@ import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.events.GameEvent;
 import mage.players.Player;
-import mage.target.common.TargetPermanent;
+import mage.target.TargetPermanent;
 import mage.target.targetpointer.FixedTarget;
 
 /**
