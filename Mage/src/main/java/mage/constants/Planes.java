@@ -20,6 +20,7 @@ public enum Planes {
     PLANE_BESIEGED_VIKING_VILLAGE("BesiegedVikingVillagePlane", "Plane - Besieged Viking Village", "WHO"),
     PLANE_CITY_OF_THE_DALEKS("CityOfTheDaleksPlane", "Plane - City of the Daleks", "WHO"),
     PLANE_BLACK_LOTUS_LOUNGE("BlackLotusLoungePlane", "Plane - Black Lotus Lounge", "PUNK"),
+    PLANE_BLOODHILL_BASTION("BloodhillBastionPlane", "Plane - Bloodhill Bastion", "MOC"),
     PLANE_BOWIE_BASE_ONE("BowieBaseOnePlane", "Plane - Bowie Base One", "WHO"),
     PLANE_CELESTINE_REEF("CelestineReefPlane", "Plane - Celestine Reef"),
     PLANE_COAL_HILL_SCHOOL("CoalHillSchoolPlane", "Plane - Coal Hill School", "WHO"),

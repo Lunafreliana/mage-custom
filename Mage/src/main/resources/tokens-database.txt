@@ -182,6 +182,7 @@
 |PLANE:PUNK|Plane - Circus of the Sun||CircusOfTheSunPlane|
 |PLANE:PUNK|Plane - Black Lotus Lounge||BlackLotusLoungePlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
+|PLANE:MOC|Plane - Bloodhill Bastion||BloodhillBastionPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
 |PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|
 |PLANE:PCA|Plane - Celestine Reef||CelestineReefPlane|
