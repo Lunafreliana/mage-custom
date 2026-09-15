@@ -216,6 +216,7 @@
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
 |PLANE:WHO|Plane - Ood Sphere||OodSpherePlane|
+|PLANE:PCA|Plane - Otaria||OtariaPlane|
 |PLANE:PUNK|Plane - Oteclán||OteclanPlane|
 |PLANE:PCA|Plane - Panopticon||PanopticonPlane|
 |PLANE:PUNK|Plane - Pursued by Something||PursuedBySomethingPlane|
