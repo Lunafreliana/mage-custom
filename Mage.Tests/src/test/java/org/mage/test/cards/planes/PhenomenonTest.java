@@ -20,6 +20,7 @@ import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
+import mage.game.command.phenomena.TeamUpPhenomenon;
 import mage.game.command.phenomena.TimeDistortionPhenomenon;
 import mage.game.events.GameEvent;
 import mage.game.stack.StackAbility;
@@ -392,6 +393,16 @@ public class PhenomenonTest extends CardTestPlayerBase {
     }
 
     @Test
+    public void testTeamUpRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.TEAM_UP));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Team-Up!", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Team-Up!", metadata.getImageName());
+        Assert.assertEquals("PUNK", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof TeamUpPhenomenon);
     public void testTimeDistortionRegistryMetadata() {
         PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
                 PlanarCardRegistry.getId(Phenomena.TIME_DISTORTION));
