@@ -64,6 +64,7 @@ public class OrochiColonyTest extends CardTestPlayerBase {
         addTarget(playerA, "Grizzly Bears");
         attack(1, playerA, "Grizzly Bears");
         block(1, playerB, "Hill Giant", "Grizzly Bears");
+        setChoice(playerA, false); // Decline the land search after combat damage.
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
