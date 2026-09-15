@@ -75,6 +75,7 @@ public enum Planes {
     PLANE_TEMPLE_OF_ATROPOS("TempleOfAtroposPlane", "Plane - Temple of Atropos", "WHO"),
     PLANE_THE_GOLDEN_CITY_OF_ORAZCA("TheGoldenCityOfOrazcaPlane", "Plane - The Golden City of Orazca", "MOC"),
     PLANE_THE_GREAT_AERIE("TheGreatAeriePlane", "Plane - The Great Aerie", "MOC"),
+    PLANE_THE_HIPPODROME("TheHippodromePlane", "Plane - The Hippodrome"),
     PLANE_THE_COMMAND_ZONE("TheCommandZonePlane", "Plane - The Command Zone", "PUNK"),
     PLANE_THE_LUX_FOUNDATION_LIBRARY("TheLuxFoundationLibraryPlane", "Plane - The Lux Foundation Library", "WHO"),
     PLANE_THE_MATRIX_OF_TIME("TheMatrixOfTimePlane", "Plane - The Matrix of Time", "WHO"),
