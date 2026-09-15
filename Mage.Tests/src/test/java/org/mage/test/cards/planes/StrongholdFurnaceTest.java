@@ -22,8 +22,8 @@ public class StrongholdFurnaceTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Twin Bolt");
-        addTarget(playerA, playerB);
-        addTarget(playerA, "Hill Giant");
+        addTargetAmount(playerA, playerB, 1);
+        addTargetAmount(playerA, "Hill Giant", 1);
         setStrictChooseMode(true);
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
