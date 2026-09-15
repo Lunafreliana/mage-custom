@@ -32,6 +32,7 @@ public class BloodhillBastionTest extends CardTestPlayerBase {
     public void chaosBlinksStolenNontokenCreatureUnderYourControl() {
         addPlane(playerA, Planes.PLANE_BLOODHILL_BASTION);
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 3);
+        addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         addCard(Zone.HAND, playerA, "Act of Treason");
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
