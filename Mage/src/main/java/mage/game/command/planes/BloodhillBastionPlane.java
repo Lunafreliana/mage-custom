@@ -12,7 +12,7 @@ import mage.constants.SetTargetPointer;
 import mage.constants.Zone;
 import mage.filter.StaticFilters;
 import mage.game.command.Plane;
-import mage.target.common.TargetCreaturePermanent;
+import mage.target.TargetPermanent;
 
 /**
  * @author The XMage Developers
@@ -36,7 +36,7 @@ public final class BloodhillBastionPlane extends Plane {
         // Whenever chaos ensues, exile target nontoken creature you control, then return it
         // to the battlefield under your control.
         ability = new ChaosEnsuesTriggeredAbility(new ExileThenReturnTargetEffect(true, false), false);
-        ability.addTarget(new TargetCreaturePermanent(StaticFilters.FILTER_CONTROLLED_CREATURE_NON_TOKEN));
+        ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CONTROLLED_CREATURE_NON_TOKEN));
         this.getAbilities().add(ability);
     }
 
