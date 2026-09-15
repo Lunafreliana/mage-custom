@@ -181,6 +181,7 @@
 |PLANE:WHO|Plane - Coal Hill School||CoalHillSchoolPlane|
 |PLANE:PUNK|Plane - Circus of the Sun||CircusOfTheSunPlane|
 |PLANE:PUNK|Plane - Black Lotus Lounge||BlackLotusLoungePlane|
+|PLANE:PUNK|Plane - Bicycle Rack||BicycleRackPlane|
 |PLANE:PCA|Plane - Bant||BantPlane|
 |PLANE:WHO|Plane - Besieged Viking Village||BesiegedVikingVillagePlane|
 |PLANE:WHO|Plane - Bowie Base One||BowieBaseOnePlane|
@@ -216,15 +217,19 @@
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
 |PLANE:WHO|Plane - Ood Sphere||OodSpherePlane|
+|PLANE:PCA|Plane - Otaria||OtariaPlane|
 |PLANE:PUNK|Plane - Oteclán||OteclanPlane|
+|PLANE:MOC|Plane - Orochi Colony||OrochiColonyPlane|
 |PLANE:PCA|Plane - Panopticon||PanopticonPlane|
 |PLANE:PUNK|Plane - Pursued by Something||PursuedBySomethingPlane|
 |PLANE:PUNK|Plane - Preston's Stage||PrestonsStagePlane|
 |PLANE:PUNK|Plane - Raiders' Allegiance||RaidersAllegiancePlane|
 |PLANE:PCA|Plane - Prahv||PrahvPlane|
+|PLANE:PCA|Plane - Sea of Sand||SeaOfSandPlane|
 |PLANE:PCA|Plane - Selesnya Loft Gardens||SelesnyaLoftGardensPlane|
 |PLANE:MOC|Plane - Sokenzan||SokenzanPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
+|PLANE:MOC|Plane - Stronghold Furnace||StrongholdFurnacePlane|
 |PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
@@ -241,6 +246,7 @@
 |PLANE:MOC|Plane - Nyx||NyxPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Bean||TheBeanPlane|
+|PLANE:PCA|Plane - The Hippodrome||TheHippodromePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|
 |PLANE:WHO|Plane - The Matrix of Time||TheMatrixOfTimePlane|
