@@ -7,6 +7,7 @@ import mage.constants.CardType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
+import mage.counters.CounterType;
 import mage.game.command.PlanarCardRegistry;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,26 +30,21 @@ public class BloodhillBastionTest extends CardTestPlayerBase {
     }
 
     @Test
-    public void chaosBlinksStolenNontokenCreatureUnderYourControl() {
+    public void chaosBlinksNontokenCreatureYouControl() {
         addPlane(playerA, Planes.PLANE_BLOODHILL_BASTION);
-        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 3);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
-        addCard(Zone.HAND, playerA, "Act of Treason");
-        addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Act of Treason", "Hill Giant");
+        addCounters(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears", CounterType.P1P1, 1);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, "Hill Giant");
-        setStrictChooseMode(true);
 
-        setStopAt(2, PhaseStep.UPKEEP);
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertPermanentCount(playerA, "Hill Giant", 1);
-        assertPermanentCount(playerB, "Hill Giant", 0);
+        assertPermanentCount(playerA, "Grizzly Bears", 1);
+        assertCounterCount("Grizzly Bears", CounterType.P1P1, 0);
     }
 
     @Test
