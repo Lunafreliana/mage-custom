@@ -43,6 +43,7 @@ import mage.filter.common.FilterControlledPermanent;
 import mage.filter.common.FilterCreatureForCombat;
 import mage.filter.common.FilterCreatureForCombatBlock;
 import mage.filter.predicate.Predicates;
+import mage.watchers.common.ChaoticAetherWatcher;
 import mage.filter.predicate.permanent.PermanentIdPredicate;
 import mage.game.*;
 import mage.game.combat.CombatGroup;
@@ -3443,6 +3444,13 @@ public abstract class PlayerImpl implements Player, Serializable {
                                 planarSidesAmount,
                                 rollDieEvent.getRollsAmount()
                         );
+                        ChaoticAetherWatcher chaoticAetherWatcher = game.getState()
+                                .getWatcher(ChaoticAetherWatcher.class);
+                        if (planarResult == PlanarDieRollResult.BLANK_ROLL
+                                && chaoticAetherWatcher != null
+                                && chaoticAetherWatcher.conditionMet()) {
+                            planarResult = PlanarDieRollResult.CHAOS_ROLL;
+                        }
                         dieRolls.add(new RollDieResult(0, 0, planarResult));
                         rollResult = planarResult;
                         break;
