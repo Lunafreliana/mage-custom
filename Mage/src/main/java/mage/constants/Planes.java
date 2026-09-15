@@ -43,6 +43,7 @@ public enum Planes {
     PLANE_GRAND_OSSUARY("GrandOssuaryPlane", "Plane - Grand Ossuary"),
     PLANE_HEDRON_FIELDS_OF_AGADEEM("HedronFieldsOfAgadeemPlane", "Plane - Hedron Fields of Agadeem"),
     PLANE_HORIZON_BOUGHS("HorizonBoughsPlane", "Plane - Horizon Boughs"),
+    PLANE_HOTEL_OF_FEARS("HotelOfFearsPlane", "Plane - Hotel of Fears", "WHO"),
     PLANE_IMMERSTURM("ImmersturmPlane", "Plane - Immersturm"),
     PLANE_IZZET_STEAM_MAZE("IzzetSteamMazePlane", "Plane - Izzet Steam Maze"),
     PLANE_KETRIA("KetriaPlane", "Plane - Ketria", "MOC"),

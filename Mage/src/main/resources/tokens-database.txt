@@ -204,6 +204,7 @@
 |PLANE:PCA|Plane - Grand Ossuary||GrandOssuaryPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
 |PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
+|PLANE:WHO|Plane - Hotel of Fears||HotelOfFearsPlane|
 |PLANE:PCA|Plane - Immersturm||ImmersturmPlane|
 |PLANE:PCA|Plane - Izzet Steam Maze||IzzetSteamMazePlane|
 |PLANE:MOC|Plane - Ketria||KetriaPlane|

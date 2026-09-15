@@ -2,17 +2,13 @@ package mage.constants;
 
 /** Implemented Planechase phenomenon cards. */
 public enum Phenomena {
+    CHAOTIC_AETHER("ChaoticAetherPhenomenon", "Phenomenon - Chaotic Aether"),
+    FIXED_POINT_IN_TIME("FixedPointInTimePhenomenon", "Phenomenon - Fixed Point in Time", "WHO"),
     INTERPLANAR_TUNNEL("InterplanarTunnelPhenomenon", "Phenomenon - Interplanar Tunnel", "PCA"),
     MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany", "PCA"),
     REALITY_SHAPING("RealityShapingPhenomenon", "Phenomenon - Reality Shaping", "PCA"),
     SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging", "PCA"),
-    TEAM_UP("TeamUpPhenomenon", "Phenomenon - Team-Up!", "PUNK");
-    FIXED_POINT_IN_TIME("FixedPointInTimePhenomenon", "Phenomenon - Fixed Point in Time", "WHO"),
-    CHAOTIC_AETHER("ChaoticAetherPhenomenon", "Phenomenon - Chaotic Aether"),
-    INTERPLANAR_TUNNEL("InterplanarTunnelPhenomenon", "Phenomenon - Interplanar Tunnel"),
-    MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany"),
-    REALITY_SHAPING("RealityShapingPhenomenon", "Phenomenon - Reality Shaping"),
-    SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging"),
+    TEAM_UP("TeamUpPhenomenon", "Phenomenon - Team-Up!", "PUNK"),
     TIME_DISTORTION("TimeDistortionPhenomenon", "Phenomenon - Time Distortion");
 
     private final String className;

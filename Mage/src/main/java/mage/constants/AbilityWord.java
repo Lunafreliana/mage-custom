@@ -52,6 +52,7 @@ public enum AbilityWord {
     PACK_TACTICS("Pack tactics"),
     PARADOX("Paradox"),
     PARLEY("Parley"),
+    PRAISE_HIM("Praise Him"),
     RADIANCE("Radiance"),
     RAID("Raid"),
     RALLY("Rally"),
