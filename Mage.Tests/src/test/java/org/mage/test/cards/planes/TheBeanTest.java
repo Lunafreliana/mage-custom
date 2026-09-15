@@ -67,8 +67,10 @@ public class TheBeanTest extends CardTestPlayerBase {
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertPermanentCount(playerA, "Grizzly Bears", 2);
-        assertPermanentCount(playerB, "Hill Giant", 1);
+        // The planeswalk-to trigger first gives both players one copy. Chaos then gives
+        // only the planar controller an additional copy.
+        assertPermanentCount(playerA, "Grizzly Bears", 3);
+        assertPermanentCount(playerB, "Hill Giant", 2);
     }
 
     @Test
