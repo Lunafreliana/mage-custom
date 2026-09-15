@@ -21,9 +21,14 @@ public final class PlanechasePlanarDieResultResolver {
             case CHAOS_ROLL:
                 return new ChaosEnsuesEffect().apply(game, source);
             case PLANAR_ROLL:
+                GameEvent event = new GameEvent(GameEvent.EventType.PLANESWALK_FROM_PLANAR_DIE,
+                        rollerId, source, rollerId);
+                if (game.replaceEvent(event)) {
+                    return true;
+                }
                 PlaneswalkingTriggeredAbility ability = new PlaneswalkingTriggeredAbility();
                 ability.setControllerId(rollerId);
-                GameEvent event = new GameEvent(GameEvent.EventType.ROLL_DIE,
+                event = new GameEvent(GameEvent.EventType.ROLL_DIE,
                         rollerId, source, rollerId);
                 game.addTriggeredAbility(ability, event);
                 return true;
