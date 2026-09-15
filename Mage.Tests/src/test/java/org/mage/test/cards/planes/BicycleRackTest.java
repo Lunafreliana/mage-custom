@@ -49,9 +49,9 @@ public class BicycleRackTest extends CardTestPlayerBase {
 
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cycling {2}");
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Cycling {2}");
-        runCode("verify controller-specific boost", 2, PhaseStep.POSTCOMBAT_MAIN,
-                playerB, (info, player, game) -> {
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerB, "Cycling {2}");
+        runCode("verify controller-specific boost", 1, PhaseStep.POSTCOMBAT_MAIN,
+                playerA, (info, player, game) -> {
                     assertPowerToughness(playerA, "Runeclaw Bear", 3, 3);
                     assertPowerToughness(playerB, "Silvercoat Lion", 2, 2);
                 });
