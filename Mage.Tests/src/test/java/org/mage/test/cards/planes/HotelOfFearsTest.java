@@ -49,7 +49,7 @@ public class HotelOfFearsTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Phyrexian Obliterator");
         setChoice(playerA, "Black");
-        addTarget(playerA, "Memnite");
+        setChoice(playerA, "Memnite");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
