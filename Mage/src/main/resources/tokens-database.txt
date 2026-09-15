@@ -232,10 +232,14 @@
 |PLANE:MOC|Plane - Sokenzan||SokenzanPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
 |PLANE:MOC|Plane - Stronghold Furnace||StrongholdFurnacePlane|
+|PHENOMENON:PCA|Phenomenon - Chaotic Aether||ChaoticAetherPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
+|PHENOMENON:WHO|Phenomenon - Fixed Point in Time||FixedPointInTimePhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
+|PHENOMENON:PUNK|Phenomenon - Team-Up!||TeamUpPhenomenon|
+|PHENOMENON:PCA|Phenomenon - Time Distortion||TimeDistortionPhenomenon|
 |PLANE:PCA|Plane - Takenuma||TakenumaPlane|
 |PLANE:WHO|Plane - TARDIS Bay||TardisBayPlane|
 |PLANE:PUNK|Plane - Tarnation||TarnationPlane|
@@ -247,6 +251,7 @@
 |PLANE:MOC|Plane - Isle of Vesuva||IsleOfVesuvaPlane|
 |PLANE:MOC|Plane - Nyx||NyxPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
+|PLANE:PUNK|Plane - The Bean||TheBeanPlane|
 |PLANE:PCA|Plane - The Hippodrome||TheHippodromePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|

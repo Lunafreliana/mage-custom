@@ -32,7 +32,7 @@ public final class PlanarCardRegistry {
         }
         for (Phenomena phenomenon : Phenomena.values()) {
             register(entries, id(CardType.PHENOMENON, phenomenon.name()), CardType.PHENOMENON,
-                    displayName(phenomenon.getFullName()), phenomenon.getFullName(), "PCA",
+                    displayName(phenomenon.getFullName()), phenomenon.getFullName(), phenomenon.getSetCode(),
                     () -> Phenomenon.createPhenomenon(phenomenon));
         }
         return Collections.unmodifiableMap(entries);
