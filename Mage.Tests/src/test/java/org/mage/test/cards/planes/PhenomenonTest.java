@@ -403,6 +403,9 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals("Phenomenon - Team-Up!", metadata.getImageName());
         Assert.assertEquals("PUNK", metadata.getSetCode());
         Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof TeamUpPhenomenon);
+    }
+
+    @Test
     public void testTimeDistortionRegistryMetadata() {
         PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
                 PlanarCardRegistry.getId(Phenomena.TIME_DISTORTION));
@@ -413,6 +416,9 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals("Phenomenon - Time Distortion", metadata.getImageName());
         Assert.assertEquals("PCA", metadata.getSetCode());
         Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof TimeDistortionPhenomenon);
+    }
+
+    @Test
     public void testChaoticAetherChangesBlankRollsUntilLeavingAPlane() {
         prepareStartedPlanechaseGame();
         runCode("resolve Chaotic Aether and roll blanks", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
