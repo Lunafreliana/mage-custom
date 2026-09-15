@@ -20,6 +20,25 @@ import static mage.constants.CommanderCardType.ANY;
 public class TheCommandZoneTest extends CardTestCommanderDuelBase {
 
     @Test
+    public void eachPlayerWithoutCommanderMayPutItOntoBattlefield() {
+        addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
+        addCard(Zone.COMMAND, playerA, "Balduvian Bears");
+        addCard(Zone.COMMAND, playerB, "Memnite");
+
+        addTarget(playerA, "Balduvian Bears");
+        addTarget(playerB, "Memnite");
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
+        execute();
+
+        assertCommandZoneCount(playerA, "Balduvian Bears", 0);
+        assertPermanentCount(playerA, "Balduvian Bears", 1);
+        assertCommandZoneCount(playerB, "Memnite", 0);
+        assertPermanentCount(playerB, "Memnite", 1);
+    }
+
+    @Test
     public void commanderAbilityTriggersTwiceDuringPlanarControllersTurn() {
         addPlane(playerA, Planes.PLANE_THE_COMMAND_ZONE);
         addCard(Zone.COMMAND, playerA, "Soul Warden");

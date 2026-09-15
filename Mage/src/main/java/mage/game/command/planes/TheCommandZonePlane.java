@@ -24,6 +24,7 @@ import mage.target.TargetCard;
 import mage.util.CardUtil;
 import mage.watchers.common.CommanderPlaysCountWatcher;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -75,6 +76,7 @@ class TheCommandZoneArrivalEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
+        Set<UUID> playersControllingCommanders = new HashSet<>();
         for (UUID playerId : game.getPlayerList()) {
             Player player = game.getPlayer(playerId);
             if (player == null) {
@@ -86,12 +88,13 @@ class TheCommandZoneArrivalEffect extends OneShotEffect {
             if (game.getBattlefield().getAllActivePermanents(playerId).stream()
                     .map(Permanent::getId)
                     .anyMatch(commanderIds::contains)) {
+                playersControllingCommanders.add(playerId);
                 player.drawCards(1, source, game);
             }
         }
         for (UUID playerId : game.getPlayerList()) {
             Player player = game.getPlayer(playerId);
-            if (player == null || playerId.equals(source.getControllerId())) {
+            if (player == null || playersControllingCommanders.contains(playerId)) {
                 continue;
             }
             Cards commanders = new CardsImpl(game.getCommanderCardsFromCommandZone(
