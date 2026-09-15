@@ -234,8 +234,8 @@
 |PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PUNK|Phenomenon - Omenpath Instability||OmenpathInstabilityPhenomenon|
-|TOKEN:PUNK|Entropy Token||EntropyToken|
-|TOKEN:PUNK|Omenpath Token||OmenpathToken|
+|TOK:PUNK|Entropy||EntropyToken|
+|TOK:PUNK|Omenpath||OmenpathToken|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PLANE:PCA|Plane - Takenuma||TakenumaPlane|
