@@ -14,7 +14,7 @@ import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.constants.SubType;
 import mage.constants.Zone;
-import mage.filter.common.FilterPermanent;
+import mage.filter.FilterPermanent;
 import mage.game.Game;
 import mage.game.command.Plane;
 import mage.players.Player;
