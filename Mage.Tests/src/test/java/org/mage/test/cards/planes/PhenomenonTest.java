@@ -18,6 +18,7 @@ import mage.game.command.Plane;
 import mage.game.command.phenomena.ChaoticAetherPhenomenon;
 import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
+import mage.game.command.phenomena.OmenpathInstabilityPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.command.phenomena.TeamUpPhenomenon;
@@ -364,6 +365,38 @@ public class PhenomenonTest extends CardTestPlayerBase {
         assertHandCount(playerA, "Lightning Bolt", 1);
         assertHandCount(playerB, "Grizzly Bears", 1);
         assertPermanentCount(playerB, "Grizzly Bears", 0);
+    }
+
+    @Test
+    public void testOmenpathInstabilityCreatesBothTokensForEachPlayer() {
+        prepareStartedPlanechaseGame();
+        runCode("encounter Omenpath Instability", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertTrue(info, game.addPhenomenon(new OmenpathInstabilityPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+        });
+
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertPermanentCount(playerA, "Entropy Token", 1);
+        assertPermanentCount(playerA, "Omenpath Token", 1);
+        assertPermanentCount(playerB, "Entropy Token", 1);
+        assertPermanentCount(playerB, "Omenpath Token", 1);
+    }
+
+    @Test
+    public void testOmenpathInstabilityRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.OMENPATH_INSTABILITY));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Omenpath Instability", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Omenpath Instability", metadata.getImageName());
+        Assert.assertEquals("PUNK", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId())
+                instanceof OmenpathInstabilityPhenomenon);
     }
 
     @Test

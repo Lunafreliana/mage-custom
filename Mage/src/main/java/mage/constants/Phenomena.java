@@ -6,6 +6,7 @@ public enum Phenomena {
     FIXED_POINT_IN_TIME("FixedPointInTimePhenomenon", "Phenomenon - Fixed Point in Time", "WHO"),
     INTERPLANAR_TUNNEL("InterplanarTunnelPhenomenon", "Phenomenon - Interplanar Tunnel"),
     MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany"),
+    OMENPATH_INSTABILITY("OmenpathInstabilityPhenomenon", "Phenomenon - Omenpath Instability", "PUNK"),
     REALITY_SHAPING("RealityShapingPhenomenon", "Phenomenon - Reality Shaping"),
     SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging"),
     TEAM_UP("TeamUpPhenomenon", "Phenomenon - Team-Up!", "PUNK"),
