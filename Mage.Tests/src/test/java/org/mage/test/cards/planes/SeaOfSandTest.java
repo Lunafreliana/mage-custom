@@ -9,7 +9,7 @@ import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.PlanarCardRegistry;
-import mage.target.common.TargetPlayer;
+import mage.target.TargetPlayer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
