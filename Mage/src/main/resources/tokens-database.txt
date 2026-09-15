@@ -235,6 +235,7 @@
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
+|PHENOMENON:PUNK|Phenomenon - Team-Up!||TeamUpPhenomenon|
 |PLANE:PCA|Plane - Takenuma||TakenumaPlane|
 |PLANE:WHO|Plane - TARDIS Bay||TardisBayPlane|
 |PLANE:PUNK|Plane - Tarnation||TarnationPlane|

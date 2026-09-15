@@ -16,6 +16,7 @@ import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
+import mage.game.command.phenomena.TeamUpPhenomenon;
 import mage.game.events.GameEvent;
 import mage.game.stack.StackAbility;
 import mage.game.stack.StackObject;
@@ -357,6 +358,19 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals("Phenomenon - Interplanar Tunnel", metadata.getImageName());
         Assert.assertEquals("PCA", metadata.getSetCode());
         Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof InterplanarTunnelPhenomenon);
+    }
+
+    @Test
+    public void testTeamUpRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.TEAM_UP));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Team-Up!", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Team-Up!", metadata.getImageName());
+        Assert.assertEquals("PUNK", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof TeamUpPhenomenon);
     }
 
     private void prepareStartedPlanechaseGame() {
