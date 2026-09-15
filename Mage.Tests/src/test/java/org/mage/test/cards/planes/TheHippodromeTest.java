@@ -35,6 +35,7 @@ public class TheHippodromeTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Hill Giant");
+        setChoice(playerA, "Yes");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
@@ -51,6 +52,7 @@ public class TheHippodromeTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
         addTarget(playerA, "Scaled Wurm");
+        setChoice(playerA, "Yes");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
