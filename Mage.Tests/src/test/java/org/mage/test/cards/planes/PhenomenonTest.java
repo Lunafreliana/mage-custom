@@ -20,6 +20,7 @@ import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
+import mage.game.command.phenomena.TimeDistortionPhenomenon;
 import mage.game.events.GameEvent;
 import mage.game.stack.StackAbility;
 import mage.game.stack.StackObject;
@@ -137,6 +138,32 @@ public class PhenomenonTest extends CardTestPlayerBase {
     @Test
     public void testInterplanarTunnelEncounterTriggerHasStackViews() {
         assertPhenomenonEncounterStackViews(new InterplanarTunnelPhenomenon());
+    }
+
+    @Test
+    public void testTimeDistortionEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new TimeDistortionPhenomenon());
+    }
+
+    @Test
+    public void testTimeDistortionReversesTurnOrderEachTime() {
+        prepareStartedPlanechaseGame();
+        runCode("encounter Time Distortion twice", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertFalse(info, game.isTurnOrderReversed());
+
+            Assert.assertTrue(info, game.addPhenomenon(new TimeDistortionPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+            Assert.assertTrue(info, game.isTurnOrderReversed());
+
+            game.checkStateAndTriggered();
+            Assert.assertTrue(info, game.addPhenomenon(new TimeDistortionPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+            Assert.assertFalse(info, game.isTurnOrderReversed());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
     }
 
     private void assertPhenomenonEncounterStackViews(Phenomenon phenomenon) {
@@ -365,6 +392,16 @@ public class PhenomenonTest extends CardTestPlayerBase {
     }
 
     @Test
+    public void testTimeDistortionRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.TIME_DISTORTION));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Time Distortion", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Time Distortion", metadata.getImageName());
+        Assert.assertEquals("PCA", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof TimeDistortionPhenomenon);
     public void testChaoticAetherChangesBlankRollsUntilLeavingAPlane() {
         prepareStartedPlanechaseGame();
         runCode("resolve Chaotic Aether and roll blanks", 1, PhaseStep.PRECOMBAT_MAIN, playerA,

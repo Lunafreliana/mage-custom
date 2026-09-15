@@ -5,6 +5,7 @@ import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.PlaneswalkEffect;
+import mage.abilities.effects.common.ReverseTurnOrderEffect;
 import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.constants.TurnPhase;
@@ -27,7 +28,7 @@ public final class TempleOfAtroposPlane extends Plane {
         this.getAbilities().add(new TempleOfAtroposPostcombatMainTriggeredAbility());
 
         // When chaos ensues, reverse the game's turn order. Then planeswalk.
-        Ability ability = new ChaosEnsuesTriggeredAbility(new TempleOfAtroposReverseTurnOrderEffect(), false);
+        Ability ability = new ChaosEnsuesTriggeredAbility(new ReverseTurnOrderEffect(), false);
         ability.addEffect(new PlaneswalkEffect(false).concatBy("Then"));
         this.getAbilities().add(ability);
     }
@@ -97,29 +98,6 @@ class TempleOfAtroposAdditionalBeginningPhaseEffect extends OneShotEffect {
         game.getState().getTurnMods().add(
                 new TurnMod(source.getControllerId()).withExtraPhase(TurnPhase.BEGINNING)
         );
-        return true;
-    }
-}
-
-class TempleOfAtroposReverseTurnOrderEffect extends OneShotEffect {
-
-    TempleOfAtroposReverseTurnOrderEffect() {
-        super(Outcome.Neutral);
-        staticText = "reverse the game's turn order";
-    }
-
-    private TempleOfAtroposReverseTurnOrderEffect(final TempleOfAtroposReverseTurnOrderEffect effect) {
-        super(effect);
-    }
-
-    @Override
-    public TempleOfAtroposReverseTurnOrderEffect copy() {
-        return new TempleOfAtroposReverseTurnOrderEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        game.getState().setReverseTurnOrder(true);
         return true;
     }
 }

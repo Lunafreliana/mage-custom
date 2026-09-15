@@ -7,7 +7,8 @@ public enum Phenomena {
     INTERPLANAR_TUNNEL("InterplanarTunnelPhenomenon", "Phenomenon - Interplanar Tunnel"),
     MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany"),
     REALITY_SHAPING("RealityShapingPhenomenon", "Phenomenon - Reality Shaping"),
-    SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging");
+    SPATIAL_MERGING("SpatialMergingPhenomenon", "Phenomenon - Spatial Merging"),
+    TIME_DISTORTION("TimeDistortionPhenomenon", "Phenomenon - Time Distortion");
 
     private final String className;
     private final String fullName;
