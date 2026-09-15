@@ -1,7 +1,10 @@
 package org.mage.test.cards.planes;
 
+import mage.abilities.SpellAbility;
+import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.constants.CardType;
 import mage.constants.MageObjectType;
+import mage.constants.Outcome;
 import mage.constants.PhaseStep;
 import mage.constants.Phenomena;
 import mage.constants.Planes;
@@ -12,17 +15,21 @@ import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.PlanarDeckMode;
 import mage.game.command.Plane;
+import mage.game.command.phenomena.ChaoticAetherPhenomenon;
 import mage.game.command.phenomena.InterplanarTunnelPhenomenon;
 import mage.game.command.phenomena.MutualEpiphanyPhenomenon;
 import mage.game.command.phenomena.OmenpathInstabilityPhenomenon;
 import mage.game.command.phenomena.RealityShapingPhenomenon;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
+import mage.game.command.phenomena.TeamUpPhenomenon;
+import mage.game.command.phenomena.TimeDistortionPhenomenon;
 import mage.game.events.GameEvent;
 import mage.game.stack.StackAbility;
 import mage.game.stack.StackObject;
 import mage.view.CardView;
 import mage.view.GameView;
 import mage.view.StackAbilityView;
+import mage.watchers.common.ChaoticAetherWatcher;
 import mage.watchers.common.PlaneswalkedWatcher;
 import org.junit.Assert;
 import org.junit.Test;
@@ -133,6 +140,32 @@ public class PhenomenonTest extends CardTestPlayerBase {
     @Test
     public void testInterplanarTunnelEncounterTriggerHasStackViews() {
         assertPhenomenonEncounterStackViews(new InterplanarTunnelPhenomenon());
+    }
+
+    @Test
+    public void testTimeDistortionEncounterTriggerHasStackViews() {
+        assertPhenomenonEncounterStackViews(new TimeDistortionPhenomenon());
+    }
+
+    @Test
+    public void testTimeDistortionReversesTurnOrderEachTime() {
+        prepareStartedPlanechaseGame();
+        runCode("encounter Time Distortion twice", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            Assert.assertFalse(info, game.isTurnOrderReversed());
+
+            Assert.assertTrue(info, game.addPhenomenon(new TimeDistortionPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+            Assert.assertTrue(info, game.isTurnOrderReversed());
+
+            game.checkStateAndTriggered();
+            Assert.assertTrue(info, game.addPhenomenon(new TimeDistortionPhenomenon(), player.getId()));
+            game.checkStateAndTriggered();
+            game.getStack().resolve(game);
+            Assert.assertFalse(info, game.isTurnOrderReversed());
+        });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
     }
 
     private void assertPhenomenonEncounterStackViews(Phenomenon phenomenon) {
@@ -390,6 +423,79 @@ public class PhenomenonTest extends CardTestPlayerBase {
         Assert.assertEquals("Phenomenon - Interplanar Tunnel", metadata.getImageName());
         Assert.assertEquals("PCA", metadata.getSetCode());
         Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof InterplanarTunnelPhenomenon);
+    }
+
+    @Test
+    public void testTeamUpRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.TEAM_UP));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Team-Up!", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Team-Up!", metadata.getImageName());
+        Assert.assertEquals("PUNK", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof TeamUpPhenomenon);
+    }
+
+    @Test
+    public void testTimeDistortionRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.TIME_DISTORTION));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Time Distortion", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Time Distortion", metadata.getImageName());
+        Assert.assertEquals("PCA", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof TimeDistortionPhenomenon);
+    }
+
+    @Test
+    public void testChaoticAetherChangesBlankRollsUntilLeavingAPlane() {
+        prepareStartedPlanechaseGame();
+        runCode("resolve Chaotic Aether and roll blanks", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> {
+                    Assert.assertTrue(info, game.addPhenomenon(new ChaoticAetherPhenomenon(), player.getId()));
+                    game.checkStateAndTriggered();
+                    game.getStack().resolve(game);
+
+                    ChaoticAetherWatcher watcher = game.getState().getWatcher(ChaoticAetherWatcher.class);
+                    Assert.assertNotNull(info, watcher);
+                    Assert.assertTrue(info, watcher.conditionMet());
+
+                    SpellAbility source = new SpellAbility(new ManaCostsImpl<>("{0}"), "test planar roll");
+                    source.setControllerId(player.getId());
+                    Assert.assertEquals(info, mage.constants.PlanarDieRollResult.CHAOS_ROLL,
+                            player.rollPlanarDie(Outcome.Benefit, source, game, 0, 0));
+
+                    game.fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                            UUID.randomUUID(), null, player.getId(), CardType.PHENOMENON.ordinal(), true));
+                    Assert.assertTrue(info, watcher.conditionMet());
+                    Assert.assertEquals(info, mage.constants.PlanarDieRollResult.CHAOS_ROLL,
+                            player.rollPlanarDie(Outcome.Benefit, source, game, 0, 0));
+
+                    game.fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
+                            UUID.randomUUID(), null, player.getId(), CardType.PLANE.ordinal(), true));
+                    Assert.assertFalse(info, watcher.conditionMet());
+                    Assert.assertEquals(info, mage.constants.PlanarDieRollResult.BLANK_ROLL,
+                            player.rollPlanarDie(Outcome.Benefit, source, game, 0, 0));
+                });
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void testChaoticAetherRegistryMetadata() {
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(
+                PlanarCardRegistry.getId(Phenomena.CHAOTIC_AETHER));
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals(CardType.PHENOMENON, metadata.getType());
+        Assert.assertEquals("Chaotic Aether", metadata.getEnglishName());
+        Assert.assertEquals("Phenomenon - Chaotic Aether", metadata.getImageName());
+        Assert.assertEquals("PCA", metadata.getSetCode());
+        Assert.assertTrue(PlanarCardRegistry.create(metadata.getId()) instanceof ChaoticAetherPhenomenon);
     }
 
     private void prepareStartedPlanechaseGame() {

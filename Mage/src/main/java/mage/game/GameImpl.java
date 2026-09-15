@@ -2465,7 +2465,8 @@ public abstract class GameImpl implements Game {
             // Keep this object's triggers registered through its departure event;
             // rules 603.10g and 701.31d make planeswalk-away triggers look back in time.
             fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
-                    plane.getId(), (Ability) null, state.getPlanarControllerId(), 0, true));
+                    plane.getId(), (Ability) null, state.getPlanarControllerId(),
+                    plane.getPlanarCardType().ordinal(), true));
             state.removeTriggersOfSourceId(plane.getId());
         }
     }
@@ -3807,7 +3808,8 @@ public abstract class GameImpl implements Game {
                     // The new planar controller takes control before the owner's Plane leaves,
                     // so planeswalk-away abilities are controlled by the surviving player.
                     fireEvent(new GameEvent(GameEvent.EventType.PLANESWALKED_AWAY,
-                            planarCard.getId(), (Ability) null, replacementPlanarPlayerId, 0, true));
+                            planarCard.getId(), (Ability) null, replacementPlanarPlayerId,
+                            planarCard.getPlanarCardType().ordinal(), true));
                     state.removeTriggersOfSourceId(planarCard.getId());
                     revealReplacementPlane = true;
                 }

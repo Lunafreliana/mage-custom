@@ -204,6 +204,7 @@
 |PLANE:PCA|Plane - Grand Ossuary||GrandOssuaryPlane|
 |PLANE:PCA|Plane - Hedron Fields of Agadeem||HedronFieldsOfAgadeemPlane|
 |PLANE:PCA|Plane - Horizon Boughs||HorizonBoughsPlane|
+|PLANE:WHO|Plane - Hotel of Fears||HotelOfFearsPlane|
 |PLANE:PCA|Plane - Immersturm||ImmersturmPlane|
 |PLANE:PCA|Plane - Izzet Steam Maze||IzzetSteamMazePlane|
 |PLANE:MOC|Plane - Ketria||KetriaPlane|
@@ -211,7 +212,9 @@
 |PLANE:WHO|Plane - Kerblam! Warehouse||KerblamWarehousePlane|
 |PLANE:WHO|Plane - Lake Silencio||LakeSilencioPlane|
 |PLANE:PCA|Plane - Lethe Lake||LetheLakePlane|
+|PLANE:MOC|Plane - Littjara||LittjaraPlane|
 |PLANE:PCA|Plane - Llanowar||LlanowarPlane|
+|PLANE:MOC|Plane - Megaflora Jungle||MegafloraJunglePlane|
 |PLANE:WHO|Plane - Mondassian Colony Ship||MondassianColonyShipPlane|
 |PLANE:PCA|Plane - Minamo||MinamoPlane|
 |PLANE:PUNK|Plane - Multiversal High Council||MultiversalHighCouncilPlane|
@@ -231,13 +234,17 @@
 |PLANE:MOC|Plane - Sokenzan||SokenzanPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
 |PLANE:MOC|Plane - Stronghold Furnace||StrongholdFurnacePlane|
+|PHENOMENON:PCA|Phenomenon - Chaotic Aether||ChaoticAetherPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
+|PHENOMENON:WHO|Phenomenon - Fixed Point in Time||FixedPointInTimePhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PUNK|Phenomenon - Omenpath Instability||OmenpathInstabilityPhenomenon|
 |TOK:PUNK|Entropy||EntropyToken|
 |TOK:PUNK|Omenpath||OmenpathToken|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
+|PHENOMENON:PUNK|Phenomenon - Team-Up!||TeamUpPhenomenon|
+|PHENOMENON:PCA|Phenomenon - Time Distortion||TimeDistortionPhenomenon|
 |PLANE:PCA|Plane - Takenuma||TakenumaPlane|
 |PLANE:WHO|Plane - TARDIS Bay||TardisBayPlane|
 |PLANE:PUNK|Plane - Tarnation||TarnationPlane|
@@ -249,6 +256,7 @@
 |PLANE:MOC|Plane - Isle of Vesuva||IsleOfVesuvaPlane|
 |PLANE:MOC|Plane - Nyx||NyxPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
+|PLANE:PUNK|Plane - The Bean||TheBeanPlane|
 |PLANE:PCA|Plane - The Hippodrome||TheHippodromePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|
