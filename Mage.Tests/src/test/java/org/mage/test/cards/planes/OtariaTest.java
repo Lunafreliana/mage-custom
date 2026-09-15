@@ -25,8 +25,8 @@ public class OtariaTest extends CardTestPlayerBase {
         addCard(Zone.GRAVEYARD, playerA, "Lightning Bolt");
         addCard(Zone.GRAVEYARD, playerB, "Lightning Bolt");
 
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Lightning Bolt", playerB);
-        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Lightning Bolt", playerA);
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Flashback {R}", playerB);
+        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Flashback {R}", playerA);
 
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
         execute();
