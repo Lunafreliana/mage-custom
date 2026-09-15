@@ -25,8 +25,8 @@ public class TheCommandZoneTest extends CardTestCommanderDuelBase {
         addCard(Zone.COMMAND, playerA, "Balduvian Bears");
         addCard(Zone.COMMAND, playerB, "Memnite");
 
-        addTarget(playerA, "Balduvian Bears");
-        addTarget(playerB, "Memnite");
+        setChoice(playerA, "Balduvian Bears");
+        setChoice(playerB, "Memnite");
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
