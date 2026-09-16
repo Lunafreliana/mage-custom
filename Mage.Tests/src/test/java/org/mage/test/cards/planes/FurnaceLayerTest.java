@@ -1,13 +1,10 @@
 package org.mage.test.cards.planes;
 
-import mage.abilities.SpellAbility;
-import mage.abilities.costs.mana.ManaCostsImpl;
-import mage.abilities.effects.common.ChaosEnsuesEffect;
-import mage.constants.CardType;
 import mage.constants.PhaseStep;
 import mage.constants.Planes;
 import mage.constants.Zone;
 import mage.game.command.PlanarCardRegistry;
+import mage.game.events.GameEvent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -49,12 +46,15 @@ public class FurnaceLayerTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_FURNACE_LAYER);
         addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
         addCard(Zone.BATTLEFIELD, playerB, "Forest");
-        SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
-        causeChaos.addEffect(new ChaosEnsuesEffect());
-        addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
+        runCode("chaos ensues", 1, PhaseStep.PRECOMBAT_MAIN, playerA, (info, player, game) -> {
+            game.fireEvent(new GameEvent(
+                    GameEvent.EventType.CHAOS_ENSUES,
+                    game.getState().getFaceUpPlanes().get(0).getId(), null, player.getId()
+            ));
+            game.checkStateAndTriggered();
+        });
         addTarget(playerA, "Grizzly Bears");
         setChoice(playerA, true);
 
