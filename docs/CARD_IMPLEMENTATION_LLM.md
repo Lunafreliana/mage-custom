@@ -337,6 +337,13 @@ implementation rather than duplicating the keyword in the command object. Keep
 the battlefield constructor as the default for ordinary cards, and test that the
 keyword follows the current command-zone controller.
 
+Apply the same rule to reusable triggered abilities. A trigger whose event can
+come from any permanent (for example, a land being tapped for mana) may still
+hardcode the source ability's active zone to `Zone.BATTLEFIELD`. Add a zone-aware
+constructor while preserving the battlefield-default overloads, then use
+`Zone.COMMAND` for a Plane instead of copying the event-handling implementation
+into the planar card.
+
 When multiple abilities of one permanent share a source-specific exile zone, derive
 that zone from the same actual source-object zone-change counter everywhere. A
 battlefield ability that has not yet triggered can still have
