@@ -207,7 +207,7 @@ public enum TokenRepository {
                     if (typeAndSet[0].equals("DUNGEON")) {
                         tokenType = TokenType.DUNGEON;
                         if (!tokenClassName.endsWith("Dungeon")) {
-                            errorsList.add("Tokens database: dungeon's name must ends with [...Dungeon] word: " + line);
+                            errorsList.add("Tokens database: dungeon's class name must ends with [...Dungeon] word: " + line);
                             continue;
                         }
                     }
