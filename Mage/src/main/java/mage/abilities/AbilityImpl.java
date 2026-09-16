@@ -28,6 +28,7 @@ import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.game.command.Dungeon;
 import mage.game.command.Emblem;
+import mage.game.command.PlanarCard;
 import mage.game.command.Plane;
 import mage.game.events.BatchEvent;
 import mage.game.events.GameEvent;
@@ -1319,7 +1320,14 @@ public abstract class AbilityImpl implements Ability {
             return true;
         }
 
-        // emblems/dungeons/planes effects (works all the time, store in command zone)
+        // Planar cards in their decks remain resolvable as sources of delayed triggers.
+        // Their printed static abilities only function while face up (CR 901.7, 611.3b).
+        // Do not gate triggered abilities here: planeswalk-away triggers look back in time.
+        if (zone == Zone.COMMAND && this instanceof StaticAbility && affectedSourceObject instanceof PlanarCard) {
+            return game.getState().isFaceUpPlanarCard(affectedSourceId);
+        }
+
+        // Emblems/dungeons and planar triggers use command-zone source objects.
         if (zone == Zone.COMMAND) {
             if (affectedSourceObject instanceof Emblem || affectedSourceObject instanceof Dungeon || affectedSourceObject instanceof Plane) {
                 return true;
