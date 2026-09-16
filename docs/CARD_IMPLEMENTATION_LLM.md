@@ -471,6 +471,17 @@ not supply the token metadata required by `addPlane` and the shared planar image
 lookup path. A registry metadata assertion alone therefore does not cover this
 integration requirement; focused tests that call `addPlane` do.
 
+Planar source lookup and static-ability activation are separate concerns.
+Face-down planar-deck cards must remain resolvable for delayed-trigger source
+identity and trigger-order views, but their printed static abilities only work
+while face up (CR 901.7, 611.3b). Check face-up command membership in the shared
+static-ability zone check; do not infer activation from `game.getObject(...)`
+being non-null or from `Zone.COMMAND` alone. Do not discard printed effects on
+departure: those templates must work again when the Plane returns. Preserve
+planeswalk-away triggers and effects created by resolving abilities with their
+own durations. Regression tests should cycle through boosting Planes repeatedly,
+check both players and granted keywords, and return/recast a boosted commander.
+
 Counters on Plane cards belong to the runtime `Plane` command object, not to a
 temporary card or permanent representation. Plane counter state must be copied
 with the Plane for rollback/reconnect, and effects must resolve the source's
