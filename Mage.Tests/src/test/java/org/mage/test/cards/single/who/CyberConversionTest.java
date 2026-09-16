@@ -1,6 +1,8 @@
 package org.mage.test.cards.single.who;
 
 import mage.abilities.keyword.FlyingAbility;
+import mage.cards.repository.TokenInfo;
+import mage.cards.repository.TokenRepository;
 import mage.constants.CardType;
 import mage.constants.EmptyNames;
 import mage.constants.PhaseStep;
@@ -42,6 +44,19 @@ public class CyberConversionTest extends CardTestPlayerBase {
         assertNotSubtype(FACE_DOWN, SubType.ANGEL);
         assertAbility(playerB, FACE_DOWN, FlyingAbility.getInstance(), false);
 
+        TokenInfo reminder = TokenRepository.instance.findPreferredTokenInfoForXmage(
+                TokenRepository.XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN, permanent.getId());
+        Assert.assertNotNull("Cyberman reminder image must be registered", reminder);
+        Assert.assertEquals("https://api.scryfall.com/cards/twho/24/en?format=image", reminder.getDownloadUrl());
+        Assert.assertEquals("Cyberman", permanent.getImageFileName());
+        Assert.assertEquals(TokenRepository.XMAGE_TOKENS_SET_CODE, permanent.getExpansionSetCode());
+        Assert.assertEquals(Integer.valueOf(1), permanent.getImageNumber());
+
+        TokenInfo normalFaceDown = TokenRepository.instance.findPreferredTokenInfoForXmage(
+                TokenRepository.XMAGE_IMAGE_NAME_FACE_DOWN_MANUAL, permanent.getId());
+        Assert.assertNotNull("The ordinary face-down image must remain registered", normalFaceDown);
+        Assert.assertNotEquals(normalFaceDown.getName(), reminder.getName());
+
         CardView view = new CardView((PermanentCard) permanent, currentGame, false, false);
         Assert.assertTrue("The view should show the dynamically added artifact type",
                 view.getCardTypes().contains(CardType.ARTIFACT));
@@ -51,6 +66,9 @@ public class CyberConversionTest extends CardTestPlayerBase {
                 view.getSubTypes().contains(SubType.CYBERMAN));
         Assert.assertFalse("The view should not show the original Angel subtype",
                 view.getSubTypes().contains(SubType.ANGEL));
+        Assert.assertEquals("Cyberman", view.getImageFileName());
+        Assert.assertEquals(TokenRepository.XMAGE_TOKENS_SET_CODE, view.getExpansionSetCode());
+        Assert.assertEquals(Integer.valueOf(1), view.getImageNumber());
     }
 
     @Test
@@ -106,6 +124,11 @@ public class CyberConversionTest extends CardTestPlayerBase {
         assertType("Pine Walker", CardType.ARTIFACT, false);
         assertNotSubtype("Pine Walker", SubType.CYBERMAN);
         assertSubtype("Pine Walker", SubType.ELEMENTAL);
+
+        Permanent permanent = getPermanent("Pine Walker", playerA);
+        CardView view = new CardView((PermanentCard) permanent, currentGame, false, false);
+        Assert.assertNotEquals("Face-up cards must not retain Cyberman reminder artwork",
+                "Cyberman", view.getImageFileName());
     }
 
     @Test
