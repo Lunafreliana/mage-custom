@@ -30,6 +30,7 @@ public enum TokenRepository {
     // - image name from tok/xmage folder
     // - additional card name for controller like "Morph: face up name"
     public static final String XMAGE_IMAGE_NAME_FACE_DOWN_MANUAL = "Face Down";
+    public static final String XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN = "Cyberman";
     public static final String XMAGE_IMAGE_NAME_FACE_DOWN_MANIFEST = "Manifest";
     public static final String XMAGE_IMAGE_NAME_FACE_DOWN_CLOAK = "Cloak";
     public static final String XMAGE_IMAGE_NAME_FACE_DOWN_MORPH = "Morph";
@@ -270,6 +271,9 @@ public enum TokenRepository {
         // Backface
         // TODO: can't find backface's api url so use direct link from third party site instead (must be replaced to scryfall someday)
         res.add(createXmageToken(XMAGE_IMAGE_NAME_FACE_DOWN_MANUAL, 1, "https://upload.wikimedia.org/wikipedia/en/a/aa/Magic_the_gathering-card_back.jpg"));
+
+        // Cyberman reminder card (Doctor Who Tokens, TWHO #24)
+        res.add(createXmageToken(XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN, 1, "https://api.scryfall.com/cards/twho/24/en?format=image"));
 
         // Copy
         // https://scryfall.com/search?q=include%3Aextras+unique%3Aprints+type%3Atoken+copy&unique=cards&as=grid&order=name

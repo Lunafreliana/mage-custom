@@ -435,6 +435,12 @@ For a new card in an existing set, normally add its implementation and one `SetC
 
 Behavior tests are grouped by mechanic/set under [`Mage.Tests/src/test/java/org/mage/test/cards`](../Mage.Tests/src/test/java/org/mage/test/cards). Most extend a base such as `CardTestPlayerBase` or `CardTestCommander4Players`, found beneath [`org/mage/test`](../Mage.Tests/src/test/java/org/mage/test). Read the base signatures before writing a test.
 
+Match numeric JUnit assertions to the getter's declared return type. For example,
+`CardView.getImageNumber()` returns primitive `int`, so use
+`Assert.assertEquals(1, view.getImageNumber())`. Mixing an `Integer` expected
+value with a primitive actual value makes JUnit 4's object and numeric overloads
+ambiguous and prevents the test module from compiling.
+
 Typical scenario:
 
 ```java
