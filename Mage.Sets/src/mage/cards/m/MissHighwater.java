@@ -41,7 +41,7 @@ public final class MissHighwater extends CardImpl {
         this.toughness = new MageInt(3);
 
         // Menace
-        this.addAbility(MenaceAbility.getInstance());
+        this.addAbility(new MenaceAbility());
 
         // Whenever Miss Highwater deals combat damage to a player who doesn't have a contract counter,
         // they may discard their hand. If they do, they draw seven cards and get a contract counter.
