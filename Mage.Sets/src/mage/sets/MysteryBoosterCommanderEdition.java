@@ -50,6 +50,7 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Jandor, Fortuned Traveler", 42, Rarity.RARE, mage.cards.j.JandorFortunedTraveler.class));
         cards.add(new SetCardInfo("Jeweled Amulet", 75, Rarity.UNCOMMON, mage.cards.j.JeweledAmulet.class));
         cards.add(new SetCardInfo("Joven and Chandler", 24, Rarity.RARE, mage.cards.j.JovenAndChandler.class));
+        cards.add(new SetCardInfo("Kuroki, Thief of Talents", 15, Rarity.RARE, mage.cards.k.KurokiThiefOfTalents.class));
         cards.add(new SetCardInfo("Lyna, Veil of Vengeance", 43, Rarity.RARE, mage.cards.l.LynaVeilofVengeance.class));
         cards.add(new SetCardInfo("Maular, the Next Evolution", 31, Rarity.RARE, mage.cards.m.MaularTheNextEvolution.class));
         cards.add(new SetCardInfo("Massimo, the Magician", 45, Rarity.RARE, mage.cards.m.MassimoTheMagician.class));
