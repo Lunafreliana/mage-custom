@@ -68,7 +68,7 @@ public class CyberConversionTest extends CardTestPlayerBase {
                 view.getSubTypes().contains(SubType.ANGEL));
         Assert.assertEquals("Cyberman", view.getImageFileName());
         Assert.assertEquals(TokenRepository.XMAGE_TOKENS_SET_CODE, view.getExpansionSetCode());
-        Assert.assertEquals(Integer.valueOf(1), view.getImageNumber());
+        Assert.assertEquals(1, view.getImageNumber());
     }
 
     @Test
