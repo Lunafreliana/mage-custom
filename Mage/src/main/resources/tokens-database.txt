@@ -250,6 +250,7 @@
 |PLANE:PUNK|Plane - Tarnation||TarnationPlane|
 |PLANE:PCA|Plane - Tazeem||TazeemPlane|
 |PLANE:MOC|Plane - Ten Wizards Mountain||TenWizardsMountainPlane|
+|PLANE:PCA|Plane - Tember City||TemberCityPlane|
 |PLANE:WHO|Plane - Temple of Atropos||TempleOfAtroposPlane|
 |PLANE:MOC|Plane - The Golden City of Orazca||TheGoldenCityOfOrazcaPlane|
 |PLANE:MOC|Plane - Inys Haen||InysHaenPlane|

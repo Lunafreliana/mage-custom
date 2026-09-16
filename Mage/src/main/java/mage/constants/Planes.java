@@ -81,6 +81,7 @@ public enum Planes {
     PLANE_TARNATION("TarnationPlane", "Plane - Tarnation", "PUNK"),
     PLANE_TAZEEM("TazeemPlane", "Plane - Tazeem"),
     PLANE_TEN_WIZARDS_MOUNTAIN("TenWizardsMountainPlane", "Plane - Ten Wizards Mountain", "MOC"),
+    PLANE_TEMBER_CITY("TemberCityPlane", "Plane - Tember City"),
     PLANE_TEMPLE_OF_ATROPOS("TempleOfAtroposPlane", "Plane - Temple of Atropos", "WHO"),
     PLANE_THE_GOLDEN_CITY_OF_ORAZCA("TheGoldenCityOfOrazcaPlane", "Plane - The Golden City of Orazca", "MOC"),
     PLANE_THE_GREAT_AERIE("TheGreatAeriePlane", "Plane - The Great Aerie", "MOC"),
