@@ -1,0 +1,74 @@
+package org.mage.test.cards.planes;
+
+import mage.abilities.SpellAbility;
+import mage.abilities.costs.mana.ManaCostsImpl;
+import mage.abilities.effects.common.ChaosEnsuesEffect;
+import mage.constants.CardType;
+import mage.constants.PhaseStep;
+import mage.constants.Planes;
+import mage.constants.Zone;
+import mage.game.command.PlanarCardRegistry;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mage.test.serverside.base.CardTestPlayerBase;
+
+public class FurnaceLayerTest extends CardTestPlayerBase {
+
+    @Test
+    public void planeswalkAndUpkeepSelectRandomPlayersToDiscard() {
+        addPlane(playerA, Planes.PLANE_FURNACE_LAYER);
+        addCard(Zone.HAND, playerA, "Mountain", 2);
+        addCard(Zone.HAND, playerB, "Mountain", 2);
+        removeAllCardsFromLibrary(playerA);
+        removeAllCardsFromLibrary(playerB);
+        skipInitShuffling();
+
+        setChoice(playerA, "When you planeswalk"); // Order the initial planeswalk and upkeep triggers.
+        runCode("two random targets discarded lands", 1, PhaseStep.PRECOMBAT_MAIN, playerA,
+                (info, player, game) -> {
+                    int handCards = game.getPlayer(playerA.getId()).getHand().size()
+                            + game.getPlayer(playerB.getId()).getHand().size();
+                    int totalLife = game.getPlayer(playerA.getId()).getLife()
+                            + game.getPlayer(playerB.getId()).getLife();
+                    Assert.assertEquals(info + " -- each trigger discards one card", 2, handCards);
+                    Assert.assertEquals(info + " -- each discarded land causes 3 life loss", 34, totalLife);
+                });
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+    }
+
+    @Test
+    public void chaosMayDestroyTargetNonlandPermanent() {
+        addPlane(playerA, Planes.PLANE_FURNACE_LAYER);
+        addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
+        addCard(Zone.BATTLEFIELD, playerB, "Forest");
+        SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
+        causeChaos.addEffect(new ChaosEnsuesEffect());
+        addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
+        addTarget(playerA, "Grizzly Bears");
+        setChoice(playerA, true);
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertGraveyardCount(playerB, "Grizzly Bears", 1);
+        assertPermanentCount(playerB, "Forest", 1);
+    }
+
+    @Test
+    public void registryExposesFurnaceLayerMetadata() {
+        String id = PlanarCardRegistry.getId(Planes.PLANE_FURNACE_LAYER);
+        PlanarCardRegistry.Metadata metadata = PlanarCardRegistry.getMetadata(id);
+
+        Assert.assertNotNull(metadata);
+        Assert.assertEquals("Furnace Layer", metadata.getEnglishName());
+        Assert.assertEquals("Plane - Furnace Layer", metadata.getImageName());
+        Assert.assertEquals("PCA", metadata.getSetCode());
+        Assert.assertNotNull(PlanarCardRegistry.create(id));
+    }
+}

@@ -33,6 +33,7 @@ public enum Planes {
     PLANE_THE_FERTILE_LANDS_OF_SAULVINIA(
             "TheFertileLandsOfSaulviniaPlane", "Plane - The Fertile Lands of Saulvinia", "MOC"),
     PLANE_FIELDS_OF_SUMMER("FieldsOfSummerPlane", "Plane - Fields of Summer"),
+    PLANE_FURNACE_LAYER("FurnaceLayerPlane", "Plane - Furnace Layer"),
     PLANE_GAVONY("GavonyPlane", "Plane - Gavony"),
     PLANE_GROVE_OF_THE_DREAMPODS("GroveOfTheDreampodsPlane", "Plane - Grove of the Dreampods"),
     PLANE_GLEN_ELENDRA("GlenElendraPlane", "Plane - Glen Elendra"),
