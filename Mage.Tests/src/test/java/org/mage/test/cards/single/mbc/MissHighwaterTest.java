@@ -57,10 +57,15 @@ public class MissHighwaterTest extends CardTestMultiPlayerBase {
         addCard(Zone.BATTLEFIELD, playerB, "Sol Ring");
         addCard(Zone.BATTLEFIELD, playerB, "Ornithopter");
         addCard(Zone.BATTLEFIELD, playerB, "Forest");
+        setLife(playerB, 6);
+
+        addCard(Zone.HAND, playerC, "Lightning Bolt");
+        addCard(Zone.BATTLEFIELD, playerC, "Mountain");
 
         attack(1, playerA, missHighwater, playerB);
         setChoice(playerB, true);
-        concede(1, PhaseStep.POSTCOMBAT_MAIN, playerB);
+        // A concession makes a player leave immediately, so use a game loss to exercise the LOST trigger.
+        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerC, "Lightning Bolt", playerB);
 
         setStopAt(2, PhaseStep.PRECOMBAT_MAIN);
         execute();
@@ -86,7 +91,7 @@ public class MissHighwaterTest extends CardTestMultiPlayerBase {
         execute();
 
         assertLife(playerB, 10);
-        assertHandCount(playerB, 8); // seven from the contract plus the draw on player B's turn
+        assertHandCount(playerB, 7);
         Assert.assertEquals(1, playerB.getCountersCount(CounterType.CONTRACT));
     }
 }
