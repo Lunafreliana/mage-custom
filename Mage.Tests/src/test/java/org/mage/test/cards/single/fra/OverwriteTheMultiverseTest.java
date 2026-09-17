@@ -1,8 +1,8 @@
 package org.mage.test.cards.single.fra;
 
-import mage.constants.CounterType;
 import mage.constants.PhaseStep;
 import mage.constants.Zone;
+import mage.counters.CounterType;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
