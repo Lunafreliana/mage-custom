@@ -29,7 +29,7 @@ public class DackFaydenHelpingHandTest extends CardTestMultiPlayerBaseWithRangeA
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dack);
         addTarget(playerA, playerD);
         addTarget(playerA, playerC);
-        addTarget(playerA, playerB);
+        // PlayerB is the only eligible opponent left and is selected automatically.
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
         execute();
