@@ -3173,6 +3173,7 @@
 |TOK:HOB|Wolf||WolfToken|
 
 # FRA
+|TOK:FRA|Angel||LyraTolarianArchangelToken|
 |TOK:FRA|Illusion||Illusion11Token|
 
 # TRK

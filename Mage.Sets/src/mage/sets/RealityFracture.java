@@ -49,11 +49,14 @@ public final class RealityFracture extends ExpansionSet {
         cards.add(new SetCardInfo("Garruk, Curse Breaker", 314, Rarity.MYTHIC, mage.cards.g.GarrukCurseBreaker.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Garruk, Veiled Butcher", 229, Rarity.MYTHIC, mage.cards.g.GarrukVeiledButcher.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Garruk, Veiled Butcher", 303, Rarity.MYTHIC, mage.cards.g.GarrukVeiledButcher.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Geist of Saint Thalia", 214, Rarity.UNCOMMON, mage.cards.g.GeistOfSaintThalia.class));
         cards.add(new SetCardInfo("Generous Revival", 8, Rarity.UNCOMMON, mage.cards.g.GenerousRevival.class));
+        cards.add(new SetCardInfo("Kindred Judgment", 13, Rarity.RARE, mage.cards.k.KindredJudgment.class));
         cards.add(new SetCardInfo("Liliana the Faultless", 200, Rarity.RARE, mage.cards.l.LilianaTheFaultless.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Liliana the Faultless", 293, Rarity.RARE, mage.cards.l.LilianaTheFaultless.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Liliana the Repentant", 231, Rarity.RARE, mage.cards.l.LilianaTheRepentant.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Liliana the Repentant", 305, Rarity.RARE, mage.cards.l.LilianaTheRepentant.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Lyra, Tolarian Archangel", 217, Rarity.RARE, mage.cards.l.LyraTolarianArchangel.class));
         cards.add(new SetCardInfo("Paradox Shaper", 143, Rarity.UNCOMMON, mage.cards.p.ParadoxShaper.class));
         cards.add(new SetCardInfo("Perfected Theory", 34, Rarity.UNCOMMON, mage.cards.p.PerfectedTheory.class));
         cards.add(new SetCardInfo("Prudent Fateseer", 146, Rarity.UNCOMMON, mage.cards.p.PrudentFateseer.class));
@@ -68,12 +71,15 @@ public final class RealityFracture extends ExpansionSet {
         cards.add(new SetCardInfo("The Theorist, Jace Beleren", 415, Rarity.MYTHIC, mage.cards.t.TheTheoristJaceBeleren.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Theorist, Jace Beleren", 43, Rarity.MYTHIC, mage.cards.t.TheTheoristJaceBeleren.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("The Theorist, Jace Beleren", 443, Rarity.MYTHIC, mage.cards.t.TheTheoristJaceBeleren.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Theorix Charm", 155, Rarity.UNCOMMON, mage.cards.t.TheorixCharm.class));
         cards.add(new SetCardInfo("Tinybones, Pocket Nuisance", 237, Rarity.UNCOMMON, mage.cards.t.TinybonesPocketNuisance.class));
         cards.add(new SetCardInfo("Titanbones, Towering Heart", 266, Rarity.UNCOMMON, mage.cards.t.TitanbonesToweringHeart.class));
+        cards.add(new SetCardInfo("Vigorbloom Charm", 160, Rarity.UNCOMMON, mage.cards.v.VigorbloomCharm.class));
         cards.add(new SetCardInfo("Vigorbloom Vanguard", 161, Rarity.UNCOMMON, mage.cards.v.VigorbloomVanguard.class));
         cards.add(new SetCardInfo("Woodwork Prodigy", 165, Rarity.UNCOMMON, mage.cards.w.WoodworkProdigy.class));
         cards.add(new SetCardInfo("Yargle, Glutton of Urborg", 241, Rarity.UNCOMMON, mage.cards.y.YargleGluttonOfUrborg.class));
         cards.add(new SetCardInfo("Yargle, Goliath of Otaria", 225, Rarity.UNCOMMON, mage.cards.y.YargleGoliathOfOtaria.class));
+        cards.add(new SetCardInfo("Yoshimaru, Beloved Companion", 209, Rarity.UNCOMMON, mage.cards.y.YoshimaruBelovedCompanion.class));
 
         cards.removeIf(setCardInfo -> unfinished.contains(setCardInfo.getName()));
     }
