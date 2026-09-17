@@ -257,6 +257,7 @@
 |PLANE:MOC|Plane - Nyx||NyxPlane|
 |PLANE:MOC|Plane - The Great Aerie||TheGreatAeriePlane|
 |PLANE:PUNK|Plane - The Bean||TheBeanPlane|
+|PLANE:PUNK|Plane - The Windy City||TheWindyCityPlane|
 |PLANE:PCA|Plane - The Hippodrome||TheHippodromePlane|
 |PLANE:PUNK|Plane - The Command Zone||TheCommandZonePlane|
 |PLANE:WHO|Plane - The Lux Foundation Library||TheLuxFoundationLibraryPlane|
