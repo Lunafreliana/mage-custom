@@ -24,9 +24,10 @@ public class WinterTormentedLonerTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, winter);
         setChoice(playerA, true);
-        addTarget(playerA, "Grizzly Bears");
+        setChoice(playerA, "Grizzly Bears");
         addTarget(playerB, "Runeclaw Bear");
 
+        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.BEGIN_COMBAT);
         execute();
 
@@ -45,6 +46,7 @@ public class WinterTormentedLonerTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, winter);
         setChoice(playerA, false);
 
+        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.BEGIN_COMBAT);
         execute();
 
