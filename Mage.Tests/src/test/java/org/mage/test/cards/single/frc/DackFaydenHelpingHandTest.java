@@ -25,6 +25,8 @@ public class DackFaydenHelpingHandTest extends CardTestMultiPlayerBaseWithRangeA
         addCard(Zone.LIBRARY, playerA, "Centaur Courser");
         addCard(Zone.LIBRARY, playerA, "Plains");
         addCard(Zone.LIBRARY, playerA, "Hill Giant");
+        // Unlike in a two-player game, the starting player draws on turn one in multiplayer.
+        addCard(Zone.LIBRARY, playerA, "Mountain");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dack);
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
