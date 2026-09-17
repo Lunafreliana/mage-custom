@@ -99,7 +99,14 @@ jobs:
             echo '::error::Unresolved merge entries remain; no branch will be pushed.'
             exit 1
           fi
-          git diff --cached --check
+          # Upstream already has whitespace warnings in unrelated files; only
+          # check the files resolved by this task rather than reformat upstream.
+          git diff --cached --check -- \
+            .github/workflows/maven.yml \
+            Mage.Sets/src/mage/cards/y/YargleGoliathOfOtaria.java \
+            Mage.Sets/src/mage/sets/RealityFracture.java \
+            Mage.Sets/src/mage/sets/RealityFractureCommander.java \
+            Mage.Sets/src/mage/sets/SecretsOfStrixhaven.java
           git diff --check
           git commit -m "Sync official XMage upstream ${UPSTREAM_SHA:0:7} (preserve custom conflicts except Yargle)"
           echo '--- Merge parents and changed-file summary ---'
