@@ -147,6 +147,8 @@ class DackFaydenHelpingHandEffect extends OneShotEffect {
             effect.setTargetPointer(new FixedTarget(permanent, game));
             game.addEffect(effect, source);
         }
+        // Recalculate continuous effects after the final control-changing effect is added.
+        game.processAction();
         return true;
     }
 }
