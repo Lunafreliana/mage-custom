@@ -31,8 +31,8 @@ import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.permanent.Permanent;
 import mage.players.Player;
-import mage.target.common.TargetControlledCreaturePermanent;
-import mage.target.common.TargetCreaturePermanent;
+import mage.target.TargetPermanent;
+import mage.target.common.TargetControlledPermanent;
 import mage.target.targetpointer.FixedTarget;
 
 import java.util.UUID;
@@ -63,19 +63,19 @@ public final class TheWindyCityPlane extends Plane {
         Ability ability = new PlaneswalkToSourceTriggeredAbility(
                 new AddCountersTargetEffect(CounterType.FLYING.createInstance())
         );
-        ability.addTarget(new TargetControlledCreaturePermanent(COUNTER_FILTER));
+        ability.addTarget(new TargetControlledPermanent(COUNTER_FILTER));
         this.getAbilities().add(ability);
         ability = new BeginningOfUpkeepTriggeredAbility(
                 Zone.COMMAND, TargetController.YOU,
                 new AddCountersTargetEffect(CounterType.FLYING.createInstance()), false
         );
-        ability.addTarget(new TargetControlledCreaturePermanent(COUNTER_FILTER));
+        ability.addTarget(new TargetControlledPermanent(COUNTER_FILTER));
         this.getAbilities().add(ability);
 
         // Whenever chaos ensues, exile target creature with flying. For as long as it remains
         // exiled, its owner may cast it by paying {2} rather than paying its mana cost.
         ability = new ChaosEnsuesTriggeredAbility(new TheWindyCityExileEffect(), false);
-        ability.addTarget(new TargetCreaturePermanent(FLYING_CREATURE_FILTER));
+        ability.addTarget(new TargetPermanent(FLYING_CREATURE_FILTER));
         this.getAbilities().add(ability);
 
         // When you planeswalk away from The Windy City, remove all flying counters from all creatures.
