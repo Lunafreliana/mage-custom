@@ -3174,6 +3174,7 @@
 
 # FRA
 |TOK:FRA|Illusion||Illusion11Token|
+|TOK:FRA|Jace Token||JacePlaneswalkerToken|
 
 # TRK
 |TOK:TRK|Human||Human01Token|
