@@ -57,8 +57,8 @@ jobs:
               registration = f'new SetCardInfo("{name}", '
               if registration not in source or java_class not in source:
                   raise RuntimeError(f'No existing SetCardInfo registration for {name}')
-              letter = java_class.removeprefix('mage.cards.').split('.')[0]
-              class_name = java_class.rsplit('.', 1)[-1].removesuffix('.class')
+              qualified = java_class.removeprefix('mage.cards.').removesuffix('.class')
+              letter, class_name = qualified.split('.', 1)
               if not Path(f'Mage.Sets/src/mage/cards/{letter}/{class_name}.java').is_file():
                   raise RuntimeError(f'Implementation is absent: {name}')
           remaining = [name for name in names if name not in restore]
