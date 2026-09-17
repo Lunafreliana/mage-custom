@@ -4,12 +4,15 @@ import mage.abilities.keyword.FlyingAbility;
 import mage.constants.CardType;
 import mage.constants.EmptyNames;
 import mage.constants.PhaseStep;
+import mage.constants.Planes;
 import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.game.permanent.Permanent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
+
+import java.util.Collections;
 
 public class MissyTest extends CardTestPlayerBase {
 
@@ -98,5 +101,21 @@ public class MissyTest extends CardTestPlayerBase {
 
         assertLife(playerB, 20);
         assertHandCount(playerA, 1);
+    }
+
+    @Test
+    public void testVillainousDrawChoiceCausesChaos() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_PANOPTICON);
+        addCard(Zone.BATTLEFIELD, playerA, "Missy");
+        addCard(Zone.LIBRARY, playerA, "Island", 2);
+        skipInitShuffling();
+        setChoice(playerB, false);
+
+        setStopAt(1, PhaseStep.END_TURN);
+        execute();
+
+        assertLife(playerB, 20);
+        assertHandCount(playerA, 2);
     }
 }
