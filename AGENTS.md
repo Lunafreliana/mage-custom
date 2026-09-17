@@ -8,7 +8,7 @@ For any Planechase-related task, read `docs/PLANECHASE_REWORK.md` before making 
 
 For every task that implements, fixes, reviews, refactors, or tests Magic: The Gathering card behavior:
 
-1. Read `docs/CARD_IMPLEMENTATION_LLM.md` in full before changing code.
+1. Read `docs/CARD_IMPLEMENTATION_LLM.md` in full before changing code. For original custom cards in the `CLUN` set, also read `docs/CUSTOM_CARDS_LLM.md`.
 2. Treat the requirements and workflow in that document as mandatory.
 3. Do not implement a card from Oracle text alone when keywords, keyword actions, rules-defined terms, layers, face-down behavior, replacement effects, copy effects, linked abilities, zone changes, or other non-trivial rules are involved.
 4. When rules behavior is uncertain or abbreviated by Oracle text:
@@ -41,6 +41,9 @@ GitHub Actions is the default validation runner for this repository.
 
 `docs/CARD_IMPLEMENTATION_LLM.md`
 is the authoritative implementation workflow and technical guidance for coding agents.
+
+`docs/CUSTOM_CARDS_LLM.md`
+supplements the authoritative guide with the CLUN custom-card registration workflow.
 
 `docs/CARD_IMPLEMENTATION_HUMAN.md`
 is explanatory documentation for human developers and should not replace the LLM implementation guide.
