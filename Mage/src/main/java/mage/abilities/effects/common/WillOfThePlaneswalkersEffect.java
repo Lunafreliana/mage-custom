@@ -6,6 +6,9 @@ import mage.choices.TwoChoiceVote;
 import mage.constants.AbilityWord;
 import mage.constants.Outcome;
 import mage.game.Game;
+import mage.game.command.PlaneswalkContext;
+
+import java.util.UUID;
 
 /**
  * @author TheElk801
@@ -35,12 +38,15 @@ public class WillOfThePlaneswalkersEffect extends OneShotEffect {
         vote.doVotes(source, game);
         int planeswalkCount = vote.getVoteCount(true);
         int chaosCount = vote.getVoteCount(false);
-        // TODO: Implement when planes have been refactored
         if (planeswalkCount > chaosCount) {
-            // planeswalk to next plane
-        } else {
-            // chaos ensues
+            UUID planarControllerId = game.getPlanarControllerId(null);
+            if (planarControllerId == null) {
+                return true;
+            }
+            return game.planeswalk(new PlaneswalkContext(
+                    planarControllerId, PlaneswalkContext.Cause.SPELL_OR_ABILITY, source.getSourceId()
+            ));
         }
-        return true;
+        return new ChaosEnsuesEffect().apply(game, source);
     }
 }

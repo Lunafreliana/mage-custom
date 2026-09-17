@@ -226,7 +226,7 @@ public final class MarchOfTheMachineCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Pain Distributor", 33, Rarity.RARE, mage.cards.p.PainDistributor.class));
         cards.add(new SetCardInfo("Painful Truths", 262, Rarity.RARE, mage.cards.p.PainfulTruths.class));
         cards.add(new SetCardInfo("Path of Ancestry", 418, Rarity.COMMON, mage.cards.p.PathOfAncestry.class));
-//        cards.add(new SetCardInfo("Path of the Animist", 38, Rarity.RARE, mage.cards.p.PathOfTheAnimist.class));
+        cards.add(new SetCardInfo("Path of the Animist", 38, Rarity.RARE, mage.cards.p.PathOfTheAnimist.class));
 //        cards.add(new SetCardInfo("Path of the Enigma", 23, Rarity.RARE, mage.cards.p.PathOfTheEnigma.class));
 //        cards.add(new SetCardInfo("Path of the Ghosthunter", 18, Rarity.RARE, mage.cards.p.PathOfTheGhosthunter.class));
 //        cards.add(new SetCardInfo("Path of the Pyromancer", 34, Rarity.RARE, mage.cards.p.PathOfThePyromancer.class));
