@@ -31,9 +31,9 @@ import java.util.UUID;
 public final class LyraTolarianArchangel extends CardImpl {
 
     public LyraTolarianArchangel(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId, setInfo, new SuperType[]{SuperType.LEGENDARY},
-                new CardType[]{CardType.CREATURE}, "{1}{U}{U}");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{1}{U}{U}");
 
+        this.supertype.add(SuperType.LEGENDARY);
         this.subtype.add(SubType.ANGEL);
         this.subtype.add(SubType.WIZARD);
         this.power = new MageInt(3);
