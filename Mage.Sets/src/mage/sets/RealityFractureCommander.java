@@ -20,6 +20,7 @@ public final class RealityFractureCommander extends ExpansionSet {
         this.hasBasicLands = false;
 
         cards.add(new SetCardInfo("Avacyn, Angel of Horror", 7, Rarity.RARE, mage.cards.a.AvacynAngelOfHorror.class));
+        cards.add(new SetCardInfo("Dack Fayden, Helping Hand", 4, Rarity.RARE, mage.cards.d.DackFaydenHelpingHand.class));
         cards.add(new SetCardInfo("Darksteel Angel", 98, Rarity.RARE, mage.cards.d.DarksteelAngel.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Darksteel Angel", 13, Rarity.RARE, mage.cards.d.DarksteelAngel.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Ob Nixilis, the Ascended", 5, Rarity.RARE, mage.cards.o.ObNixilisTheAscended.class));
