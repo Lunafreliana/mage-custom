@@ -117,6 +117,7 @@ public class CardView extends SimpleCardView {
     protected String rightSplitCostsStr;
     protected List<String> rightSplitRules;
     protected String rightSplitTypeLine;
+    protected String rightSplitSpellType;
 
     protected boolean isDoubleFacedCard;
 
@@ -239,6 +240,7 @@ public class CardView extends SimpleCardView {
         this.rightSplitCostsStr = cardView.rightSplitCostsStr;
         this.rightSplitRules = cardView.rightSplitRules == null ? null : new ArrayList<>(cardView.rightSplitRules);
         this.rightSplitTypeLine = cardView.rightSplitTypeLine;
+        this.rightSplitSpellType = cardView.rightSplitSpellType;
 
         this.isDoubleFacedCard = cardView.isDoubleFacedCard;
 
@@ -323,7 +325,6 @@ public class CardView extends SimpleCardView {
         if (game != null && card instanceof Spell) {
             card = ((Spell) card).getSpellAbility().getCharacteristics(game);
         }
-
         // use isFaceDown(game) only here to find real status, all other code must use this.faceDown
         this.faceDown = game != null && sourceCard.isFaceDown(game);
         boolean showFaceUp = !this.faceDown;
@@ -451,8 +452,9 @@ public class CardView extends SimpleCardView {
                 SpellOptionCard spellOptionCard = mainCard.getSpellCard();
                 rightSplitName = spellOptionCard.getName();
                 rightSplitCostsStr = String.join("", spellOptionCard.getManaCostSymbols());
-                rightSplitRules = spellOptionCard.getRules(game);
+                rightSplitRules = spellOptionCard.getInsetRules(game);
                 rightSplitTypeLine = getCardTypeLine(game, spellOptionCard);
+                rightSplitSpellType = spellOptionCard.getSpellType();
                 fullCardName = mainCard.getName() + MockCard.CARD_WITH_SPELL_OPTION_NAME_SEPARATOR + spellOptionCard.getName();
                 this.manaCostLeftStr = mainCard.getManaCostSymbols();
                 this.manaCostRightStr = spellOptionCard.getManaCostSymbols();
@@ -470,7 +472,11 @@ public class CardView extends SimpleCardView {
             this.name = card.getName();
             this.displayName = card.getName();
             this.displayFullName = fullCardName;
-            this.rules = new ArrayList<>(card.getRules(game));
+            // Spell-option cards render both parts above. Keep the combined
+            // spell rule for permanent views, where there is no inset frame.
+            this.rules = card instanceof CardWithSpellOption
+                    ? new ArrayList<>(((CardWithSpellOption) card).getSharedRules(game))
+                    : new ArrayList<>(card.getRules(game));
             this.manaValue = card.getManaValue();
         }
 
@@ -1472,6 +1478,10 @@ public class CardView extends SimpleCardView {
 
     public String getRightSplitTypeLine() {
         return rightSplitTypeLine;
+    }
+
+    public String getRightSplitSpellType() {
+        return rightSplitSpellType;
     }
 
     public ArtRect getArtRect() {
