@@ -1,18 +1,15 @@
 package mage.cards.k;
 
 import mage.MageInt;
-import mage.abilities.Ability;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.dynamicvalue.common.DevotionCount;
-import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.common.continuous.LoseCreatureTypeSourceEffect;
+import mage.abilities.effects.common.continuous.ManaBecomesColorlessEffect;
 import mage.abilities.effects.common.continuous.MaximumHandSizeControllerEffect;
 import mage.abilities.keyword.IndestructibleAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.*;
-import mage.game.Game;
-import mage.players.Player;
 
 import java.util.UUID;
 
@@ -43,7 +40,7 @@ public final class KruphixGodOfHorizons extends CardImpl {
         )));
 
         // If unused mana would empty from your mana pool, that mana becomes colorless instead.
-        this.addAbility(new SimpleStaticAbility(new KruphixGodOfHorizonsEffect()));
+        this.addAbility(new SimpleStaticAbility(new ManaBecomesColorlessEffect()));
     }
 
     private KruphixGodOfHorizons(final KruphixGodOfHorizons card) {
@@ -53,31 +50,5 @@ public final class KruphixGodOfHorizons extends CardImpl {
     @Override
     public KruphixGodOfHorizons copy() {
         return new KruphixGodOfHorizons(this);
-    }
-}
-
-class KruphixGodOfHorizonsEffect extends ContinuousEffectImpl {
-
-    KruphixGodOfHorizonsEffect() {
-        super(Duration.WhileOnBattlefield, Layer.RulesEffects, SubLayer.NA, Outcome.Benefit);
-        staticText = "if you would lose unspent mana, that mana becomes colorless instead";
-    }
-
-    private KruphixGodOfHorizonsEffect(final KruphixGodOfHorizonsEffect effect) {
-        super(effect);
-    }
-
-    @Override
-    public KruphixGodOfHorizonsEffect copy() {
-        return new KruphixGodOfHorizonsEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        Player player = game.getPlayer(source.getControllerId());
-        if (player != null) {
-            player.getManaPool().setManaBecomesColorless(true);
-        }
-        return true;
     }
 }
