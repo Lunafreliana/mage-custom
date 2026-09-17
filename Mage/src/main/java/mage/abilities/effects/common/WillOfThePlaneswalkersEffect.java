@@ -39,11 +39,11 @@ public class WillOfThePlaneswalkersEffect extends OneShotEffect {
         int planeswalkCount = vote.getVoteCount(true);
         int chaosCount = vote.getVoteCount(false);
         if (planeswalkCount > chaosCount) {
-            UUID planarControllerId = game.getPlanarControllerId(null);
-            if (planarControllerId == null) {
+            if (!game.getState().isPlaneChase() || game.getState().getFaceUpPlanarCards().isEmpty()) {
                 return true;
             }
-            return game.planeswalk(new PlaneswalkContext(
+            UUID planarControllerId = game.getState().getPlanarControllerId();
+            return planarControllerId != null && game.planeswalk(new PlaneswalkContext(
                     planarControllerId, PlaneswalkContext.Cause.SPELL_OR_ABILITY, source.getSourceId()
             ));
         }
