@@ -37,6 +37,7 @@ public class TheWindyCityTest extends CardTestPlayerBase {
 
     @Test
     public void chaosExilesFlyingCreatureAndOwnerCastsItForTwo() {
+        setStrictChooseMode(true);
         addPlane(playerA, Planes.PLANE_THE_WINDY_CITY);
         addCard(Zone.BATTLEFIELD, playerB, "Serra Angel");
         addCard(Zone.BATTLEFIELD, playerB, "Wastes", 2);
