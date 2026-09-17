@@ -1,6 +1,5 @@
 package mage.cards.p;
 
-import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.MillCardsEachPlayerEffect;
@@ -12,10 +11,12 @@ import mage.cards.CardSetInfo;
 import mage.constants.*;
 import mage.filter.StaticFilters;
 import mage.game.Game;
+import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.TargetCard;
 import mage.target.common.TargetCardInGraveyard;
 import mage.target.targetpointer.FixedTarget;
+import mage.util.CardUtil;
 
 import java.util.UUID;
 
@@ -71,16 +72,24 @@ class PathOfTheSchemerEffect extends OneShotEffect {
         TargetCard target = new TargetCardInGraveyard(StaticFilters.FILTER_CARD_CREATURE);
         target.withNotTarget(true);
         if (!target.canChoose(source.getControllerId(), source, game)) {
+            return true;
+        }
+        if (!player.choose(Outcome.PutCreatureInPlay, target, source, game)) {
             return false;
         }
-        player.choose(Outcome.PutCreatureInPlay, target, source, game);
         Card card = game.getCard(target.getFirstTarget());
         if (card == null) {
             return false;
         }
+        if (!player.moveCards(card, Zone.BATTLEFIELD, source, game)) {
+            return false;
+        }
+        Permanent permanent = CardUtil.getPermanentFromCardPutToBattlefield(card, game);
+        if (permanent == null) {
+            return false;
+        }
         game.addEffect(new AddCardTypeTargetEffect(Duration.Custom, CardType.ARTIFACT)
-                .setTargetPointer(new FixedTarget(new MageObjectReference(card, game, 1))), source);
-        player.moveCards(card, Zone.BATTLEFIELD, source, game);
+                .setTargetPointer(new FixedTarget(permanent, game)), source);
         return true;
     }
 }

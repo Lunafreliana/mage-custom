@@ -35,12 +35,10 @@ public class WillOfThePlaneswalkersEffect extends OneShotEffect {
         vote.doVotes(source, game);
         int planeswalkCount = vote.getVoteCount(true);
         int chaosCount = vote.getVoteCount(false);
-        // TODO: Implement when planes have been refactored
         if (planeswalkCount > chaosCount) {
-            // planeswalk to next plane
+            return new PlaneswalkEffect(false).apply(game, source);
         } else {
-            // chaos ensues
+            return new ChaosEnsuesEffect().apply(game, source);
         }
-        return true;
     }
 }
