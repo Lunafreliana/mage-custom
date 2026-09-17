@@ -107,12 +107,14 @@ class DackFaydenHelpingHandEffect extends OneShotEffect {
             }
         }
         controller.revealCards(source, revealed, game);
+        List<UUID> creatureIds = new ArrayList<>();
+        creatureCards.forEach(card -> creatureIds.add(card.getId()));
         controller.moveCards(creatureCards, Zone.BATTLEFIELD, source, game, false, false, true, null);
         controller.shuffleLibrary(source, game);
 
         List<Permanent> permanents = new ArrayList<>();
-        for (Card card : creatureCards) {
-            Permanent permanent = game.getPermanent(card.getId());
+        for (UUID creatureId : creatureIds) {
+            Permanent permanent = game.getPermanent(creatureId);
             if (permanent != null) {
                 permanents.add(permanent);
                 game.addEffect(new GoadTargetEffect(Duration.EndOfGame)
@@ -122,16 +124,23 @@ class DackFaydenHelpingHandEffect extends OneShotEffect {
 
         Set<UUID> chosenOpponents = new LinkedHashSet<>();
         for (Permanent permanent : permanents) {
-            FilterOpponent filter = new FilterOpponent("a different opponent to gain control of "
-                    + permanent.getLogName());
-            chosenOpponents.forEach(playerId -> filter.add(Predicates.not(new PlayerIdPredicate(playerId))));
-            TargetPlayer target = new TargetPlayer(1, 1, true, filter);
-            if (!controller.chooseTarget(outcome, target, source, game)) {
-                continue;
-            }
-            UUID opponentId = target.getFirstTarget();
-            if (opponentId == null) {
-                continue;
+            Set<UUID> availableOpponents = new LinkedHashSet<>(game.getOpponents(controller.getId()));
+            availableOpponents.removeAll(chosenOpponents);
+            UUID opponentId;
+            if (availableOpponents.size() == 1) {
+                opponentId = availableOpponents.iterator().next();
+            } else {
+                FilterOpponent filter = new FilterOpponent("a different opponent to gain control of "
+                        + permanent.getLogName());
+                chosenOpponents.forEach(playerId -> filter.add(Predicates.not(new PlayerIdPredicate(playerId))));
+                TargetPlayer target = new TargetPlayer(1, 1, true, filter);
+                if (!controller.chooseTarget(outcome, target, source, game)) {
+                    continue;
+                }
+                opponentId = target.getFirstTarget();
+                if (opponentId == null) {
+                    continue;
+                }
             }
             chosenOpponents.add(opponentId);
             ContinuousEffect effect = new GainControlTargetEffect(Duration.EndOfGame, opponentId);
