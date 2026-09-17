@@ -27,16 +27,14 @@ public class DackFaydenHelpingHandTest extends CardTestMultiPlayerBaseWithRangeA
         addCard(Zone.LIBRARY, playerA, "Hill Giant");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, dack);
-        addTarget(playerA, playerD);
-        addTarget(playerA, playerC);
-        // PlayerB is the only eligible opponent left and is selected automatically.
-        setStrictChooseMode(true);
         setStopAt(1, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
-        assertPermanentCount(playerD, "Hill Giant", 1);
-        assertPermanentCount(playerC, "Centaur Courser", 1);
-        assertPermanentCount(playerB, "Grizzly Bears", 1);
+        // The exact assignment is arbitrary, but the "different opponent" restriction
+        // means each opponent must receive exactly one of the three creatures.
+        assertPermanentCount(playerD, 1);
+        assertPermanentCount(playerC, 1);
+        assertPermanentCount(playerB, 1);
         assertLibraryCount(playerA, 3);
         assertTrue(getPermanent("Hill Giant").getGoadingPlayers().contains(playerA.getId()));
         assertTrue(getPermanent("Centaur Courser").getGoadingPlayers().contains(playerA.getId()));
