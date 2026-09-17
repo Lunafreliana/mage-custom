@@ -1,7 +1,6 @@
 package mage.cards.w;
 
 import mage.MageInt;
-import mage.abilities.Ability;
 import mage.abilities.common.EntersBattlefieldTriggeredAbility;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.common.delayed.ReflexiveTriggeredAbility;
@@ -48,7 +47,7 @@ public final class WinterTormentedLoner extends CardImpl {
         this.toughness = new MageInt(3);
 
         // When Winter enters, you may sacrifice a creature or planeswalker. When you do, each opponent sacrifices a creature of their choice.
-        Ability reflexiveAbility = new ReflexiveTriggeredAbility(
+        ReflexiveTriggeredAbility reflexiveAbility = new ReflexiveTriggeredAbility(
                 new SacrificeOpponentsEffect(StaticFilters.FILTER_PERMANENT_CREATURE), false
         );
         this.addAbility(new EntersBattlefieldTriggeredAbility(new DoWhenCostPaid(
