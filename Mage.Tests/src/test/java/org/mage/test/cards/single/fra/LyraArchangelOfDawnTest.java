@@ -38,6 +38,7 @@ public class LyraArchangelOfDawnTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Plains");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Heroes' Reunion");
+        addTarget(playerA, playerA);
 
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
