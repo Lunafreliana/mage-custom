@@ -2,14 +2,15 @@ package mage.cards.y;
 
 import java.util.UUID;
 import mage.MageInt;
+import mage.constants.SubType;
+import mage.constants.SuperType;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
-import mage.constants.SubType;
-import mage.constants.SuperType;
 
 /**
- * @author TheElk801
+ *
+ * @author muz
  */
 public final class YargleGoliathOfOtaria extends CardImpl {
 
