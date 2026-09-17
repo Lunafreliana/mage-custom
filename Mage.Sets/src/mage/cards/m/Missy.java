@@ -5,6 +5,7 @@ import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.common.DiesCreatureTriggeredAbility;
 import mage.abilities.effects.OneShotEffect;
+import mage.abilities.effects.common.ChaosEnsuesEffect;
 import mage.abilities.effects.common.FaceVillainousChoiceOpponentsEffect;
 import mage.abilities.effects.common.continuous.BecomesCybermanEffect;
 import mage.abilities.triggers.BeginningOfEndStepTriggeredAbility;
@@ -135,8 +136,6 @@ class MissySecondChoice extends VillainousChoice {
             return false;
         }
         controller.drawCards(1, source, game);
-        // Plane cards currently model their chaos abilities inside planar-die
-        // roll abilities, so XMage has no general chaos-ensues event to fire.
-        return true;
+        return new ChaosEnsuesEffect().apply(game, source);
     }
 }
