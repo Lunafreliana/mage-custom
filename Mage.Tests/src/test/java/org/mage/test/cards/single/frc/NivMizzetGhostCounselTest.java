@@ -15,6 +15,7 @@ public class NivMizzetGhostCounselTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Chaplain's Blessing");
         addCard(Zone.BATTLEFIELD, playerA, "Plains");
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears", 5);
+        skipInitShuffling();
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Chaplain's Blessing");
         setChoice(playerA, true); // Pay 5 life and draw five cards.
@@ -47,6 +48,7 @@ public class NivMizzetGhostCounselTest extends CardTestPlayerBase {
     public void tapAbilityDrainsAndTriggersCardDraw() {
         addCard(Zone.BATTLEFIELD, playerA, nivMizzet);
         addCard(Zone.LIBRARY, playerA, "Grizzly Bears");
+        skipInitShuffling();
 
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{T}: Each opponent loses 1 life");
         setChoice(playerA, true); // Pay the 1 life gained and draw a card.
