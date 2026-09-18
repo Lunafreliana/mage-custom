@@ -7,14 +7,15 @@ import mage.abilities.common.EntersBattlefieldControlledTriggeredAbility;
 import mage.abilities.condition.Condition;
 import mage.abilities.costs.common.TapSourceCost;
 import mage.abilities.common.ActivateIfConditionActivatedAbility;
-import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.CreateTokenEffect;
+import mage.abilities.effects.common.FightTargetsEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
-import mage.constants.Outcome;
+import mage.constants.SetTargetPointer;
 import mage.constants.TargetController;
 import mage.constants.WatcherScope;
+import mage.constants.Zone;
 import mage.filter.FilterPermanent;
 import mage.filter.StaticFilters;
 import mage.filter.common.FilterCreaturePermanent;
@@ -50,7 +51,11 @@ public final class BoxingRing extends CardImpl {
 
         // Whenever a creature you control enters, it fights up to one target creature you don't control with the same mana value.
         Ability ability = new EntersBattlefieldControlledTriggeredAbility(
-                new BoxingRingFightEffect(), StaticFilters.FILTER_PERMANENT_A_CREATURE
+                Zone.BATTLEFIELD,
+                new FightTargetsEffect(false).setText(
+                        "it fights up to one target creature you don't control with the same mana value"
+                ), StaticFilters.FILTER_PERMANENT_A_CREATURE,
+                false, SetTargetPointer.PERMANENT
         );
         ability.addTarget(new TargetPermanent(0, 1, filter));
         this.addAbility(ability);
@@ -81,30 +86,6 @@ enum BoxingRingPredicate implements ObjectSourcePlayerPredicate<Permanent> {
                 .map(MageObject::getManaValue)
                 .filter(x -> x == input.getObject().getManaValue())
                 .isPresent();
-    }
-}
-
-class BoxingRingFightEffect extends OneShotEffect {
-
-    BoxingRingFightEffect() {
-        super(Outcome.Benefit);
-        staticText = "it fights up to one target creature you don't control with the same mana value";
-    }
-
-    private BoxingRingFightEffect(final BoxingRingFightEffect effect) {
-        super(effect);
-    }
-
-    @Override
-    public BoxingRingFightEffect copy() {
-        return new BoxingRingFightEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        Permanent permanent = (Permanent) getValue("permanentEnteringBattlefield");
-        Permanent creature = game.getPermanent(getTargetPointer().getFirst(game, source));
-        return permanent != null && creature != null && permanent.fight(creature, source, game);
     }
 }
 
