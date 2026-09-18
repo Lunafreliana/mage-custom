@@ -282,16 +282,19 @@ public abstract class TokenImpl extends MageObjectImpl implements Token {
             Token token = entry.getKey();
             int amount = entry.getValue();
 
-            // check if token needs to be attached to a specific object (e.g. Estrid the Masked, Role Token)
-            Permanent permanentAttachedTo;
+            // The attachment may be a permanent or, for an Aura with enchant player, a player.
+            Permanent permanentAttachedTo = attachedTo == null ? null : game.getPermanent(attachedTo);
+            Player playerAttachedTo = attachedTo == null ? null : game.getPlayer(attachedTo);
             if (attachedTo != null) {
-                permanentAttachedTo = game.getPermanent(attachedTo);
-                if (permanentAttachedTo == null || permanentAttachedTo.cantBeAttachedBy(token, source, game, true)) {
-                    game.informPlayers(token.getName() + " will not be created as it cannot be attached to the chosen permanent");
+                if (permanentAttachedTo != null) {
+                    if (permanentAttachedTo.cantBeAttachedBy(token, source, game, true)) {
+                        game.informPlayers(token.getName() + " will not be created as it cannot be attached to the chosen permanent");
+                        continue;
+                    }
+                } else if (playerAttachedTo == null || !token.getSubtype().contains(SubType.AURA)) {
+                    game.informPlayers(token.getName() + " will not be created as it cannot be attached to the chosen object");
                     continue;
                 }
-            } else {
-                permanentAttachedTo = null;
             }
 
             // choose token's set code due source
@@ -326,7 +329,7 @@ public abstract class TokenImpl extends MageObjectImpl implements Token {
 
                 ZoneChangeEvent emptyEvent = new ZoneChangeEvent(newPermanent, source, newPermanent.getControllerId(), Zone.OUTSIDE, Zone.BATTLEFIELD);
                 // tokens zcc must simulate card's zcc to keep copied card/spell settings
-                // (example: etb's kicker ability of copied creature spell, see tests with Deathforge Shaman)
+                // (example: ETB's kicker ability of copied creature spell, see tests with Deathforge Shaman)
                 newPermanent.updateZoneChangeCounter(game, emptyEvent);
 
                 if (source != null) {
@@ -445,6 +448,8 @@ public abstract class TokenImpl extends MageObjectImpl implements Token {
                     } else {
                         permanentAttachedTo.addAttachment(permanent.getId(), source, game);
                     }
+                } else if (playerAttachedTo != null && !isBestow && permanent.hasSubtype(SubType.AURA, game)) {
+                    playerAttachedTo.addAttachment(permanent.getId(), source, game);
                 }
 
                 // must attack
