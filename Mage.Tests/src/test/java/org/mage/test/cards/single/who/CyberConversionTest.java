@@ -48,8 +48,12 @@ public class CyberConversionTest extends CardTestPlayerBase {
                 TokenRepository.XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN, permanent.getId());
         Assert.assertNotNull("Cyberman reminder image must be registered", reminder);
         Assert.assertEquals("https://api.scryfall.com/cards/twho/24/en?format=image", reminder.getDownloadUrl());
+        Assert.assertEquals(TokenRepository.CYBERMAN_REMINDER_SET_CODE, reminder.getSetCode());
+        Assert.assertEquals(reminder.getDownloadUrl(),
+                TokenRepository.instance.prepareScryfallDownloadList().get("WHO/Cyberman/1"));
         Assert.assertEquals("Cyberman", permanent.getImageFileName());
-        Assert.assertEquals(TokenRepository.XMAGE_TOKENS_SET_CODE, permanent.getExpansionSetCode());
+        Assert.assertEquals(TokenRepository.CYBERMAN_REMINDER_SET_CODE, permanent.getExpansionSetCode());
+        Assert.assertEquals("0", permanent.getCardNumber());
         Assert.assertEquals(Integer.valueOf(1), permanent.getImageNumber());
 
         TokenInfo normalFaceDown = TokenRepository.instance.findPreferredTokenInfoForXmage(
@@ -67,7 +71,8 @@ public class CyberConversionTest extends CardTestPlayerBase {
         Assert.assertFalse("The view should not show the original Angel subtype",
                 view.getSubTypes().contains(SubType.ANGEL));
         Assert.assertEquals("Cyberman", view.getImageFileName());
-        Assert.assertEquals(TokenRepository.XMAGE_TOKENS_SET_CODE, view.getExpansionSetCode());
+        Assert.assertEquals(TokenRepository.CYBERMAN_REMINDER_SET_CODE, view.getExpansionSetCode());
+        Assert.assertEquals("0", view.getCardNumber());
         Assert.assertEquals(1, view.getImageNumber());
     }
 

@@ -25,6 +25,7 @@ public enum TokenRepository {
     instance;
 
     public static final String XMAGE_TOKENS_SET_CODE = "XMAGE";
+    public static final String CYBERMAN_REMINDER_SET_CODE = "WHO";
 
     // All possible image names. Used for:
     // - image name from tok/xmage folder
@@ -273,7 +274,9 @@ public enum TokenRepository {
         res.add(createXmageToken(XMAGE_IMAGE_NAME_FACE_DOWN_MANUAL, 1, "https://upload.wikimedia.org/wikipedia/en/a/aa/Magic_the_gathering-card_back.jpg"));
 
         // Cyberman reminder card (Doctor Who Tokens, TWHO #24)
-        res.add(createXmageToken(XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN, 1, "https://api.scryfall.com/cards/twho/24/en?format=image"));
+        res.add(new TokenInfo(TokenType.XMAGE, XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN,
+                CYBERMAN_REMINDER_SET_CODE, 1)
+                .withDownloadUrl("https://api.scryfall.com/cards/twho/24/en?format=image"));
 
         // Copy
         // https://scryfall.com/search?q=include%3Aextras+unique%3Aprints+type%3Atoken+copy&unique=cards&as=grid&order=name
