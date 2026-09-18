@@ -7,15 +7,15 @@ import mage.constants.SetType;
  * Technical home for original custom cards without an official printing.
  * Add SetCardInfo entries when the first CLUN cards are implemented.
  */
-public final class Clun extends ExpansionSet {
+public final class CLUN extends ExpansionSet {
 
-    private static final Clun instance = new Clun();
+    private static final CLUN instance = new CLUN();
 
-    public static Clun getInstance() {
+    public static CLUN getInstance() {
         return instance;
     }
 
-    private Clun() {
+    private CLUN() {
         // Technical registration date; CLUN has no official release date.
         super("CLUN", "CLUN", ExpansionSet.buildDate(2026, 9, 18), SetType.CUSTOM_SET);
         this.hasBoosters = false;

@@ -4,10 +4,10 @@ This guide supplements [CARD_IMPLEMENTATION_LLM.md](CARD_IMPLEMENTATION_LLM.md),
 
 ## Set identity and first-card workflow
 
-- The set skeleton is [`Mage.Sets/src/mage/sets/Clun.java`](../Mage.Sets/src/mage/sets/Clun.java). Its displayed name and set code are both `CLUN`; it uses `SetType.CUSTOM_SET`, disables boosters and basic lands, and intentionally has **no card entries yet**. The date in its constructor is only a technical registration date. An empty skeleton does not create playable cards; whether it appears in a client set list depends on how that view filters empty sets.
+- The set skeleton is [`Mage.Sets/src/mage/sets/CLUN.java`](../Mage.Sets/src/mage/sets/CLUN.java). Its displayed name and set code are both `CLUN`; it uses `SetType.CUSTOM_SET`, disables boosters and basic lands, and intentionally has **no card entries yet**. The date in its constructor is only a technical registration date. An empty skeleton does not create playable cards; whether it appears in a client set list depends on how that view filters empty sets.
 - For each original card, first obtain the creator's exact name, mana cost, type line, rules text, power/toughness or loyalty, intended color identity, and any custom-mechanic definitions. Do not invent missing card text, an official Oracle entry, official rulings, Scryfall IDs, or Release Notes for cards that have none. Research the current Comprehensive Rules and analogous modern XMage behavior for existing Magic mechanics; document any original house-rule decisions explicitly.
 - Implement the card in `Mage.Sets/src/mage/cards/<first-letter>/<JavaClassName>.java` using the existing `CardImpl`/`CardSetInfo` constructor and copy pattern described in the main guide. Check for a class/name collision first. Do not create a placeholder card just to make the set nonempty.
-- Register every intended CLUN printing in the `Clun` constructor using `cards.add(new SetCardInfo(...))`. Add `import mage.constants.Rarity;` when adding entries. Example for a **hypothetical** card, only after implementing its real class:
+- Register every intended CLUN printing in the `CLUN` constructor using `cards.add(new SetCardInfo(...))`. Add `import mage.constants.Rarity;` when adding entries. Example for a **hypothetical** card, only after implementing its real class:
 
 ```java
 cards.add(new SetCardInfo("Example Custom Card", 1, Rarity.RARE,
@@ -20,7 +20,7 @@ cards.add(new SetCardInfo("Example Custom Card", 1, Rarity.RARE,
 ## Artwork and visibility
 
 - CLUN artwork has no automatic official Scryfall/Gatherer source. Provide artwork through the existing client image-download/custom-image mechanism and validate the actual lookup key and missing-image path in the running client. Do not invent an image URL or assume that registering a set automatically supplies images; do not overwrite shared `Face Down` artwork to represent a custom card.
-- A card is usable only after its implemented class and `SetCardInfo` are available in the built server/client card data. Adding the empty `Clun` set alone does not make a new card searchable or playable.
+- A card is usable only after its implemented class and `SetCardInfo` are available in the built server/client card data. Adding the empty `CLUN` set alone does not make a new card searchable or playable.
 
 ## Tests and delivery
 
