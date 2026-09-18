@@ -2,6 +2,7 @@ package org.mage.test.cards.single.clun;
 
 import mage.constants.PhaseStep;
 import mage.constants.Zone;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestCommander4Players;
 
@@ -24,6 +25,8 @@ public class VulpesCursedTailTest extends CardTestCommander4Players {
 
         assertPermanentCount(playerA, vulpes, 1);
         assertPermanentCount(playerA, "Tailcurse", 1);
+        Assert.assertEquals("Tailcurse must enchant the targeted player", playerB.getId(),
+                getPermanent("Tailcurse", playerA.getId()).getAttachedTo());
     }
 
     @Test
