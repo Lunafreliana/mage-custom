@@ -54,6 +54,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * Original custom card for CLUN.
@@ -250,7 +251,9 @@ class HarumaRevealedHandWatcher extends Watcher {
     HarumaRevealedHandWatcher() { super(WatcherScope.CARD); }
     @Override public void watch(GameEvent event, Game game) {
         if (event.getType() == GameEvent.EventType.HAND_REVEALED && event.getTargetId() != null && event.getData() != null) {
-            names.computeIfAbsent(event.getTargetId(), x -> new LinkedHashSet<>()).addAll(Arrays.asList(event.getData().split("\\0", -1)));
+            names.computeIfAbsent(event.getTargetId(), x -> new LinkedHashSet<>()).addAll(Arrays.asList(
+                    event.getData().split(Pattern.quote("\0"), -1)
+            ));
         }
     }
     @Override public void reset() { super.reset(); names.clear(); }
