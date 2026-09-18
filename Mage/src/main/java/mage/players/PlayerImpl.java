@@ -1989,6 +1989,17 @@ public abstract class PlayerImpl implements Player, Serializable {
         } else {
             game.getState().getRevealed().update(CardUtil.createObjectRelatedWindowTitle(source, game, titleSuffix), cards);
         }
+        // Publish hand reveals for cards that care about information exposed from a hand.
+        game.getPlayers().forEach((handOwnerId, handOwner) -> {
+            String names = cards.getCards(game).stream()
+                    .filter(card -> handOwner.getHand().contains(card.getId()))
+                    .map(Card::getName)
+                    .collect(java.util.stream.Collectors.joining("\0"));
+            if (!names.isEmpty()) {
+                game.fireEvent(GameEvent.getEvent(GameEvent.EventType.HAND_REVEALED,
+                        handOwnerId, source, null, names, names.split("\0", -1).length));
+            }
+        });
         if (postToLog && !game.isSimulation()) {
             StringBuilder sb = new StringBuilder(getLogName()).append(" reveals ");
             int current = 0;
@@ -2023,6 +2034,16 @@ public abstract class PlayerImpl implements Player, Serializable {
     @Override
     public void lookAtCards(Ability source, String titleSuffix, Cards cards, Game game) {
         game.getState().getLookedAt(this.playerId).add(CardUtil.createObjectRelatedWindowTitle(source, game, titleSuffix), cards);
+        game.getPlayers().forEach((handOwnerId, handOwner) -> {
+            String names = cards.getCards(game).stream()
+                    .filter(card -> handOwner.getHand().contains(card.getId()))
+                    .map(Card::getName)
+                    .collect(java.util.stream.Collectors.joining("\0"));
+            if (!names.isEmpty()) {
+                game.fireEvent(GameEvent.getEvent(GameEvent.EventType.HAND_LOOKED_AT,
+                        handOwnerId, source, this.playerId, names, names.split("\0", -1).length));
+            }
+        });
         game.fireUpdatePlayersEvent();
     }
 

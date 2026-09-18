@@ -178,6 +178,7 @@ public enum CounterType {
     PARALYZATION("paralyzation"),
     PETAL("petal"),
     PETRIFICATION("petrification"),
+    PERCEPTION("perception"),
     PHYLACTERY("phylactery"),
     PHYRESIS("phyresis"),
     PIN("pin"),
