@@ -28,11 +28,16 @@ public class VulpesCursedTailTest extends CardTestCommander4Players {
 
     @Test
     public void simultaneousCombatDamageIsCombinedAndRewardsEachEligiblePlayerOnce() {
-        addCard(Zone.BATTLEFIELD, playerA, vulpes);
+        addCard(Zone.HAND, playerA, vulpes);
+        addCard(Zone.BATTLEFIELD, playerA, "Tropical Island");
+        addCard(Zone.BATTLEFIELD, playerA, "Volcanic Island");
+        addCard(Zone.BATTLEFIELD, playerA, "Taiga");
         addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
         addCard(Zone.BATTLEFIELD, playerB, "Hill Giant");
 
-        // Vulpes's entry trigger targets D. Both of B's creatures deal damage simultaneously.
+        // A casts Vulpes in turn 1 and attaches Tailcurse to D.
+        // B takes turn 4 in this four-player test and deals 5 simultaneous combat damage to D.
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, vulpes);
         addTarget(playerA, playerD);
         attack(4, playerB, "Grizzly Bears", playerD);
         attack(4, playerB, "Hill Giant", playerD);
@@ -50,11 +55,11 @@ public class VulpesCursedTailTest extends CardTestCommander4Players {
     @Test
     public void curseControllerIsNotRewardedTwiceForOwnDamage() {
         addCard(Zone.BATTLEFIELD, playerA, vulpes);
-        addTarget(playerA, playerB);
         attack(1, playerA, vulpes, playerB);
 
-        // Put the Tailcurse from the attack trigger on C so only B's Tailcurse sees the damage.
-        addTarget(playerA, playerC);
+        // Only the attack trigger fires for a creature placed directly on the battlefield.
+        // Attach Tailcurse to B before Vulpes deals 3 combat damage to B.
+        addTarget(playerA, playerB);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
