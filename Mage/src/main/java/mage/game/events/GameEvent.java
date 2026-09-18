@@ -81,6 +81,8 @@ public class GameEvent implements Serializable {
         CONNIVE, // targetId is conniving permanent, playerId is its controller
         ECHO_PAID,
         MIRACLE_CARD_REVEALED,
+        /* targetId is the owner of the hand; playerId is the player looking (null for a public reveal); data contains card names separated by a NUL. */
+        HAND_LOOKED_AT, HAND_REVEALED,
         /* MADNESS_CARD_EXILED,
          targetId    id of the card with madness
          sourceId    original id of the madness ability
