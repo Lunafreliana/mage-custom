@@ -16,7 +16,7 @@ public class PathOfThePyromancerTest extends CardTestPlayerBase {
     @Test
     public void discardsHandAddsManaAndDrawsCards() {
         gameOptions.planeChase = true;
-        gameOptions.sharedPlanarDeck = Arrays.asList(Planes.PLANE_AKOUM, Planes.PLANE_PANOPTICON);
+        gameOptions.sharedPlanarDeck = Arrays.asList(Planes.PLANE_AKOUM, Planes.PLANE_TOWASHI);
         addCard(Zone.HAND, playerA, path);
         addCard(Zone.HAND, playerA, "Grizzly Bears");
         addCard(Zone.HAND, playerA, "Silvercoat Lion");
@@ -27,6 +27,7 @@ public class PathOfThePyromancerTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, path);
         setChoice(playerA, true); // Planeswalk
         setChoice(playerB, true); // Planeswalk
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         checkManaPool("mana from two discarded cards", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "R", 2);
 
         setStrictChooseMode(true);
@@ -35,7 +36,7 @@ public class PathOfThePyromancerTest extends CardTestPlayerBase {
 
         assertHandCount(playerA, 3);
         assertGraveyardCount(playerA, 3);
-        Assert.assertEquals("Plane - Panopticon", currentGame.getState().getFaceUpPlanes().get(0).getName());
+        Assert.assertEquals("Plane - Towashi", currentGame.getState().getFaceUpPlanes().get(0).getName());
     }
 
     @Test
@@ -48,6 +49,7 @@ public class PathOfThePyromancerTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, path);
         setChoice(playerA, false); // Chaos
         setChoice(playerB, false); // Chaos
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         checkManaPool("no mana from no discarded cards", 1, PhaseStep.PRECOMBAT_MAIN, playerA, "R", 0);
 
         setStrictChooseMode(true);
