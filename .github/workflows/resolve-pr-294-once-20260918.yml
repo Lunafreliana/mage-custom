@@ -1,0 +1,58 @@
+name: Resolve PR 294 conflict once
+
+on:
+  push:
+    branches:
+      - automation/resolve-pr-294-20260918
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Merge custom into PR 294, preserving custom registrations
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin custom codex/implement-path-of-the-pyromancer
+          base=8cb5cce043357d2af214452d937c54081494a772
+          head=a41715ce36ea9993bcd48e60cc3635bd1ef35bf6
+          test "$(git rev-parse origin/custom)" = "$base"
+          test "$(git rev-parse origin/codex/implement-path-of-the-pyromancer)" = "$head"
+          git switch --detach "$head"
+          if git merge --no-commit --no-ff "$base"; then
+            echo 'Merge applied automatically.'
+          else
+            conflicts="$(git diff --name-only --diff-filter=U)"
+            test "$conflicts" = 'Mage.Sets/src/mage/sets/MarchOfTheMachineCommander.java' || { echo "Unexpected conflicts: $conflicts"; exit 1; }
+          fi
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+          base = '8cb5cce043357d2af214452d937c54081494a772'
+          path = Path('Mage.Sets/src/mage/sets/MarchOfTheMachineCommander.java')
+          original = subprocess.check_output(['git', 'show', f'{base}:{path}'], text=True)
+          old = '//        cards.add(new SetCardInfo("Path of the Pyromancer", 34, Rarity.RARE, mage.cards.p.PathOfThePyromancer.class));'
+          new = '        cards.add(new SetCardInfo("Path of the Pyromancer", 34, Rarity.RARE, mage.cards.p.PathOfThePyromancer.class));'
+          assert original.count(old) == 1, 'Expected exactly one disabled Pyromancer entry'
+          assert '        cards.add(new SetCardInfo("Path of the Ghosthunter", 18,' in original, 'Current custom Ghosthunter registration missing'
+          assert '        cards.add(new SetCardInfo("Path of the Animist", 38,' in original, 'Current custom Animist registration missing'
+          assert '        cards.add(new SetCardInfo("Path of the Schemer", 28,' in original, 'Current custom Schemer registration missing'
+          path.write_text(original.replace(old, new, 1))
+          PY
+          git add Mage.Sets/src/mage/sets/MarchOfTheMachineCommander.java
+          test -z "$(git diff --name-only --diff-filter=U)"
+          test "$(git hash-object Mage.Tests/src/test/java/org/mage/test/cards/single/moc/PathOfThePyromancerTest.java)" = 68a92c23cb7ae6f4d31001f69a234f2e4c90dd37
+          git commit -m 'Resolve PR #294 conflict with custom (preserve registrations and enable Pyromancer)'
+          changed="$(git diff --name-only "$base" HEAD)"
+          expected="$(printf '%s\n' 'Mage.Sets/src/mage/sets/MarchOfTheMachineCommander.java' 'Mage.Tests/src/test/java/org/mage/test/cards/single/moc/PathOfThePyromancerTest.java')"
+          test "$changed" = "$expected" || { echo "Unexpected changes against custom: $changed"; exit 1; }
+          git push origin HEAD:refs/heads/codex/implement-path-of-the-pyromancer
