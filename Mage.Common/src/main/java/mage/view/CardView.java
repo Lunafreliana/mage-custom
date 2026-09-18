@@ -1109,7 +1109,10 @@ public class CardView extends SimpleCardView {
             String imageFileName = imageSourceCard.getImageFileName();
             Integer imageNumber = imageSourceCard.getImageNumber();
             boolean imageUsesVariousArt = imageSourceCard.getUsesVariousArt();
-            if (imageSetCode.equals(TokenRepository.XMAGE_TOKENS_SET_CODE)) {
+            if (imageSetCode.equals(TokenRepository.XMAGE_TOKENS_SET_CODE)
+                    || (isFaceDown
+                    && imageSetCode.equals(TokenRepository.CYBERMAN_REMINDER_SET_CODE)
+                    && imageFileName.equals(TokenRepository.XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN))) {
                 this.expansionSetCode = imageSetCode;
                 this.cardNumber = imageCardNumber;
                 this.imageFileName = imageFileName;

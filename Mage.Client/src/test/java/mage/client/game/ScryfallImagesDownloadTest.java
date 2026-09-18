@@ -1,6 +1,8 @@
 package mage.client.game;
 
 import mage.cards.decks.PlanarDeckCard;
+import mage.cards.repository.TokenInfo;
+import mage.cards.repository.TokenRepository;
 import mage.constants.Planes;
 import mage.game.command.PlanarCard;
 import mage.game.command.PlanarCardRegistry;
@@ -122,6 +124,25 @@ public class ScryfallImagesDownloadTest {
                 CardImageUtils.buildImagePathToCardView(new CardView(carrier)));
         Assert.assertTrue(CardImageUtils.buildImagePathToCardView(new CardView(carrier))
                 .contains(java.io.File.separator + "TOK"));
+    }
+
+    @Test
+    public void test_CybermanReminderUsesWhoTokenImage() throws Exception {
+        TokenInfo reminder = TokenRepository.instance.findPreferredTokenInfoForXmage(
+                TokenRepository.XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN, null);
+        Assert.assertNotNull(reminder);
+        Assert.assertEquals(TokenRepository.CYBERMAN_REMINDER_SET_CODE, reminder.getSetCode());
+
+        CardDownloadData token = new CardDownloadData(
+                reminder.getName(), reminder.getSetCode(), "0", false, reminder.getImageNumber());
+        token.setToken(true);
+        CardImageSource imageSource = ScryfallImageSource.getInstance();
+        Assert.assertTrue(imageSource.isTokenImageProvided(
+                reminder.getSetCode(), reminder.getName(), reminder.getImageNumber()));
+        Assert.assertEquals(reminder.getDownloadUrl(), imageSource.generateTokenUrl(token).getBaseUrl());
+        Assert.assertEquals(CardImageUtils.buildImagePathToTokens() + "WHO"
+                        + java.io.File.separator + "Cyberman 1.full.jpg",
+                CardImageUtils.buildImagePathToCardOrToken(token));
     }
 
     @Test

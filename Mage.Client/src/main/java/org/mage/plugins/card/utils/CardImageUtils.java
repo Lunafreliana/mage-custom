@@ -155,11 +155,16 @@ public final class CardImageUtils {
 
         boolean isPlanarCard = card.getCardTypes().contains(CardType.PLANE)
                 || card.getCardTypes().contains(CardType.PHENOMENON);
+        boolean isCybermanReminder = card.isFaceDown()
+                && card.getExpansionSetCode().equals(TokenRepository.CYBERMAN_REMINDER_SET_CODE)
+                && imageFileName.equals(TokenRepository.XMAGE_IMAGE_NAME_FACE_DOWN_CYBERMAN);
         boolean isTokenRepository = isPlanarCard
                 || card.getMageObjectType().isUseTokensRepository()
-                || card.getExpansionSetCode().equals(TokenRepository.XMAGE_TOKENS_SET_CODE);
-        // if token from a card then must use card repository instead
-        if (isTokenRepository && !isPlanarCard && !card.getCardNumber().isEmpty()) {
+                || card.getExpansionSetCode().equals(TokenRepository.XMAGE_TOKENS_SET_CODE)
+                || isCybermanReminder;
+        // A nonempty, nonzero collector number identifies a regular card, not a token.
+        if (isTokenRepository && !isPlanarCard && !card.getCardNumber().isEmpty()
+                && !"0".equals(card.getCardNumber())) {
             isTokenRepository = false;
         }
 
