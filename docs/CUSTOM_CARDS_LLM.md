@@ -4,7 +4,7 @@ This guide supplements [CARD_IMPLEMENTATION_LLM.md](CARD_IMPLEMENTATION_LLM.md),
 
 ## Set identity and first-card workflow
 
-- The set skeleton is [`Mage.Sets/src/mage/sets/CLUN.java`](../Mage.Sets/src/mage/sets/CLUN.java). Its displayed name and set code are both `CLUN`; it uses `SetType.CUSTOM_SET`, disables boosters and basic lands, and intentionally has **no card entries yet**. The date in its constructor is only a technical registration date. An empty skeleton does not create playable cards; whether it appears in a client set list depends on how that view filters empty sets.
+- The set registry is [`Mage.Sets/src/mage/sets/CLUN.java`](../Mage.Sets/src/mage/sets/CLUN.java). Its displayed name and set code are both `CLUN`; it uses `SetType.CUSTOM_SET` and disables boosters and basic lands. The date in its constructor is only a technical registration date. A set entry does not become playable until its corresponding card class is also available in the built card data.
 - For each original card, first obtain the creator's exact name, mana cost, type line, rules text, power/toughness or loyalty, intended color identity, and any custom-mechanic definitions. Do not invent missing card text, an official Oracle entry, official rulings, Scryfall IDs, or Release Notes for cards that have none. Research the current Comprehensive Rules and analogous modern XMage behavior for existing Magic mechanics; document any original house-rule decisions explicitly.
 - Implement the card in `Mage.Sets/src/mage/cards/<first-letter>/<JavaClassName>.java` using the existing `CardImpl`/`CardSetInfo` constructor and copy pattern described in the main guide. Check for a class/name collision first. Do not create a placeholder card just to make the set nonempty.
 - Register every intended CLUN printing in the `CLUN` constructor using `cards.add(new SetCardInfo(...))`. Add `import mage.constants.Rarity;` when adding entries. Example for a **hypothetical** card, only after implementing its real class:
@@ -24,5 +24,5 @@ cards.add(new SetCardInfo("Example Custom Card", 1, Rarity.RARE,
 
 ## Tests and delivery
 
-- Add focused tests under `Mage.Tests/src/test/java/org/mage/test/cards` for each new card's characteristics, choices, rules interactions, and copy/zone behavior as appropriate. Check that the card is discoverable from its `CLUN` registration and that the intended art lookup works when artwork is part of the task. The set skeleton has a metadata/empty-list test in `ClunSetTest`.
+- Add focused tests under `Mage.Tests/src/test/java/org/mage/test/cards` for each new card's characteristics, choices, rules interactions, and copy/zone behavior as appropriate. Check that the card is discoverable from its `CLUN` registration and that the intended art lookup works when artwork is part of the task. Set identity and registration are covered in `ClunSetTest`.
 - Keep changes scoped to CLUN and the relevant cards. Follow `AGENTS.md`: GitHub Actions is the authoritative build-and-test environment; do not download a new Java/Maven toolchain just to run local validation. Report the actual CI result rather than claiming unrun tests passed.
