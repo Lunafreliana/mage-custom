@@ -1,7 +1,5 @@
 package mage.cards.h;
 
-import mage.Cards;
-import mage.CardsImpl;
 import mage.MageInt;
 import mage.abilities.Ability;
 import mage.abilities.DelayedTriggeredAbility;
@@ -23,6 +21,8 @@ import mage.abilities.triggers.BeginningOfEndStepTriggeredAbility;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
+import mage.cards.Cards;
+import mage.cards.CardsImpl;
 import mage.constants.CardType;
 import mage.constants.CostModificationType;
 import mage.constants.Duration;
@@ -40,8 +40,8 @@ import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
 import mage.game.stack.Spell;
 import mage.players.Player;
+import mage.target.TargetPermanent;
 import mage.target.common.TargetCardInHand;
-import mage.target.common.TargetCreaturePermanent;
 import mage.target.common.TargetOpponent;
 import mage.target.targetpointer.FixedTarget;
 import mage.util.CardUtil;
@@ -74,7 +74,9 @@ public final class HarumaVeilBeneathTheStorm extends CardImpl {
         this.addAbility(new HarumaKanchiTaipuAbility());
 
         // {1}{U}: Look at target opponent's hand. Activate only once each turn.
-        Ability look = new SimpleActivatedAbility(new LookAtTargetPlayerHandEffect(), new ManaCostsImpl<>("{1}{U}"));
+        SimpleActivatedAbility look = new SimpleActivatedAbility(
+                new LookAtTargetPlayerHandEffect(), new ManaCostsImpl<>("{1}{U}")
+        );
         look.addTarget(new TargetOpponent());
         look.setMaxActivationsPerTurn(1);
         this.addAbility(look);
@@ -83,7 +85,7 @@ public final class HarumaVeilBeneathTheStorm extends CardImpl {
         Ability genjutsu = new SimpleActivatedAbility(new HarumaFalseOpeningEffect(),
                 new RemoveCountersSourceCost(new Counter(CounterType.PERCEPTION.getName(), 1)));
         genjutsu.withFlavorWord("Genjutsu");
-        genjutsu.addTarget(new TargetCreaturePermanent(StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURE));
+        genjutsu.addTarget(new TargetPermanent(StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURE));
         genjutsu.getModes().setLimitUsageByOnce(true);
         genjutsu.setModeTag("False Opening");
 
