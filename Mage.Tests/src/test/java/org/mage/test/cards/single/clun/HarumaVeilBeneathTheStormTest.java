@@ -17,7 +17,6 @@ public class HarumaVeilBeneathTheStormTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerB, "Grizzly Bears");
 
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{1}{U}: Look at target opponent's hand");
-        addTarget(playerA, playerB);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
@@ -32,7 +31,7 @@ public class HarumaVeilBeneathTheStormTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, "Hill Giant");
 
         setChoice(playerA, true); // use the optional end-step trigger
-        addTarget(playerA, "Grizzly Bears^Hill Giant");
+        setChoice(playerA, "Grizzly Bears^Hill Giant");
         setStopAt(1, PhaseStep.CLEANUP);
         execute();
 
