@@ -12,7 +12,9 @@ import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.filter.FilterSpell;
 import mage.filter.common.FilterControlledCreaturePermanent;
+import mage.filter.predicate.Predicate;
 import mage.game.command.Plane;
+import mage.game.stack.StackObject;
 import mage.target.TargetPermanent;
 
 import java.util.EnumSet;
@@ -46,12 +48,13 @@ public final class WelcomeToValleyPlane extends Plane {
     );
 
     private static final FilterSpell FILTER_ANIMAL_SPELL = new FilterSpell("an animal spell");
+    private static final Predicate<StackObject> ANIMAL_SPELL_PREDICATE = (spell, game) -> spell.isCreature(game)
+            && ANIMAL_TYPES.stream().anyMatch(type -> spell.hasSubtype(type, game));
     private static final FilterControlledCreaturePermanent FILTER_CONTROLLED_CREATURE
             = new FilterControlledCreaturePermanent("creature you control");
 
     static {
-        FILTER_ANIMAL_SPELL.add((spell, game) -> spell.isCreature(game)
-                && ANIMAL_TYPES.stream().anyMatch(type -> spell.hasSubtype(type, game)));
+        FILTER_ANIMAL_SPELL.add(ANIMAL_SPELL_PREDICATE);
     }
 
     public WelcomeToValleyPlane() {
