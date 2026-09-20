@@ -105,6 +105,7 @@ public enum Planes {
     PLANE_TURRI_ISLAND("TurriIslandPlane", "Plane - Turri Island"),
     PLANE_UNDERCITY_REACHES("UndercityReachesPlane", "Plane - Undercity Reaches"),
     PLANE_VELIS_VEL("VelisVelPlane", "Plane - Velis Vel"),
+    PLANE_WELCOME_TO_VALLEY("WelcomeToValleyPlane", "Plane - Welcome to Valley", "PUNK"),
     PLANE_WE_HOPE_YOU_LIKE_SQUIRRELS("WeHopeYouLikeSquirrelsPlane", "Plane - We Hope You Like Squirrels");
 
     private final String className;
