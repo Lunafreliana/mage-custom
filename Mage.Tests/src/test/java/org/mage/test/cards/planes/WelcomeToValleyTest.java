@@ -23,6 +23,8 @@ public class WelcomeToValleyTest extends CardTestPlayerBase {
         addCard(Zone.LIBRARY, playerA, "Mountain", 3);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Grizzly Bears");
+        // The plane's draw trigger must resolve before another sorcery-speed creature can be cast.
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Norwood Ranger");
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
