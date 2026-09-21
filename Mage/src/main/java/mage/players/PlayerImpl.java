@@ -5673,7 +5673,15 @@ public abstract class PlayerImpl implements Player, Serializable {
                     new FilterCard("card" + (cards.size() == 1 ? "" : "s")
                             + " to PUT into your GRAVEYARD (Surveil)"));
             chooseTarget(Outcome.Benefit, cards, target, source, game);
-            moveCards(new CardsImpl(target.getTargets()), Zone.GRAVEYARD, source, game);
+            Cards cardsToGraveyard = new CardsImpl(target.getTargets());
+            moveCards(cardsToGraveyard, Zone.GRAVEYARD, source, game);
+            cardsToGraveyard
+                    .getCards(game)
+                    .stream()
+                    .filter(card -> game.getState().getZone(card.getId()) == Zone.GRAVEYARD)
+                    .forEach(card -> game.fireEvent(GameEvent.getEvent(
+                            GameEvent.EventType.SURVEILLED_CARD, card.getId(), source, getId()
+                    )));
             cards.removeIf(target.getTargets()::contains);
             putCardsOnTopOfLibrary(cards, game, source, true);
         }
