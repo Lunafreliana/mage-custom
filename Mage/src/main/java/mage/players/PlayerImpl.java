@@ -43,7 +43,6 @@ import mage.filter.common.FilterControlledPermanent;
 import mage.filter.common.FilterCreatureForCombat;
 import mage.filter.common.FilterCreatureForCombatBlock;
 import mage.filter.predicate.Predicates;
-import mage.watchers.common.ChaoticAetherWatcher;
 import mage.filter.predicate.permanent.PermanentIdPredicate;
 import mage.game.*;
 import mage.game.combat.CombatGroup;
@@ -69,6 +68,8 @@ import mage.target.common.TargetDiscard;
 import mage.util.CardUtil;
 import mage.util.GameLog;
 import mage.util.RandomUtil;
+import mage.watchers.common.ChaoticAetherWatcher;
+import mage.watchers.common.SurveilledCardsWatcher;
 
 /**
  * Server: basic player implementation, shared for human and AI
@@ -5673,7 +5674,16 @@ public abstract class PlayerImpl implements Player, Serializable {
                     new FilterCard("card" + (cards.size() == 1 ? "" : "s")
                             + " to PUT into your GRAVEYARD (Surveil)"));
             chooseTarget(Outcome.Benefit, cards, target, source, game);
-            moveCards(new CardsImpl(target.getTargets()), Zone.GRAVEYARD, source, game);
+            Set<UUID> cardsToGraveyard = new HashSet<>(target.getTargets());
+            moveCards(new CardsImpl(cardsToGraveyard), Zone.GRAVEYARD, source, game);
+            SurveilledCardsWatcher watcher = game.getState().getWatcher(SurveilledCardsWatcher.class);
+            if (watcher != null) {
+                cardsToGraveyard.stream()
+                        .filter(cardId -> Zone.GRAVEYARD.match(game.getState().getZone(cardId)))
+                        .map(game::getCard)
+                        .filter(Objects::nonNull)
+                        .forEach(card -> watcher.addCard(getId(), card, game));
+            }
             cards.removeIf(target.getTargets()::contains);
             putCardsOnTopOfLibrary(cards, game, source, true);
         }

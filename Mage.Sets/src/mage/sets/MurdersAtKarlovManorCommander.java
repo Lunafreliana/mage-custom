@@ -101,6 +101,7 @@ public final class MurdersAtKarlovManorCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Etali, Primal Storm", 152, Rarity.RARE, mage.cards.e.EtaliPrimalStorm.class));
         cards.add(new SetCardInfo("Ethereal Investigator", 105, Rarity.RARE, mage.cards.e.EtherealInvestigator.class));
         cards.add(new SetCardInfo("Everflowing Chalice", 227, Rarity.UNCOMMON, mage.cards.e.EverflowingChalice.class));
+        cards.add(new SetCardInfo("Eye of Duskmantle", 27, Rarity.RARE, mage.cards.e.EyeOfDuskmantle.class));
         cards.add(new SetCardInfo("Exalted Angel", 63, Rarity.RARE, mage.cards.e.ExaltedAngel.class));
         cards.add(new SetCardInfo("Exotic Orchard", 260, Rarity.RARE, mage.cards.e.ExoticOrchard.class));
         cards.add(new SetCardInfo("Experiment Twelve", 37, Rarity.RARE, mage.cards.e.ExperimentTwelve.class, NON_FULL_USE_VARIOUS));
