@@ -1726,6 +1726,7 @@ public abstract class GameImpl implements Game {
         newWatchers.add(new MainPhaseWatcher()); // supports abilities introduced after initial watcher collection
         newWatchers.add(new CombatDamageToPlayerThisCombatWatcher()); // supports late-added command-zone sources
         newWatchers.add(new PlayersDealtCombatDamageThisTurnWatcher());
+        newWatchers.add(new SurveilledCardsWatcher()); // cards put into graveyards while surveilling
 
         // runtime check - allows only GAME scope (one watcher per game)
         newWatchers.forEach(watcher -> {
