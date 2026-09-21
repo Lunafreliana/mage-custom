@@ -540,6 +540,11 @@ whereas `setChoice` is used only for the separate ordering prompt when two or
 more cards remain on top. A mismatched command may be consumed by the following
 prompt and produce a misleading invalid-choice failure.
 
+Cards described as "surveilled" are only the cards actually put into a
+graveyard by the surveil instruction, not every card looked at. Track the
+successful post-replacement zone change with `CardsSurveilledWatcher`; ordinary
+mill or discard events and cards left on top by surveil do not qualify.
+
 Manifest dread likewise selects from a private temporary card collection with
 `Player.choose`, so tests must queue the card to manifest with `setChoice`, even
 though the engine represents that selection with `TargetCardInLibrary`. Using
