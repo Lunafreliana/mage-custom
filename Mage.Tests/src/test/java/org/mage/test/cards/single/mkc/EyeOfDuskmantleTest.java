@@ -24,7 +24,9 @@ public class EyeOfDuskmantleTest extends CardTestPlayerBase {
         addCard(Zone.HAND, playerA, gaze);
         addCard(Zone.HAND, playerA, eye);
         addCard(Zone.BATTLEFIELD, playerA, "Island");
-        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 7);
+        // Leave one mana beyond the exact sequence so automatic mana selection
+        // cannot make this history-tracking test depend on payment ordering.
+        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 8);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, gaze);
         addTarget(playerA, bears);
