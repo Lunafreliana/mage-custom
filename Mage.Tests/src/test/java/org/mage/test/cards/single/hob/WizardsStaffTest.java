@@ -12,7 +12,6 @@ public class WizardsStaffTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Wizard's Staff");
         addCard(Zone.BATTLEFIELD, playerA, "Prodigal Sorcerer"); // 1/1 Wizard
         addCard(Zone.BATTLEFIELD, playerA, "Island");
-        // Either Mountain can pay for equip while preserving red mana for Shock.
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 2);
         addCard(Zone.HAND, playerA, "Shock");
 
