@@ -14,8 +14,11 @@ public class LoreholdTheHistorianTest extends CardTestPlayerBase {
         skipInitShuffling();
         addCard(Zone.BATTLEFIELD, playerA, lorehold);
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 2);
+        addCard(Zone.BATTLEFIELD, playerA, "Island");
+        addCard(Zone.HAND, playerA, "Reach Through Mists");
         addCard(Zone.LIBRARY, playerA, "Lava Axe");
 
+        castSpell(1, PhaseStep.UPKEEP, playerA, "Reach Through Mists");
         setChoice(playerA, true); // Reveal Lava Axe for miracle
         setChoice(playerA, true); // Cast Lava Axe for its miracle cost
         addTarget(playerA, playerB);
@@ -34,7 +37,6 @@ public class LoreholdTheHistorianTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, lorehold);
         addCard(Zone.HAND, playerA, "Squire");
         addCard(Zone.LIBRARY, playerA, "Forest");
-        addCard(Zone.LIBRARY, playerA, "Mountain");
 
         setChoice(playerA, true); // Discard a card and draw a card
         setChoice(playerA, "Squire");
