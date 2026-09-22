@@ -36,6 +36,7 @@ public class LoreholdTheHistorianTest extends CardTestPlayerBase {
         addCard(Zone.LIBRARY, playerA, "Forest");
         addCard(Zone.LIBRARY, playerA, "Mountain");
 
+        setChoice(playerA, true); // Discard a card and draw a card
         setChoice(playerA, "Squire");
 
         setStrictChooseMode(true);

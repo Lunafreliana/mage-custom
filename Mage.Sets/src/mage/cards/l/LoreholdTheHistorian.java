@@ -99,6 +99,13 @@ class LoreholdTheHistorianEffect extends ContinuousEffectImpl {
         for (Card card : controller.getHand().getCards(filter, game)) {
             game.getState().addOtherAbility(card, new MiracleAbility("{2}"));
         }
+        // XMage emits DREW_CARD immediately after moving the card to hand, before
+        // continuous effects are recalculated. Prepare the top card so the
+        // MiracleWatcher can see the granted ability during that event.
+        Card topCard = controller.getLibrary().getFromTop(game);
+        if (topCard != null && filter.match(topCard, source.getControllerId(), source, game)) {
+            game.getState().addOtherAbility(topCard, new MiracleAbility("{2}"));
+        }
         return true;
     }
 }
