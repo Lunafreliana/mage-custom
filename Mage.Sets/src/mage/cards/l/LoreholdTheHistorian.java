@@ -22,8 +22,10 @@ import mage.constants.SubLayer;
 import mage.constants.SubType;
 import mage.constants.SuperType;
 import mage.constants.TargetController;
+import mage.constants.WatcherScope;
 import mage.filter.common.FilterInstantOrSorceryCard;
 import mage.game.Game;
+import mage.game.events.GameEvent;
 import mage.players.Player;
 import mage.watchers.common.MiracleWatcher;
 
@@ -50,7 +52,7 @@ public final class LoreholdTheHistorian extends CardImpl {
         // Each instant and sorcery card in your hand has miracle {2}.
         this.addAbility(
                 new SimpleStaticAbility(new LoreholdTheHistorianEffect()),
-                new MiracleWatcher()
+                new LoreholdTheHistorianWatcher()
         );
 
         // At the beginning of each opponent's upkeep, you may discard a card. If you do, draw a card.
@@ -73,7 +75,7 @@ public final class LoreholdTheHistorian extends CardImpl {
 
 class LoreholdTheHistorianEffect extends ContinuousEffectImpl {
 
-    private static final FilterInstantOrSorceryCard filter
+    static final FilterInstantOrSorceryCard filter
             = new FilterInstantOrSorceryCard("instant and sorcery cards");
 
     LoreholdTheHistorianEffect() {
@@ -97,15 +99,39 @@ class LoreholdTheHistorianEffect extends ContinuousEffectImpl {
             return false;
         }
         for (Card card : controller.getHand().getCards(filter, game)) {
-            game.getState().addOtherAbility(card, new MiracleAbility("{2}"));
-        }
-        // XMage emits DREW_CARD immediately after moving the card to hand, before
-        // continuous effects are recalculated. Prepare the top card so the
-        // MiracleWatcher can see the granted ability during that event.
-        Card topCard = controller.getLibrary().getFromTop(game);
-        if (topCard != null && filter.match(topCard, source.getControllerId(), source, game)) {
-            game.getState().addOtherAbility(topCard, new MiracleAbility("{2}"));
+            game.getState().addOtherAbility(card, new MiracleAbility("{2}", false));
         }
         return true;
+    }
+}
+
+class LoreholdTheHistorianWatcher extends MiracleWatcher {
+
+    LoreholdTheHistorianWatcher() {
+        super(WatcherScope.CARD);
+    }
+
+    private LoreholdTheHistorianWatcher(final LoreholdTheHistorianWatcher watcher) {
+        super(watcher);
+    }
+
+    @Override
+    public LoreholdTheHistorianWatcher copy() {
+        return new LoreholdTheHistorianWatcher(this);
+    }
+
+    @Override
+    protected void checkMiracleAbility(GameEvent event, Game game) {
+        Card card = game.getCard(event.getTargetId());
+        if (game.getPermanent(getSourceId()) != null
+                && event.getPlayerId().equals(getControllerId())
+                && card != null
+                && LoreholdTheHistorianEffect.filter.match(card, getControllerId(), null, game)) {
+            if (card.getAbilities(game).stream().anyMatch(MiracleAbility.class::isInstance)) {
+                return;
+            }
+            game.getState().addOtherAbility(card, new MiracleAbility("{2}", false));
+        }
+        super.checkMiracleAbility(event, game);
     }
 }

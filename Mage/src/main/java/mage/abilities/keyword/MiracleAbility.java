@@ -77,8 +77,14 @@ public class MiracleAbility extends TriggeredAbilityImpl {
     private final String ruleText;
 
     public MiracleAbility(String miracleCosts) {
+        this(miracleCosts, true);
+    }
+
+    public MiracleAbility(String miracleCosts, boolean addWatcher) {
         super(Zone.HAND, new MiracleEffect(miracleCosts), true);
-        addWatcher(new MiracleWatcher());
+        if (addWatcher) {
+            addWatcher(new MiracleWatcher());
+        }
         ruleText = "Miracle " + miracleCosts + staticRule;
     }
 
