@@ -27,21 +27,7 @@ public class MiracleWatcher extends Watcher {
     private final Map<UUID, Integer> amountOfCardsDrawnThisTurn = new HashMap<>();
 
     public MiracleWatcher() {
-        this(WatcherScope.GAME);
-    }
-
-    protected MiracleWatcher(WatcherScope scope) {
-        super(scope);
-    }
-
-    protected MiracleWatcher(final MiracleWatcher watcher) {
-        super(watcher);
-        this.amountOfCardsDrawnThisTurn.putAll(watcher.amountOfCardsDrawnThisTurn);
-    }
-
-    @Override
-    public MiracleWatcher copy() {
-        return new MiracleWatcher(this);
+        super(WatcherScope.GAME);
     }
 
     @Override
@@ -62,7 +48,7 @@ public class MiracleWatcher extends Watcher {
         }
     }
 
-    protected void checkMiracleAbility(GameEvent event, Game game) {
+    public static void checkMiracleAbility(GameEvent event, Game game) {
         Card card = game.getCard(event.getTargetId());
         if (card != null) {
             for (Ability ability : card.getAbilities(game)) {

@@ -27,8 +27,11 @@ import mage.filter.common.FilterInstantOrSorceryCard;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.players.Player;
+import mage.watchers.Watcher;
 import mage.watchers.common.MiracleWatcher;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -105,33 +108,46 @@ class LoreholdTheHistorianEffect extends ContinuousEffectImpl {
     }
 }
 
-class LoreholdTheHistorianWatcher extends MiracleWatcher {
+class LoreholdTheHistorianWatcher extends Watcher {
+
+    private final Map<UUID, Integer> cardsDrawnThisTurn = new HashMap<>();
 
     LoreholdTheHistorianWatcher() {
         super(WatcherScope.CARD);
     }
 
-    private LoreholdTheHistorianWatcher(final LoreholdTheHistorianWatcher watcher) {
-        super(watcher);
-    }
-
     @Override
-    public LoreholdTheHistorianWatcher copy() {
-        return new LoreholdTheHistorianWatcher(this);
-    }
-
-    @Override
-    protected void checkMiracleAbility(GameEvent event, Game game) {
+    public void watch(GameEvent event, Game game) {
+        if (event.getType() == GameEvent.EventType.UNTAP_STEP_PRE) {
+            reset();
+        }
+        if (game.getPhase() == null || event.getType() != GameEvent.EventType.DREW_CARD) {
+            return;
+        }
+        UUID playerId = event.getPlayerId();
+        if (playerId == null) {
+            return;
+        }
+        int drawCount = cardsDrawnThisTurn.merge(playerId, 1, Integer::sum);
+        if (drawCount != 1) {
+            return;
+        }
         Card card = game.getCard(event.getTargetId());
         if (game.getPermanent(getSourceId()) != null
-                && event.getPlayerId().equals(getControllerId())
+                && playerId.equals(getControllerId())
                 && card != null
                 && LoreholdTheHistorianEffect.filter.match(card, getControllerId(), null, game)) {
             if (card.getAbilities(game).stream().anyMatch(MiracleAbility.class::isInstance)) {
                 return;
             }
             game.getState().addOtherAbility(card, new MiracleAbility("{2}", false));
+            MiracleWatcher.checkMiracleAbility(event, game);
         }
-        super.checkMiracleAbility(event, game);
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        cardsDrawnThisTurn.clear();
     }
 }
