@@ -48,7 +48,7 @@ public class MiracleWatcher extends Watcher {
         }
     }
 
-    private void checkMiracleAbility(GameEvent event, Game game) {
+    public static void checkMiracleAbility(GameEvent event, Game game) {
         Card card = game.getCard(event.getTargetId());
         if (card != null) {
             for (Ability ability : card.getAbilities(game)) {
