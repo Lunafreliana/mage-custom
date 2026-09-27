@@ -97,6 +97,7 @@ public enum Planes {
     PLANE_THE_DARK_BARONY("TheDarkBaronyPlane", "Plane - The Dark Barony"),
     PLANE_THE_AETHER_FLUES("TheAetherFluesPlane", "Plane - The Aether Flues", "MOC"),
     PLANE_THE_EON_FOG("TheEonFogPlane", "Plane - The Eon Fog"),
+    PLANE_THE_FOURTH_SPHERE("TheFourthSpherePlane", "Plane - The Fourth Sphere"),
     PLANE_THE_GREAT_FOREST("TheGreatForestPlane", "Plane - The Great Forest"),
     PLANE_THE_MAELSTROM("TheMaelstromPlane", "Plane - The Maelstrom"),
     PLANE_THE_ZEPHYR_MAZE_FOG("TheZephyrMazePlane", "Plane - The Zephyr Maze"),
