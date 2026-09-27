@@ -1,5 +1,6 @@
 package mage.game.command.planes;
 
+import mage.ObjectColor;
 import mage.abilities.Ability;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
 import mage.abilities.common.SpellCastAllTriggeredAbility;
@@ -10,7 +11,6 @@ import mage.cards.Card;
 import mage.constants.CardType;
 import mage.constants.Duration;
 import mage.constants.Layer;
-import mage.constants.ObjectColor;
 import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.constants.SetTargetPointer;
