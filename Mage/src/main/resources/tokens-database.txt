@@ -208,6 +208,7 @@
 |PLANE:WHO|Plane - Hotel of Fears||HotelOfFearsPlane|
 |PLANE:PCA|Plane - Immersturm||ImmersturmPlane|
 |PLANE:PCA|Plane - Izzet Steam Maze||IzzetSteamMazePlane|
+|PLANE:MOC|Plane - Jund||JundPlane|
 |PLANE:MOC|Plane - Ketria||KetriaPlane|
 |PLANE:MOC|Plane - Kharasha Foothills||KharashaFoothillsPlane|
 |PLANE:WHO|Plane - Kerblam! Warehouse||KerblamWarehousePlane|

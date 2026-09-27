@@ -47,6 +47,7 @@ public enum Planes {
     PLANE_HOTEL_OF_FEARS("HotelOfFearsPlane", "Plane - Hotel of Fears", "WHO"),
     PLANE_IMMERSTURM("ImmersturmPlane", "Plane - Immersturm"),
     PLANE_IZZET_STEAM_MAZE("IzzetSteamMazePlane", "Plane - Izzet Steam Maze"),
+    PLANE_JUND("JundPlane", "Plane - Jund", "MOC"),
     PLANE_KETRIA("KetriaPlane", "Plane - Ketria", "MOC"),
     PLANE_KHARASHA_FOOTHILLS("KharashaFoothillsPlane", "Plane - Kharasha Foothills", "MOC"),
     PLANE_KERBLAM_WAREHOUSE("KerblamWarehousePlane", "Plane - Kerblam! Warehouse", "WHO"),
