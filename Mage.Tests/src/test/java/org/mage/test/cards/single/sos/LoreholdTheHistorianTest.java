@@ -39,14 +39,15 @@ public class LoreholdTheHistorianTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Island");
         addCard(Zone.HAND, playerA, lorehold);
         addCard(Zone.HAND, playerA, "Reach Through Mists");
-        addCard(Zone.LIBRARY, playerA, "Forest");
+        addCard(Zone.LIBRARY, playerA, "Forest", 2);
         addCard(Zone.LIBRARY, playerA, "Lava Axe");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, lorehold);
-        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Reach Through Mists");
+        setChoice(playerA, false); // Don't discard during player B's upkeep
+        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Reach Through Mists");
 
         setStrictChooseMode(true);
-        setStopAt(1, PhaseStep.END_TURN);
+        setStopAt(3, PhaseStep.END_TURN);
         execute();
 
         assertPermanentCount(playerA, lorehold, 1);
