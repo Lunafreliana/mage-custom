@@ -12,13 +12,13 @@ import mage.constants.Outcome;
 import mage.constants.Planes;
 import mage.filter.FilterPermanent;
 import mage.filter.common.FilterCreaturePermanent;
+import mage.filter.predicate.Predicates;
 import mage.game.Game;
 import mage.game.command.Plane;
 import mage.game.permanent.token.Angel33Token;
 import mage.game.permanent.token.BelzenlokDemonToken;
 import mage.game.permanent.token.Token;
 import mage.players.Player;
-import mage.util.Predicates;
 
 import java.util.Arrays;
 import java.util.HashSet;
