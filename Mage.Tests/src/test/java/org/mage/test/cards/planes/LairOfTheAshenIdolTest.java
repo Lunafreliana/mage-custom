@@ -48,7 +48,8 @@ public class LairOfTheAshenIdolTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        addTarget(playerA, playerA.getName() + "^" + playerB.getName());
+        addTarget(playerA, playerA);
+        addTarget(playerA, playerB);
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
