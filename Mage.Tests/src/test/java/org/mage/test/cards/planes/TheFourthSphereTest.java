@@ -13,11 +13,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
 
+import java.util.Collections;
+
 public class TheFourthSphereTest extends CardTestPlayerBase {
 
     @Test
     public void eachPlanarControllerSacrificesANonblackCreatureDuringTheirUpkeep() {
-        addPlane(playerA, Planes.PLANE_THE_FOURTH_SPHERE);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_THE_FOURTH_SPHERE);
         addCard(Zone.BATTLEFIELD, playerA, "Silvercoat Lion");
         addCard(Zone.BATTLEFIELD, playerA, "Walking Corpse");
         addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
