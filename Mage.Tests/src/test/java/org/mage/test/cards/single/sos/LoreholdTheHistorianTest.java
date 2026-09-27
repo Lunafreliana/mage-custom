@@ -34,7 +34,8 @@ public class LoreholdTheHistorianTest extends CardTestPlayerBase {
     @Test
     public void testDoesNotGrantMiracleAfterFirstDraw() {
         skipInitShuffling();
-        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 5);
+        addCard(Zone.BATTLEFIELD, playerA, "Mountain", 4);
+        addCard(Zone.BATTLEFIELD, playerA, "Plains");
         addCard(Zone.BATTLEFIELD, playerA, "Island");
         addCard(Zone.HAND, playerA, lorehold);
         addCard(Zone.HAND, playerA, "Reach Through Mists");
