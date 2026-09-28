@@ -21,6 +21,7 @@ public final class DragonEngine extends CardImpl {
 
     public DragonEngine(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT,CardType.CREATURE},"{3}");
+        this.subtype.add(SubType.DRAGON);
         this.subtype.add(SubType.CONSTRUCT);
 
         this.power = new MageInt(1);
