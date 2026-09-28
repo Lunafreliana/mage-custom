@@ -39,8 +39,8 @@ public class LoreholdTheHistorianTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Island");
         addCard(Zone.HAND, playerA, lorehold);
         addCard(Zone.HAND, playerA, "Reach Through Mists");
-        addCard(Zone.LIBRARY, playerA, "Lava Axe");
-        addCard(Zone.LIBRARY, playerA, "Forest", 2);
+        addCard(Zone.LIBRARY, playerA, "Lava Axe"); // Drawn by Reach Through Mists
+        addCard(Zone.LIBRARY, playerA, "Forest"); // Player A's first draw, on turn 3
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, lorehold);
         setChoice(playerA, false); // Don't discard during player B's upkeep
