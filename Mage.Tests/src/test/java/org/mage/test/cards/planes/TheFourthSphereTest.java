@@ -36,7 +36,8 @@ public class TheFourthSphereTest extends CardTestPlayerBase {
 
     @Test
     public void chaosCreatesAZombieForThePlanarController() {
-        addPlane(playerA, Planes.PLANE_THE_FOURTH_SPHERE);
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_THE_FOURTH_SPHERE);
         SpellAbility causeChaos = new SpellAbility(new ManaCostsImpl<>("{0}"), "Cause Chaos");
         causeChaos.addEffect(new ChaosEnsuesEffect());
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
