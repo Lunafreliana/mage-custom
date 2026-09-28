@@ -21,6 +21,7 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         this.blockName = "Mystery Booster Commander Edition";
 
         this.hasBasicLands = false;
+        this.hasBoosters = true;
 
         cards.add(new SetCardInfo("Arzakon", 33, Rarity.RARE, mage.cards.a.Arzakon.class));
         cards.add(new SetCardInfo("Ashaya's Enduring Bond", 34, Rarity.RARE, mage.cards.a.AshayasEnduringBond.class));
