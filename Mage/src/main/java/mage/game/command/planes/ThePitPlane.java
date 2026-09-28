@@ -21,7 +21,7 @@ import mage.game.permanent.token.Token;
 import mage.players.Player;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,7 +66,8 @@ class ThePitCreateTokenEffect extends OneShotEffect {
 
     private static final String ANGEL = "3/3 white Angel creature token with flying";
     private static final String DEMON = "6/6 black Demon creature token with flying and trample";
-    private static final Set<String> CHOICES = new HashSet<>(Arrays.asList(ANGEL, DEMON));
+    // Keep the printed Angel-then-Demon order stable in clients and deterministic tests.
+    private static final Set<String> CHOICES = new LinkedHashSet<>(Arrays.asList(ANGEL, DEMON));
 
     ThePitCreateTokenEffect() {
         super(Outcome.PutCreatureInPlay);
