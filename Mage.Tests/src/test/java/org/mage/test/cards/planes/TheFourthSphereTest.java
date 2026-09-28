@@ -28,6 +28,7 @@ public class TheFourthSphereTest extends CardTestPlayerBase {
         setStopAt(2, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
+        Assert.assertEquals(playerB.getId(), currentGame.getState().getPlanarControllerId());
         assertPermanentCount(playerA, "Silvercoat Lion", 0);
         assertPermanentCount(playerA, "Walking Corpse", 1);
         assertPermanentCount(playerB, "Grizzly Bears", 0);
