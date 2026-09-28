@@ -88,9 +88,13 @@ class JundDevourEffect extends ContinuousEffectImpl {
             return false;
         }
         Card card = spell.getCard();
-        if (!card.getAbilities(game).containsClass(DevourAbility.class)) {
-            game.getState().addOtherAbility(card, new DevourAbility(5));
+        if (card == null) {
+            discard();
+            return false;
         }
+        // Multiple instances of devour are cumulative replacement effects. Do not suppress
+        // Jund's devour 5 when the spell already has a different devour ability.
+        game.getState().addOtherAbility(card, new DevourAbility(5));
         return true;
     }
 }
