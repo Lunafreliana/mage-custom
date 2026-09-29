@@ -241,6 +241,7 @@
 |PHENOMENON:PCA|Phenomenon - Chaotic Aether||ChaoticAetherPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Interplanar Tunnel||InterplanarTunnelPhenomenon|
 |PHENOMENON:WHO|Phenomenon - Fixed Point in Time||FixedPointInTimePhenomenon|
+|PHENOMENON:WHO|Phenomenon - Human—Time Lord Meta-Crisis||HumanTimeLordMetaCrisisPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Mutual Epiphany||MutualEpiphanyPhenomenon|
 |PHENOMENON:PUNK|Phenomenon - Omenpath Instability||OmenpathInstabilityPhenomenon|
 |TOK:PUNK|Entropy||EntropyToken|
