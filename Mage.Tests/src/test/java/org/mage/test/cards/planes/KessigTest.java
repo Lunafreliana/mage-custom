@@ -44,8 +44,8 @@ public class KessigTest extends CardTestPlayerBase {
         addCustomCardWithSpell(playerA, causeChaos, null, CardType.SORCERY);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cause Chaos");
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Raise the Alarm");
-        runCode("verify chaos bonuses", 1, PhaseStep.POSTCOMBAT_MAIN, playerA, (info, player, game) -> {
+        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Raise the Alarm");
+        runCode("verify chaos bonuses", 1, PhaseStep.END_TURN, playerA, (info, player, game) -> {
             assertPowerToughness(playerA, "Grizzly Bears", 4, 4);
             assertAbility(playerA, "Grizzly Bears", TrampleAbility.getInstance(), true);
             Assert.assertTrue(info, game.getBattlefield().getAllActivePermanents(player.getId()).stream()
@@ -58,7 +58,7 @@ public class KessigTest extends CardTestPlayerBase {
             assertPowerToughness(playerB, "Hill Giant", 3, 3);
         });
 
-        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        setStopAt(1, PhaseStep.END_TURN);
         execute();
     }
 
