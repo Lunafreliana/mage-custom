@@ -1,5 +1,6 @@
 package mage.cards.t;
 
+import java.util.Objects;
 import java.util.UUID;
 import mage.MageInt;
 import mage.constants.SubType;
@@ -81,7 +82,8 @@ class TheLordOfTheEaglesCostReductionEffect extends CostModificationEffectImpl {
 
     @Override
     public boolean applies(Ability abilityToModify, Ability source, Game game) {
-        return abilityToModify.getSourceId().equals(source.getSourceId()) && (abilityToModify instanceof SpellAbility);
+        return abilityToModify instanceof SpellAbility
+                && Objects.equals(abilityToModify.getSourceId(), source.getSourceId());
     }
 
     @Override
