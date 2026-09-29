@@ -1203,12 +1203,6 @@ public class VerifyCardDataTest {
         Set<String> implementedSets = sets.stream().map(ExpansionSet::getCode).collect(Collectors.toSet());
         MtgJsonService.sets().values().forEach(jsonSet -> {
             if (jsonSet.booster != null && !jsonSet.booster.isEmpty() && !implementedSets.contains(jsonSet.code)) {
-                // MTGJSON includes announced sets before their release. Those sets are not yet
-                // required for draft support and should not make otherwise unrelated changes fail.
-                if (jsonSet.releaseDate != null
-                        && LocalDate.parse(jsonSet.releaseDate).isAfter(LocalDate.now())) {
-                    return;
-                }
                 if (jsonSet.code.equals("HBG")) {
                     // TODO: remove after implement dozens A-cards, see HBG - Alchemy Horizons: Baldur's Gate
                     return;
