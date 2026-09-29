@@ -1,5 +1,6 @@
 package mage.abilities.effects.common.continuous;
 
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.effects.ContinuousEffectImpl;
 import mage.constants.*;
@@ -10,6 +11,7 @@ import mage.game.permanent.Permanent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -45,6 +47,18 @@ public class BecomesSubtypeAllEffect extends ContinuousEffectImpl {
     }
 
     @Override
+    public void init(Ability source, Game game) {
+        super.init(source, game);
+        if (getAffectedObjectsSet()) {
+            for (Permanent permanent : game.getBattlefield().getActivePermanents(
+                    filter, source.getControllerId(), source, game
+            )) {
+                affectedObjectList.add(new MageObjectReference(permanent, game));
+            }
+        }
+    }
+
+    @Override
     public BecomesSubtypeAllEffect copy() {
         return new BecomesSubtypeAllEffect(this);
     }
@@ -52,7 +66,22 @@ public class BecomesSubtypeAllEffect extends ContinuousEffectImpl {
     @Override
     public boolean apply(Game game, Ability source) {
         boolean flag = false;
-        for (Permanent permanent : game.getBattlefield().getActivePermanents(filter, source.getControllerId(), source, game)) {
+        Iterable<Permanent> permanents;
+        if (getAffectedObjectsSet()) {
+            List<Permanent> affectedPermanents = new ArrayList<>();
+            for (Iterator<MageObjectReference> iterator = affectedObjectList.iterator(); iterator.hasNext();) {
+                Permanent permanent = iterator.next().getPermanent(game);
+                if (permanent == null) {
+                    iterator.remove();
+                } else {
+                    affectedPermanents.add(permanent);
+                }
+            }
+            permanents = affectedPermanents;
+        } else {
+            permanents = game.getBattlefield().getActivePermanents(filter, source.getControllerId(), source, game);
+        }
+        for (Permanent permanent : permanents) {
             if (permanent == null) {
                 continue;
             }
