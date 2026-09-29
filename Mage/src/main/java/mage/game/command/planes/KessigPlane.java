@@ -12,6 +12,7 @@ import mage.abilities.keyword.TrampleAbility;
 import mage.constants.Duration;
 import mage.constants.Planes;
 import mage.constants.SubType;
+import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.filter.StaticFilters;
 import mage.filter.common.FilterCreaturePermanent;
@@ -27,9 +28,12 @@ public final class KessigPlane extends Plane {
 
     private static final FilterCreaturePermanent nonWerewolfFilter
             = new FilterCreaturePermanent("non-Werewolf creatures");
+    private static final FilterCreaturePermanent controlledCreatureFilter
+            = new FilterCreaturePermanent("creatures you control");
 
     static {
         nonWerewolfFilter.add(Predicates.not(SubType.WEREWOLF.getPredicate()));
+        controlledCreatureFilter.add(TargetController.YOU.getControllerPredicate());
     }
 
     public KessigPlane() {
@@ -52,7 +56,7 @@ public final class KessigPlane extends Plane {
         ).setText("gains trample"));
         ability.addEffect(new BecomesSubtypeAllEffect(
                 Duration.EndOfTurn, Collections.singletonList(SubType.WEREWOLF),
-                StaticFilters.FILTER_CONTROLLED_CREATURES, false
+                controlledCreatureFilter, false
         ).setText("and becomes a Werewolf in addition to its other types until end of turn"));
         this.getAbilities().add(ability);
     }
