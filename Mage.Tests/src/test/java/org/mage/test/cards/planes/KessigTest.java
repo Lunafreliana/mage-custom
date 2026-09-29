@@ -21,14 +21,17 @@ public class KessigTest extends CardTestPlayerBase {
         addPlane(playerA, Planes.PLANE_KESSIG);
         addCard(Zone.BATTLEFIELD, playerA, "Grizzly Bears");
         addCard(Zone.BATTLEFIELD, playerA, "Kessig Wolf");
+        addCard(Zone.BATTLEFIELD, playerA, "Monster Mashup");
 
         attack(1, playerA, "Grizzly Bears", playerB);
         attack(1, playerA, "Kessig Wolf", playerB);
+        attack(1, playerA, "Monster Mashup", playerB);
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
         execute();
 
-        assertLife(playerB, 17);
+        // Kessig Wolf is a Wolf, not a Werewolf, so only Monster Mashup deals damage.
+        assertLife(playerB, 16);
     }
 
     @Test
