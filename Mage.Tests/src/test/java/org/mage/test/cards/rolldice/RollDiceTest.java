@@ -249,6 +249,21 @@ public class RollDiceTest extends CardTestPlayerBaseWithAIHelps {
     }
 
     @Test
+    public void test_PlanarDieWithLordOfTheEaglesInHand() {
+        useHedronFieldsPlanechase();
+        addCard(Zone.HAND, playerA, "The Lord of the Eagles");
+
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "roll the planar die");
+        setDieRollResult(playerA, 3);
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.END_TURN);
+        execute();
+
+        assertHandCount(playerA, "The Lord of the Eagles", 1);
+    }
+
+    @Test
     public void test_PlanarDieWithSpellCostIncreaseInHand() {
         useHedronFieldsPlanechase();
         addCard(Zone.HAND, playerA, "Vanish into Eternity");
