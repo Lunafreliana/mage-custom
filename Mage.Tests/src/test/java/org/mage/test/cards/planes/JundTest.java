@@ -49,7 +49,7 @@ public class JundTest extends CardTestPlayerBase {
         execute();
 
         assertPermanentCount(playerA, "Memnite", 1);
-        assertPowerToughness(playerA, "Stone Golem", 3, 3);
+        assertPowerToughness(playerA, "Stone Golem", 4, 4);
     }
 
     @Test
