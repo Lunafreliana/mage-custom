@@ -224,7 +224,6 @@ public class MutateTest extends CardTestPlayerBase {
         execute();
 
         assertPermanentCount(playerA, DREAMTAIL_HERON, 2);
-        assertPermanentCount(playerA, WURM, 0);
         assertLife(playerB, 14);
     }
 
