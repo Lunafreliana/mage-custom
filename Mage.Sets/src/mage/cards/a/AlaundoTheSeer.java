@@ -214,8 +214,10 @@ class AlaundoTheSeerCastEffect extends OneShotEffect {
             return true;
         }
         if (card.isCreature(game)) {
-            ContinuousEffect effect = new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn);
-            effect.setTargetPointer(new FixedTarget(card.getId(), card.getZoneChangeCounter(game) + 1));
+            ContinuousEffect effect = new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn, null, true
+            );
+            effect.setTargetPointer(new FixedTarget(card, game));
             game.addEffect(effect, source);
         }
         return true;
