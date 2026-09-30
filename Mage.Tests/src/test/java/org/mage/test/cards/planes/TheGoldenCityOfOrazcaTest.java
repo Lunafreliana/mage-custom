@@ -1,5 +1,6 @@
 package org.mage.test.cards.planes;
 
+import java.util.Collections;
 import mage.abilities.SpellAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.common.ChaosEnsuesEffect;
@@ -33,8 +34,9 @@ public class TheGoldenCityOfOrazcaTest extends CardTestPlayerBase {
 
     @Test
     public void currentPlanarControllerGetsTreasureButDoesNotDrawWithoutCitysBlessing() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_THE_GOLDEN_CITY_OF_ORAZCA);
         removeAllCardsFromHand(playerB);
-        addPlane(playerA, Planes.PLANE_THE_GOLDEN_CITY_OF_ORAZCA);
         addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
         addCard(Zone.LIBRARY, playerB, "Island", 2);
         skipInitShuffling();
