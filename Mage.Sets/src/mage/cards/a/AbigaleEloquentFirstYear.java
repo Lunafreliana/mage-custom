@@ -3,6 +3,7 @@ package mage.cards.a;
 import mage.MageInt;
 import mage.abilities.Ability;
 import mage.abilities.common.EntersBattlefieldTriggeredAbility;
+import mage.abilities.effects.common.continuous.GainAbilityTargetEffect;
 import mage.abilities.effects.common.continuous.LoseAllAbilitiesTargetEffect;
 import mage.abilities.effects.common.counter.AddCountersTargetEffect;
 import mage.abilities.keyword.FirstStrikeAbility;
@@ -52,6 +53,14 @@ public final class AbigaleEloquentFirstYear extends CardImpl {
                 .setText(", a first strike counter"));
         ability.addEffect(new AddCountersTargetEffect(CounterType.LIFELINK.createInstance())
                 .setText(", and a lifelink counter on that creature"));
+        // Ability counters are applied before ordinary layer-six effects in XMage. Add matching
+        // continuous effects after the lose-all-abilities effect so these newer abilities survive it.
+        ability.addEffect(new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.Custom)
+                .setText(" "));
+        ability.addEffect(new GainAbilityTargetEffect(FirstStrikeAbility.getInstance(), Duration.Custom)
+                .setText(" "));
+        ability.addEffect(new GainAbilityTargetEffect(LifelinkAbility.getInstance(), Duration.Custom)
+                .setText(" "));
         ability.addTarget(new TargetPermanent(0, 1, StaticFilters.FILTER_ANOTHER_TARGET_CREATURE));
         this.addAbility(ability);
     }

@@ -362,6 +362,15 @@ Last Known Information (LKI) is needed when rules ask about characteristics imme
 
 Durations also encode whether source zone change invalidates an effect and whether controller is fixed. `Custom` requires the effect to implement expiration correctly. `OneUse` is not a synonym for one-shot: it is for a continuing effect consumed once. Avoid accidentally using `WhileOnBattlefield` for an effect created by a resolving instant, or `EndOfTurn` for “until your next turn.” Layered effects also need the correct `Layer`/`SubLayer`; copy a close analogue.
 
+Ability counters are currently materialized by `ApplyStatusEffect` before the
+ordinary layer-six effects are applied. Consequently, a resolving instruction
+that first makes a permanent lose all abilities indefinitely and then puts
+ability counters on it needs later `GainAbilityTargetEffect` instances matching
+those counters (compare Abigale, Eloquent First-Year), or the ordinary
+lose-all-abilities effect will incorrectly erase the abilities represented by
+the newly placed counters. Keep those grants later than the loss effect and add
+a regression test that checks both the counters and the resulting abilities.
+
 ### Face-down permanents: use the modern copy-layer implementation
 
 For a new effect that turns one permanent face down, prefer
