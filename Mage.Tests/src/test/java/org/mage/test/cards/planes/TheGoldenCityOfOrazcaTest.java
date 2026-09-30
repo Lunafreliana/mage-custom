@@ -1,5 +1,6 @@
 package org.mage.test.cards.planes;
 
+import java.util.Collections;
 import mage.abilities.SpellAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.common.ChaosEnsuesEffect;
@@ -29,6 +30,27 @@ public class TheGoldenCityOfOrazcaTest extends CardTestPlayerBase {
 
         assertPermanentCount(playerA, "Treasure Token", 1);
         assertHandCount(playerA, 0);
+    }
+
+    @Test
+    public void currentPlanarControllerGetsTreasureButDoesNotDrawWithoutCitysBlessing() {
+        gameOptions.planeChase = true;
+        gameOptions.sharedPlanarDeck = Collections.singletonList(Planes.PLANE_THE_GOLDEN_CITY_OF_ORAZCA);
+        removeAllCardsFromHand(playerB);
+        addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
+        addCard(Zone.LIBRARY, playerB, "Island", 2);
+        skipInitShuffling();
+
+        attack(2, playerB, "Grizzly Bears");
+
+        setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertPermanentCount(playerA, "Treasure Token", 0);
+        assertPermanentCount(playerB, "Treasure Token", 1);
+        // Player B draws one Island normally during turn two, but must not draw
+        // the second Island from the Plane trigger without the city's blessing.
+        assertHandCount(playerB, "Island", 1);
     }
 
     @Test
