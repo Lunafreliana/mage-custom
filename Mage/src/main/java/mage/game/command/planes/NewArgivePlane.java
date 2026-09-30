@@ -2,8 +2,8 @@ package mage.game.command.planes;
 
 import mage.abilities.common.AttacksAllTriggeredAbility;
 import mage.abilities.common.ChaosEnsuesTriggeredAbility;
-import mage.abilities.effects.common.BoostTargetEffect;
 import mage.abilities.effects.common.RevealCardsFromLibraryUntilEffect;
+import mage.abilities.effects.common.continuous.BoostTargetEffect;
 import mage.constants.Duration;
 import mage.constants.Planes;
 import mage.constants.PutCards;
