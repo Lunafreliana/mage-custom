@@ -58,8 +58,12 @@ public class CopyTokenFunction {
 
         // handle mutate characteristics first
         if (source instanceof Permanent && ((Permanent) source).getMutateCount() > 0) {
-            ((Permanent) source).reset(game); // TODO: pissible buggy, need research and replace by source.copy()? see #14981
-            copyToToken(target, source, game);
+            // A merged permanent's combined characteristics are copiable, but reset mutates the
+            // object on which it is called.  Build those characteristics on a snapshot so making
+            // a token copy cannot temporarily strip the live permanent's top component or effects.
+            Permanent copyFrom = ((Permanent) source).copy();
+            copyFrom.reset(game);
+            copyToToken(target, copyFrom, game);
             return;
         }
 

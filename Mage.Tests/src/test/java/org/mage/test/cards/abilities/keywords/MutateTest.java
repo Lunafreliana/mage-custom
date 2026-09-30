@@ -200,6 +200,33 @@ public class MutateTest extends CardTestPlayerBase {
         setupTestMutateBasic(true, false);
     }
 
+    @Test
+    public void testCopyingMutatedTokenDoesNotResetOriginal() {
+        setupLands(playerA);
+
+        addCard(Zone.HAND, playerA, ADVENT_OF_THE_WURM);
+        addCard(Zone.HAND, playerA, DREAMTAIL_HERON);
+        addCard(Zone.HAND, playerA, "Giant Growth");
+        addCard(Zone.BATTLEFIELD, playerA, "Vesuvan Duplimancy");
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, ADVENT_OF_THE_WURM);
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
+        castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, DREAMTAIL_HERON + USING_MUTATE, WURM);
+        setChoice(playerA, false); // Dreamtail Heron over the Wurm token
+
+        // Vesuvan Duplimancy copies the merged permanent before Giant Growth resolves. Creating
+        // that copy must not reset the original to its bottom token, even temporarily.
+        castSpell(3, PhaseStep.PRECOMBAT_MAIN, playerA, "Giant Growth", DREAMTAIL_HERON);
+        attack(3, playerA, DREAMTAIL_HERON);
+
+        setStopAt(3, PhaseStep.POSTCOMBAT_MAIN);
+        setStrictChooseMode(true);
+        execute();
+
+        assertPermanentCount(playerA, DREAMTAIL_HERON, 2);
+        assertLife(playerB, 14);
+    }
+
     /**
      * Same as above but add Essence Symbiote to check trigger, and Intangible Virtue to check token predicate
      */
