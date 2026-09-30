@@ -65,6 +65,7 @@ public enum Planes {
     PLANE_MINAMO("MinamoPlane", "Plane - Minamo"),
     PLANE_NAYA("NayaPlane", "Plane - Naya"),
     PLANE_NEPHALIA("NephaliaPlane", "Plane - Nephalia"),
+    PLANE_NEW_ARGIVE("NewArgivePlane", "Plane - New Argive", "MOC"),
     PLANE_NYX("NyxPlane", "Plane - Nyx", "MOC"),
     PLANE_OTARIA("OtariaPlane", "Plane - Otaria"),
     PLANE_OTECLAN("OteclanPlane", "Plane - Oteclán", "PUNK"),

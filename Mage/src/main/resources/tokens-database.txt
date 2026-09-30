@@ -224,6 +224,7 @@
 |PLANE:PUNK|Plane - Multiversal High Council||MultiversalHighCouncilPlane|
 |PLANE:PCA|Plane - Naya||NayaPlane|
 |PLANE:PCA|Plane - Nephalia||NephaliaPlane|
+|PLANE:MOC|Plane - New Argive||NewArgivePlane|
 |PLANE:WHO|Plane - Ood Sphere||OodSpherePlane|
 |PLANE:PCA|Plane - Otaria||OtariaPlane|
 |PLANE:PUNK|Plane - Oteclán||OteclanPlane|
