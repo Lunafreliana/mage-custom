@@ -1,12 +1,12 @@
 package org.mage.test.cards.planes;
 
 import mage.constants.CardType;
-import mage.constants.CounterType;
 import mage.constants.PhaseStep;
 import mage.constants.Phenomena;
 import mage.constants.Planes;
 import mage.constants.SuperType;
 import mage.constants.Zone;
+import mage.counters.CounterType;
 import mage.game.command.PlanarCardRegistry;
 import mage.game.command.phenomena.HumanTimeLordMetaCrisisPhenomenon;
 import mage.game.permanent.Permanent;
