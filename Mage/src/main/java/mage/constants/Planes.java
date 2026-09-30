@@ -79,6 +79,7 @@ public enum Planes {
     PLANE_SELESNYA_LOFT_GARDENS("SelesnyaLoftGardensPlane", "Plane - Selesnya Loft Gardens"),
     PLANE_SOKENZAN("SokenzanPlane", "Plane - Sokenzan", "MOC"),
     PLANE_STAIRS_TO_INFINITY("StairsToInfinityPlane", "Plane - Stairs to Infinity"),
+    PLANE_STENSIA("StensiaPlane", "Plane - Stensia", "MOC"),
     PLANE_STRONGHOLD_FURNACE("StrongholdFurnacePlane", "Plane - Stronghold Furnace", "MOC"),
     PLANE_TAKENUMA("TakenumaPlane", "Plane - Takenuma"),
     PLANE_TARDIS_BAY("TardisBayPlane", "Plane - TARDIS Bay", "WHO"),
