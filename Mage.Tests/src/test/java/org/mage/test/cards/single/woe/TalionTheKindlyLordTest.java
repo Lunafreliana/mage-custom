@@ -18,7 +18,9 @@ public class TalionTheKindlyLordTest extends CardTestPlayerBase {
 
         addCard(Zone.HAND, playerA, talion);
         addCard(Zone.BATTLEFIELD, playerA, "Underground Sea", 4);
-        addCard(Zone.LIBRARY, playerA, "Island");
+        // One card is drawn during player A's first draw step; the other is
+        // available for Talion's trigger.
+        addCard(Zone.LIBRARY, playerA, "Island", 2);
 
         // Ornithopter has mana value 0 and power 0, but toughness 2.
         addCard(Zone.HAND, playerB, "Ornithopter");
@@ -34,6 +36,6 @@ public class TalionTheKindlyLordTest extends CardTestPlayerBase {
         execute();
 
         assertLife(playerB, 18);
-        assertHandCount(playerA, "Island", 1);
+        assertHandCount(playerA, "Island", 2);
     }
 }
