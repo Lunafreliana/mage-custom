@@ -30,7 +30,9 @@ public class NewArgiveTest extends CardTestPlayerBase {
         execute();
 
         assertLife(playerB, 15);
-        assertLife(playerA, 17);
+        // addPlane assigns New Argive to player A for this focused ability test,
+        // so player B's historic creature isn't controlled by the Plane's controller.
+        assertLife(playerA, 19);
     }
 
     @Test
@@ -52,7 +54,8 @@ public class NewArgiveTest extends CardTestPlayerBase {
 
         assertHandCount(playerA, "Memnite", 1);
         assertLibraryCount(playerA, 2);
-        assertGraveyardCount(playerA, 0);
+        // The custom sorcery used to cause chaos resolves to the graveyard.
+        assertGraveyardCount(playerA, 1);
     }
 
     @Test
