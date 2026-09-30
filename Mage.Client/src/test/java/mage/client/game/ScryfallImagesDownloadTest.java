@@ -17,6 +17,9 @@ import org.mage.plugins.card.dl.sources.ScryfallImageSourceSmall;
 import org.mage.plugins.card.images.CardDownloadData;
 import org.mage.plugins.card.utils.CardImageUtils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author JayDi85
  */
@@ -154,6 +157,29 @@ public class ScryfallImagesDownloadTest {
         Assert.assertEquals(
                 "https://api.scryfall.com/cards/tpca/5/en?format=image",
                 ScryfallImageSource.getInstance().generateTokenUrl(token).getBaseUrl());
+    }
+
+    @Test
+    public void test_MarvelTokensUseCurrentCollectorNumbers() throws Exception {
+        List<TokenInfo> commanderBirds = TokenRepository.instance
+                .getByClassName("mage.game.permanent.token.BirdToken")
+                .stream()
+                .filter(token -> "MSC".equals(token.getSetCode()))
+                .collect(Collectors.toList());
+        Assert.assertEquals("MSC has one printed Bird token", 1, commanderBirds.size());
+        Assert.assertEquals("a single token image uses the unnumbered cache path",
+                Integer.valueOf(0), commanderBirds.get(0).getImageNumber());
+
+        CardDownloadData bird = new CardDownloadData("Bird", "MSC", "0", false, 0);
+        bird.setToken(true);
+
+        Assert.assertEquals(
+                "https://api.scryfall.com/cards/tmsc/5?format=image",
+                ScryfallImageSource.getInstance().generateTokenUrl(bird).getBaseUrl());
+
+        Assert.assertNull("removed phantom Bird variant must not have an image mapping",
+                org.mage.plugins.card.dl.sources.ScryfallImageSupportTokens
+                        .findTokenLink("MSC", "Bird", 2));
     }
 
     private static CardDownloadData planarToken(String name, String setCode) {
