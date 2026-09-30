@@ -1,11 +1,13 @@
 package mage.cards.a;
 
 import mage.MageInt;
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.SimpleActivatedAbility;
 import mage.abilities.costs.common.TapSourceCost;
 import mage.abilities.effects.ContinuousEffect;
+import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.DrawCardSourceControllerEffect;
 import mage.abilities.effects.common.continuous.GainAbilityTargetEffect;
@@ -16,7 +18,9 @@ import mage.cards.CardSetInfo;
 import mage.cards.CardsImpl;
 import mage.constants.CardType;
 import mage.constants.Duration;
+import mage.constants.Layer;
 import mage.constants.Outcome;
+import mage.constants.SubLayer;
 import mage.constants.SubType;
 import mage.constants.SuperType;
 import mage.constants.Zone;
@@ -98,16 +102,47 @@ class AlaundoTheSeerEffect extends OneShotEffect {
         if (manaValue > 0) {
             card.addCounters(CounterType.TIME.createInstance(manaValue), player.getId(), source, game);
         }
-        Ability ability = new AlaundoTheSeerTriggeredAbility();
-        ability.setSourceId(card.getId());
-        ability.setControllerId(card.getOwnerId());
-        game.getState().addOtherAbility(card, ability);
+        game.addEffect(new AlaundoTheSeerGainAbilityEffect(new MageObjectReference(card, game)), source);
 
         game.getExile().getCardsOwned(game, player.getId()).stream()
                 .filter(exiledCard -> !exiledCard.getId().equals(card.getId()))
                 .forEach(exiledCard -> exiledCard.removeCounters(
                         CounterType.TIME.getName(), 1, source, game
                 ));
+        return true;
+    }
+}
+
+class AlaundoTheSeerGainAbilityEffect extends ContinuousEffectImpl {
+
+    private final MageObjectReference mor;
+
+    AlaundoTheSeerGainAbilityEffect(MageObjectReference mor) {
+        super(Duration.Custom, Layer.AbilityAddingRemovingEffects_6, SubLayer.NA, Outcome.AddAbility);
+        this.mor = mor;
+    }
+
+    private AlaundoTheSeerGainAbilityEffect(final AlaundoTheSeerGainAbilityEffect effect) {
+        super(effect);
+        this.mor = effect.mor;
+    }
+
+    @Override
+    public AlaundoTheSeerGainAbilityEffect copy() {
+        return new AlaundoTheSeerGainAbilityEffect(this);
+    }
+
+    @Override
+    public boolean apply(Game game, Ability source) {
+        Card card = mor.getCard(game);
+        if (card == null || game.getState().getZone(card.getId()) != Zone.EXILED) {
+            discard();
+            return true;
+        }
+        Ability ability = new AlaundoTheSeerTriggeredAbility();
+        ability.setSourceId(card.getId());
+        ability.setControllerId(card.getOwnerId());
+        game.getState().addOtherAbility(card, ability);
         return true;
     }
 }
