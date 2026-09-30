@@ -4,6 +4,8 @@ package mage.constants;
 public enum Phenomena {
     CHAOTIC_AETHER("ChaoticAetherPhenomenon", "Phenomenon - Chaotic Aether"),
     FIXED_POINT_IN_TIME("FixedPointInTimePhenomenon", "Phenomenon - Fixed Point in Time", "WHO"),
+    HUMAN_TIME_LORD_META_CRISIS("HumanTimeLordMetaCrisisPhenomenon",
+            "Phenomenon - Human—Time Lord Meta-Crisis", "WHO"),
     INTERPLANAR_TUNNEL("InterplanarTunnelPhenomenon", "Phenomenon - Interplanar Tunnel"),
     MUTUAL_EPIPHANY("MutualEpiphanyPhenomenon", "Phenomenon - Mutual Epiphany"),
     OMENPATH_INSTABILITY("OmenpathInstabilityPhenomenon", "Phenomenon - Omenpath Instability", "PUNK"),
