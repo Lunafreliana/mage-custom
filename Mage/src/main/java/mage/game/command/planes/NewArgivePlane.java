@@ -8,9 +8,10 @@ import mage.constants.Duration;
 import mage.constants.Planes;
 import mage.constants.PutCards;
 import mage.constants.SetTargetPointer;
+import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
-import mage.filter.common.FilterControlledCreaturePermanent;
+import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.HistoricPredicate;
 import mage.game.command.Plane;
 
@@ -19,12 +20,13 @@ import mage.game.command.Plane;
  */
 public final class NewArgivePlane extends Plane {
 
-    private static final FilterControlledCreaturePermanent historicCreatureFilter
-            = new FilterControlledCreaturePermanent("historic creature you control");
+    private static final FilterCreaturePermanent historicCreatureFilter
+            = new FilterCreaturePermanent("historic creature you control");
     private static final FilterCard historicCardFilter = new FilterCard("historic card");
 
     static {
         historicCreatureFilter.add(HistoricPredicate.instance);
+        historicCreatureFilter.add(TargetController.YOU.getControllerPredicate());
         historicCardFilter.add(HistoricPredicate.instance);
     }
 
