@@ -18,8 +18,7 @@ public class TalionTheKindlyLordTest extends CardTestPlayerBase {
 
         addCard(Zone.HAND, playerA, talion);
         addCard(Zone.BATTLEFIELD, playerA, "Underground Sea", 4);
-        // Keep cards available for both the normal draw and Talion's draw.
-        addCard(Zone.LIBRARY, playerA, "Island", 2);
+        addCard(Zone.LIBRARY, playerA, "Island");
 
         // Ornithopter has mana value 0 and power 0, but toughness 2.
         addCard(Zone.HAND, playerB, "Ornithopter");
@@ -35,8 +34,8 @@ public class TalionTheKindlyLordTest extends CardTestPlayerBase {
         execute();
 
         assertLife(playerB, 18);
-        // Talion left the hand, then player A drew once for the turn and once
-        // from the matching Ornithopter spell.
-        assertHandCount(playerA, 2);
+        // The starting player skips their first draw step, so this is the card
+        // drawn by Talion's trigger.
+        assertHandCount(playerA, 1);
     }
 }
