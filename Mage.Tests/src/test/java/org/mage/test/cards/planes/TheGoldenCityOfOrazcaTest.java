@@ -32,6 +32,26 @@ public class TheGoldenCityOfOrazcaTest extends CardTestPlayerBase {
     }
 
     @Test
+    public void currentPlanarControllerGetsTreasureButDoesNotDrawWithoutCitysBlessing() {
+        removeAllCardsFromHand(playerB);
+        addPlane(playerA, Planes.PLANE_THE_GOLDEN_CITY_OF_ORAZCA);
+        addCard(Zone.BATTLEFIELD, playerB, "Grizzly Bears");
+        addCard(Zone.LIBRARY, playerB, "Island", 2);
+        skipInitShuffling();
+
+        attack(2, playerB, "Grizzly Bears");
+
+        setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertPermanentCount(playerA, "Treasure Token", 0);
+        assertPermanentCount(playerB, "Treasure Token", 1);
+        // Player B draws one Island normally during turn two, but must not draw
+        // the second Island from the Plane trigger without the city's blessing.
+        assertHandCount(playerB, "Island", 1);
+    }
+
+    @Test
     public void combatDamageDrawsWithCitysBlessing() {
         removeAllCardsFromHand(playerA);
         addPlane(playerA, Planes.PLANE_THE_GOLDEN_CITY_OF_ORAZCA);
