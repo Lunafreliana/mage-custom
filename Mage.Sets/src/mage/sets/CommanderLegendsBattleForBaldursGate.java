@@ -36,9 +36,9 @@ public final class CommanderLegendsBattleForBaldursGate extends ExpansionSet {
         cards.add(new SetCardInfo("Agent of the Shadow Thieves", 108, Rarity.UNCOMMON, mage.cards.a.AgentOfTheShadowThieves.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Agent of the Shadow Thieves", 493, Rarity.UNCOMMON, mage.cards.a.AgentOfTheShadowThieves.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Agitator Ant", 776, Rarity.RARE, mage.cards.a.AgitatorAnt.class));
-        //cards.add(new SetCardInfo("Alaundo the Seer", 264, Rarity.RARE, mage.cards.a.AlaundoTheSeer.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Alaundo the Seer", 412, Rarity.RARE, mage.cards.a.AlaundoTheSeer.class, NON_FULL_USE_VARIOUS));
-        //cards.add(new SetCardInfo("Alaundo the Seer", 523, Rarity.RARE, mage.cards.a.AlaundoTheSeer.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Alaundo the Seer", 264, Rarity.RARE, mage.cards.a.AlaundoTheSeer.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Alaundo the Seer", 412, Rarity.RARE, mage.cards.a.AlaundoTheSeer.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Alaundo the Seer", 523, Rarity.RARE, mage.cards.a.AlaundoTheSeer.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Alora, Merry Thief", 381, Rarity.UNCOMMON, mage.cards.a.AloraMerryThief.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Alora, Merry Thief", 481, Rarity.UNCOMMON, mage.cards.a.AloraMerryThief.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Alora, Merry Thief", 55, Rarity.UNCOMMON, mage.cards.a.AloraMerryThief.class, NON_FULL_USE_VARIOUS));
