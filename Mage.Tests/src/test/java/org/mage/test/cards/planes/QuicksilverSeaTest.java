@@ -20,16 +20,25 @@ public class QuicksilverSeaTest extends CardTestPlayerBase {
         removeAllCardsFromLibrary(playerA);
         skipInitShuffling();
         addPlane(playerA, Planes.PLANE_QUICKSILVER_SEA);
-        addCard(Zone.LIBRARY, playerA, "Mountain", 8);
+        addCard(Zone.LIBRARY, playerA, "Mountain");
+        addCard(Zone.LIBRARY, playerA, "Island");
+        addCard(Zone.LIBRARY, playerA, "Swamp");
+        addCard(Zone.LIBRARY, playerA, "Forest");
 
         setChoice(playerA, "When you planeswalk");
         addTarget(playerA, TestPlayer.TARGET_SKIP); // Planeswalk trigger: keep all four on top.
+        setChoice(playerA, "Mountain");
+        setChoice(playerA, "Island");
+        setChoice(playerA, "Swamp");
         addTarget(playerA, TestPlayer.TARGET_SKIP); // Upkeep trigger: keep all four on top.
+        setChoice(playerA, "Mountain");
+        setChoice(playerA, "Island");
+        setChoice(playerA, "Swamp");
         setStrictChooseMode(true);
         setStopAt(1, PhaseStep.DRAW);
         execute();
 
-        assertLibraryCount(playerA, 8);
+        assertLibraryCount(playerA, 4);
     }
 
     @Test
