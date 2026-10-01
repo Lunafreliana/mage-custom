@@ -1494,8 +1494,13 @@ public final class CardUtil {
             cards.add(((CardWithHalves) cardToCast).getLeftHalfCard());
             cards.add(((CardWithHalves) cardToCast).getRightHalfCard());
         } else if (cardToCast instanceof CardWithSpellOption) {
-            cards.add(cardToCast);
-            cards.add(((CardWithSpellOption) cardToCast).getSpellCard());
+            CardWithSpellOption cardWithSpellOption = (CardWithSpellOption) cardToCast;
+            if (cardWithSpellOption.isMainCardCastOptionAvailable(game)) {
+                cards.add(cardToCast);
+            }
+            if (cardWithSpellOption.isSpellCardCastOptionAvailable(game)) {
+                cards.add(cardWithSpellOption.getSpellCard());
+            }
         } else {
             cards.add(cardToCast);
         }
