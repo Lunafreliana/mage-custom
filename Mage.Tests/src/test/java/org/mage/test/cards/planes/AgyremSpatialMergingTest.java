@@ -8,6 +8,7 @@ import mage.constants.Zone;
 import mage.game.FreeForAll;
 import mage.game.Game;
 import mage.game.GameException;
+import mage.game.command.PlanarCard;
 import mage.game.command.Plane;
 import mage.game.command.phenomena.SpatialMergingPhenomenon;
 import mage.game.events.GameEvent;
@@ -67,8 +68,15 @@ public class AgyremSpatialMergingTest extends CardTestMultiPlayerBase {
                             Plane.createPlane(Planes.PLANE_AGYREM),
                             Plane.createPlane(Planes.PLANE_TRAIL_OF_THE_MAGE_RINGS)
                     ), false);
+                    // addPhenomenon turns the current top card face up. Temporarily
+                    // remove the two Spatial Merging destinations so the test seam
+                    // encounters the Phenomenon itself rather than the first Plane.
+                    PlanarCard firstPlane = game.getState().getSharedPlanarDeck().draw();
+                    PlanarCard secondPlane = game.getState().getSharedPlanarDeck().draw();
                     Assert.assertTrue(info, game.addPhenomenon(
                             new SpatialMergingPhenomenon(), playerA.getId()));
+                    game.getState().getSharedPlanarDeck().putOnBottom(firstPlane);
+                    game.getState().getSharedPlanarDeck().putOnBottom(secondPlane);
                     resolveStack(game);
 
                     Assert.assertTrue(info, game.getState().hasFaceUpPlane(Planes.PLANE_AGYREM));
