@@ -31,7 +31,7 @@ public class PrepareTest extends CardTestPlayerBase {
         skipInitShuffling();
 
         addCard(Zone.HAND, playerA, "Shardless Agent");
-        addCard(Zone.BATTLEFIELD, playerA, "Tropical Island", 2);
+        addCard(Zone.BATTLEFIELD, playerA, "Tropical Island", 3);
         addCard(Zone.LIBRARY, playerA, "Vigorbloom Vanguard");
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Shardless Agent");
