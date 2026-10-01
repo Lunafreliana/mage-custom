@@ -20,10 +20,10 @@ public class HERBIELovableRobotTest extends CardTestPlayerBase {
         skipInitShuffling();
         removeAllCardsFromLibrary(playerA);
         addCard(Zone.BATTLEFIELD, playerA, herbie);
-        addCard(Zone.HAND, playerA, "Ornithopter");
+        addCard(Zone.HAND, playerA, "Tormod's Crypt");
         addCard(Zone.LIBRARY, playerA, "Mountain");
 
-        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Ornithopter");
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Tormod's Crypt");
         addTarget(playerA, "Mountain");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
