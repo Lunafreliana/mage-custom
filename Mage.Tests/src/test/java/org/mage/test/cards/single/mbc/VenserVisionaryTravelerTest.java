@@ -47,7 +47,7 @@ public class VenserVisionaryTravelerTest extends CardTestPlayerBase {
 
         assertPermanentCount(playerA, "Grizzly Bears", 1);
         assertPowerToughness(playerA, "Grizzly Bears", 4, 4);
-        assertCountersCount(playerA, "Venser, Visionary Traveler", CounterType.LOYALTY, 5);
+        assertCounterCount(playerA, "Venser, Visionary Traveler", CounterType.LOYALTY, 5);
     }
 
     @Test
@@ -64,6 +64,6 @@ public class VenserVisionaryTravelerTest extends CardTestPlayerBase {
 
         assertPermanentCount(playerB, "Grizzly Bears", 0);
         assertHandCount(playerB, "Grizzly Bears", 1);
-        assertCountersCount(playerA, "Venser, Visionary Traveler", CounterType.LOYALTY, 2);
+        assertCounterCount(playerA, "Venser, Visionary Traveler", CounterType.LOYALTY, 2);
     }
 }
