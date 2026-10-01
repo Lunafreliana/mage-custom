@@ -26,6 +26,29 @@ public class PrepareTest extends CardTestPlayerBase {
     private static final String BRAINGEYSER = "Braingeyser";
 
     @Test
+    public void landscapePainterEntersPreparedAndVibrantIdeaDrawsTwoCards() {
+        addCard(Zone.HAND, playerA, "Landscape Painter");
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 7);
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Landscape Painter");
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
+        checkPlayableAbility("Vibrant Idea is available while Landscape Painter is prepared",
+                1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cast Vibrant Idea", true);
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Vibrant Idea");
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertPermanentCount(playerA, "Landscape Painter", 1);
+        assertHandCount(playerA, 2);
+        assertExileCount(playerA, "Vibrant Idea", 0);
+        Permanent permanent = getPermanent("Landscape Painter", playerA);
+        Assert.assertNotNull(permanent);
+        Assert.assertFalse(permanent.isPrepared());
+    }
+
+    @Test
     public void prepareCardAndPrepareSpellReturnTheirOwnNames() {
         addCard(Zone.HAND, playerA, CREATURE);
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 2);
