@@ -16,7 +16,9 @@ public class HERBIELovableRobotTest extends CardTestPlayerBase {
 
     @Test
     public void testSurveilsAfterCastingNoncreatureSpell() {
+        setStrictChooseMode(true);
         skipInitShuffling();
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.BATTLEFIELD, playerA, herbie);
         addCard(Zone.HAND, playerA, "Ornithopter");
         addCard(Zone.LIBRARY, playerA, "Mountain");
@@ -32,7 +34,9 @@ public class HERBIELovableRobotTest extends CardTestPlayerBase {
 
     @Test
     public void testCreatureSpellDoesNotEnableSurveil() {
+        setStrictChooseMode(true);
         skipInitShuffling();
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.BATTLEFIELD, playerA, herbie);
         addCard(Zone.HAND, playerA, "Memnite");
         addCard(Zone.LIBRARY, playerA, "Mountain");
