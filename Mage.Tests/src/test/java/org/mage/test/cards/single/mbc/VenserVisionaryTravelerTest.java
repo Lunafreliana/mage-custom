@@ -24,6 +24,7 @@ public class VenserVisionaryTravelerTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Llanowar Elves");
         activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "{G},");
         setChoice(playerA, true);
+        setChoice(playerA, "Fyndhorn Elves");
 
         setStrictChooseMode(true);
         setStopAt(2, PhaseStep.UPKEEP);
