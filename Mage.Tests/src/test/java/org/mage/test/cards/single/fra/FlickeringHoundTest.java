@@ -12,6 +12,7 @@ public class FlickeringHoundTest extends CardTestPlayerBase {
 
     @Test
     public void testCreatureSpellTriggersFlicker() {
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.BATTLEFIELD, playerA, "Flickering Hound");
         addCard(Zone.BATTLEFIELD, playerA, "Wall of Omens");
         addCard(Zone.LIBRARY, playerA, "Island");
@@ -29,6 +30,7 @@ public class FlickeringHoundTest extends CardTestPlayerBase {
 
     @Test
     public void testNoncreatureSpellDoesNotTrigger() {
+        removeAllCardsFromLibrary(playerA);
         addCard(Zone.BATTLEFIELD, playerA, "Flickering Hound");
         addCard(Zone.BATTLEFIELD, playerA, "Wall of Omens");
         addCard(Zone.LIBRARY, playerA, "Island");
