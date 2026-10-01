@@ -42,7 +42,10 @@ public class EmeritusOfAbundanceTest extends CardTestPlayerBase {
     public void attackWithEightLandsBecomesPrepared() {
         addCard(Zone.BATTLEFIELD, playerA, EMERITUS);
         addCard(Zone.BATTLEFIELD, playerA, "Forest", 8);
+        addCard(Zone.GRAVEYARD, playerA, "Lightning Bolt");
 
+        // Consume the copy created by the enters-prepared ability before attacking.
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, REGROWTH, "Lightning Bolt");
         attack(1, playerA, EMERITUS);
 
         setStopAt(1, PhaseStep.DECLARE_BLOCKERS);
@@ -59,9 +62,12 @@ public class EmeritusOfAbundanceTest extends CardTestPlayerBase {
     public void attackTriggerRechecksLandCountOnResolution() {
         addCard(Zone.BATTLEFIELD, playerA, EMERITUS);
         addCard(Zone.BATTLEFIELD, playerA, "Forest", 8);
+        addCard(Zone.GRAVEYARD, playerA, "Lightning Bolt");
         addCard(Zone.HAND, playerB, "Boomerang");
         addCard(Zone.BATTLEFIELD, playerB, "Island", 2);
 
+        // Consume the copy created by the enters-prepared ability before attacking.
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, REGROWTH, "Lightning Bolt");
         attack(1, playerA, EMERITUS);
         castSpell(1, PhaseStep.DECLARE_ATTACKERS, playerB, "Boomerang", "Forest");
 
