@@ -198,6 +198,8 @@ public final class RealityFracture extends ExpansionSet {
         cards.add(new SetCardInfo("Theorix Charm", 435, Rarity.UNCOMMON, mage.cards.t.TheorixCharm.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Tinybones, Pocket Nuisance", 237, Rarity.UNCOMMON, mage.cards.t.TinybonesPocketNuisance.class));
         cards.add(new SetCardInfo("Titanbones, Towering Heart", 266, Rarity.UNCOMMON, mage.cards.t.TitanbonesToweringHeart.class));
+        cards.add(new SetCardInfo("Variable Chaser", 47, Rarity.RARE, mage.cards.v.VariableChaser.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Variable Chaser", 426, Rarity.RARE, mage.cards.v.VariableChaser.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Vigorbloom Charm", 160, Rarity.UNCOMMON, mage.cards.v.VigorbloomCharm.class));
         cards.add(new SetCardInfo("Vigorbloom Vanguard", 161, Rarity.UNCOMMON, mage.cards.v.VigorbloomVanguard.class));
         cards.add(new SetCardInfo("Vraska's Final Mercy", 343, Rarity.RARE, mage.cards.v.VraskasFinalMercy.class, NON_FULL_USE_VARIOUS));
