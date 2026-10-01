@@ -234,6 +234,7 @@
 |PLANE:PUNK|Plane - Preston's Stage||PrestonsStagePlane|
 |PLANE:PUNK|Plane - Raiders' Allegiance||RaidersAllegiancePlane|
 |PLANE:PCA|Plane - Prahv||PrahvPlane|
+|PLANE:PCA|Plane - Quicksilver Sea||QuicksilverSeaPlane|
 |PLANE:PCA|Plane - Sea of Sand||SeaOfSandPlane|
 |PLANE:PCA|Plane - Selesnya Loft Gardens||SelesnyaLoftGardensPlane|
 |PLANE:PUNK|Plane - Shy Town||ShyTownPlane|
