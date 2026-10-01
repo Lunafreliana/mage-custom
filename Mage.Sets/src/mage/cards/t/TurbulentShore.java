@@ -1,7 +1,5 @@
 package mage.cards.t;
 
-import java.util.UUID;
-import mage.constants.SubType;
 import mage.abilities.common.EntersBattlefieldTappedUnlessAbility;
 import mage.abilities.condition.common.OpponentsControlEightLandsCondition;
 import mage.abilities.mana.BlueManaAbility;
@@ -9,6 +7,9 @@ import mage.abilities.mana.WhiteManaAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
+import mage.constants.SubType;
+
+import java.util.UUID;
 
 /**
  *
@@ -28,7 +29,8 @@ public final class TurbulentShore extends CardImpl {
 
         // This land enters tapped unless your opponents control eight or more lands.
         this.addAbility(new EntersBattlefieldTappedUnlessAbility(OpponentsControlEightLandsCondition.instance)
-            .addHint(OpponentsControlEightLandsCondition.getHint()));    }
+                .addHint(OpponentsControlEightLandsCondition.getHint()));
+    }
 
     private TurbulentShore(final TurbulentShore card) {
         super(card);
