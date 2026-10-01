@@ -26,6 +26,28 @@ public class PrepareTest extends CardTestPlayerBase {
     private static final String BRAINGEYSER = "Braingeyser";
 
     @Test
+    public void cascadeCastsPreparationCardNotPrepareSpell() {
+        removeAllCardsFromLibrary(playerA);
+        skipInitShuffling();
+
+        addCard(Zone.HAND, playerA, "Shardless Agent");
+        addCard(Zone.BATTLEFIELD, playerA, "Tropical Island", 2);
+        addCard(Zone.LIBRARY, playerA, "Vigorbloom Vanguard");
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Shardless Agent");
+        setChoice(playerA, true); // Cast the card found by cascade.
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertPermanentCount(playerA, "Shardless Agent", 1);
+        assertPermanentCount(playerA, "Vigorbloom Vanguard", 1);
+        assertExileCount(playerA, "Seed Suture", 1);
+        assertLife(playerA, 20);
+    }
+
+    @Test
     public void prepareCardAndPrepareSpellReturnTheirOwnNames() {
         addCard(Zone.HAND, playerA, CREATURE);
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 2);
