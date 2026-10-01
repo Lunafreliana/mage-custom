@@ -7,6 +7,7 @@ import mage.abilities.effects.OneShotEffect;
 import mage.abilities.keyword.DeathtouchAbility;
 import mage.cards.Card;
 import mage.cards.CardSetInfo;
+import mage.cards.Cards;
 import mage.cards.CardsImpl;
 import mage.cards.PrepareCard;
 import mage.constants.CardType;
@@ -17,9 +18,7 @@ import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.players.Player;
 import mage.target.TargetCard;
-import mage.util.RandomUtil;
 
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -79,19 +78,24 @@ class VastlandsScavengerEffect extends OneShotEffect {
         if (player == null) {
             return false;
         }
-        Set<Card> cards = player.millCards(7, source, game).getCards(StaticFilters.FILTER_CARD_CREATURE, game);
+        Cards cards = new CardsImpl(player
+                .millCards(7, source, game)
+                .getCards(StaticFilters.FILTER_CARD_CREATURE, game));
         Card card;
         switch (cards.size()) {
             case 0:
                 return true;
             case 1:
-                card = RandomUtil.randomFromCollection(cards);
+                card = cards.getRandom(game);
                 break;
             default:
                 TargetCard target = new TargetCard(Zone.ALL, StaticFilters.FILTER_CARD_CREATURE);
-                player.choose(outcome, new CardsImpl(cards), target, source, game);
-                card = game.getCard(target.getFirstTarget());
+                player.choose(outcome, cards, target, source, game);
+                card = cards.get(target.getFirstTarget(), game);
         }
-        return card == null || player.moveCards(card, Zone.BATTLEFIELD, source, game);
+        if (card != null) {
+            player.moveCards(card, Zone.BATTLEFIELD, source, game);
+        }
+        return true;
     }
 }
