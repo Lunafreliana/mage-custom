@@ -305,6 +305,8 @@ public final class MarvelSuperHeroesCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Hawkeye, Trick Shot", 506, Rarity.RARE, mage.cards.h.HawkeyeTrickShot.class));
         cards.add(new SetCardInfo("Heart-Shaped Herb", 105, Rarity.RARE, mage.cards.h.HeartShapedHerb.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Heart-Shaped Herb", 435, Rarity.RARE, mage.cards.h.HeartShapedHerb.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("H.E.R.B.I.E., Lovable Robot", 106, Rarity.RARE, mage.cards.h.HERBIELovableRobot.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("H.E.R.B.I.E., Lovable Robot", 436, Rarity.RARE, mage.cards.h.HERBIELovableRobot.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Helm of the Host", 200, Rarity.RARE, mage.cards.h.HelmOfTheHost.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Helm of the Host", 437, Rarity.RARE, mage.cards.h.HelmOfTheHost.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Herald's Horn", 287, Rarity.UNCOMMON, mage.cards.h.HeraldsHorn.class));
