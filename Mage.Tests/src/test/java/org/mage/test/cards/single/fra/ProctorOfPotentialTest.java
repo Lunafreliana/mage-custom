@@ -24,6 +24,7 @@ public class ProctorOfPotentialTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, PROCTOR);
         addTarget(playerA, "Mountain");
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Memnite");
         addTarget(playerA, "Forest");
 
@@ -46,7 +47,9 @@ public class ProctorOfPotentialTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, PROCTOR);
         addTarget(playerA, "Forest");
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Lightning Bolt", PROCTOR);
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "{W}{U}: Return this card");
 
         setStrictChooseMode(true);
