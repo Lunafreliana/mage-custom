@@ -44,7 +44,8 @@ public class EmeritusOfIdeationTest extends CardTestPlayerBase {
 
         attack(3, playerA, EMERITUS, playerB);
         setChoice(playerA, true);
-        addTarget(playerA, "Grizzly Bears", 8);
+        setChoice(playerA, "Grizzly Bears^Grizzly Bears^Grizzly Bears^Grizzly Bears^"
+                + "Grizzly Bears^Grizzly Bears^Grizzly Bears^Grizzly Bears");
         waitStackResolved(3, PhaseStep.DECLARE_ATTACKERS);
         castSpell(3, PhaseStep.POSTCOMBAT_MAIN, playerA, RECALL, playerB);
 
