@@ -1,15 +1,16 @@
 package mage.cards.e;
 
-import java.util.UUID;
 import mage.MageInt;
 import mage.abilities.common.EntersPreparedAbility;
 import mage.abilities.effects.common.DrawCardSourceControllerEffect;
 import mage.abilities.effects.common.MayTapOrUntapTargetEffect;
-import mage.constants.SubType;
-import mage.target.common.TargetCreaturePermanent;
 import mage.cards.CardSetInfo;
 import mage.cards.PrepareCard;
 import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.target.common.TargetCreaturePermanent;
+
+import java.util.UUID;
 
 /**
  *
@@ -18,7 +19,8 @@ import mage.constants.CardType;
 public final class EliteInterceptor extends PrepareCard {
 
     public EliteInterceptor(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{W}", "Rejoinder", new CardType[]{CardType.SORCERY}, "{1}{W}");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{W}",
+                "Rejoinder", CardType.SORCERY, "{1}{W}");
 
         this.subtype.add(SubType.HUMAN);
         this.subtype.add(SubType.WIZARD);
