@@ -12,7 +12,7 @@ import java.util.List;
  */
 public final class SecretsOfStrixhaven extends ExpansionSet {
 
-    private static final List<String> unfinished = Arrays.asList("Abigale, Poet Laureate", "Adventurous Eater", "Blazing Firesinger", "Cheerful Osteomancer", "Emeritus of Conflict", "Grave Researcher", "Harmonized Trio", "Honorbound Page", "Infirmary Healer", "Jadzi, Steward of Fate", "Joined Researchers", "Kirol, History Buff", "Landscape Painter", "Leech Collector", "Maelstrom Artisan", "Pigment Wrangler", "Sanar, Unfinished Genius", "Scathing Shadelock", "Scheming Silvertongue", "Spellbook Seeker", "Spiritcall Enthusiast", "Strife Scholar", "Vastlands Scavenger");
+    private static final List<String> unfinished = Arrays.asList("Abigale, Poet Laureate", "Adventurous Eater", "Blazing Firesinger", "Cheerful Osteomancer", "Emeritus of Conflict", "Grave Researcher", "Harmonized Trio", "Honorbound Page", "Infirmary Healer", "Jadzi, Steward of Fate", "Joined Researchers", "Kirol, History Buff", "Leech Collector", "Maelstrom Artisan", "Pigment Wrangler", "Sanar, Unfinished Genius", "Scathing Shadelock", "Scheming Silvertongue", "Spellbook Seeker", "Spiritcall Enthusiast", "Strife Scholar", "Vastlands Scavenger");
     private static final SecretsOfStrixhaven instance = new SecretsOfStrixhaven();
 
     public static SecretsOfStrixhaven getInstance() {
