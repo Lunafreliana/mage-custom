@@ -25,10 +25,10 @@ import mage.constants.CardType;
  */
 public final class EmeritusOfTruce extends PrepareCard {
 
-    private static final Condition condition = new OpponentControlsMoreCondition(StaticFilters.FILTER_PERMANENT_CREATURES);
+    private static final Condition CONDITION = new OpponentControlsMoreCondition(StaticFilters.FILTER_PERMANENT_CREATURES);
 
     public EmeritusOfTruce(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{1}{W}{W}", "Swords to Plowshares", new CardType[]{CardType.INSTANT},"{W}");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{1}{W}{W}", "Swords to Plowshares", new CardType[]{CardType.INSTANT}, "{W}");
 
         this.subtype.add(SubType.CAT);
         this.subtype.add(SubType.CLERIC);
@@ -36,10 +36,12 @@ public final class EmeritusOfTruce extends PrepareCard {
         this.toughness = new MageInt(3);
 
         // When this creature enters, target player creates a 1/1 white and black Inkling creature token with flying. Then if an opponent controls more creatures than you, this creature becomes prepared.
-        Ability ability = new EntersBattlefieldTriggeredAbility(new CreateTokenTargetEffect(new Inkling11Token()));
+        Ability ability = new EntersBattlefieldTriggeredAbility(
+                new CreateTokenTargetEffect(new Inkling11Token())
+        );
         ability.addEffect(new ConditionalOneShotEffect(
-            new BecomePreparedSourceEffect(),
-            condition
+                new BecomePreparedSourceEffect(),
+                CONDITION
         ).setText("Then if an opponent controls more creatures than you, this creature becomes prepared"));
         ability.addTarget(new TargetPlayer());
         this.addAbility(ability);
