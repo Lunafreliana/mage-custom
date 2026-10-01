@@ -212,6 +212,7 @@ public enum CounterType {
     SHADOW("shadow"),
     SHELL("shell"),
     SHIELD("shield"),
+    SHY("shy"),
     SHRED("shred"),
     SKEWER("skewer"),
     SLEEP("sleep"),

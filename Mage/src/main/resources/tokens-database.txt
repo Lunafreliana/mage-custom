@@ -236,6 +236,7 @@
 |PLANE:PCA|Plane - Prahv||PrahvPlane|
 |PLANE:PCA|Plane - Sea of Sand||SeaOfSandPlane|
 |PLANE:PCA|Plane - Selesnya Loft Gardens||SelesnyaLoftGardensPlane|
+|PLANE:PUNK|Plane - Shy Town||ShyTownPlane|
 |PLANE:MOC|Plane - Sokenzan||SokenzanPlane|
 |PLANE:PCA|Plane - Stairs to Infinity||StairsToInfinityPlane|
 |PLANE:MOC|Plane - Stensia||StensiaPlane|
@@ -248,6 +249,7 @@
 |PHENOMENON:PUNK|Phenomenon - Omenpath Instability||OmenpathInstabilityPhenomenon|
 |TOK:PUNK|Entropy||EntropyToken|
 |TOK:PUNK|Omenpath||OmenpathToken|
+|TOK:PUNK|Warrior||ShyTownWarriorToken|
 |PHENOMENON:PCA|Phenomenon - Reality Shaping||RealityShapingPhenomenon|
 |PHENOMENON:PCA|Phenomenon - Spatial Merging||SpatialMergingPhenomenon|
 |PHENOMENON:PUNK|Phenomenon - Team-Up!||TeamUpPhenomenon|
