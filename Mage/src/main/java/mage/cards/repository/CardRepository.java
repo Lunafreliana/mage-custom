@@ -39,7 +39,7 @@ public enum CardRepository {
     // TODO: delete db version from cards and expansions due un-used (cause dbs re-created on each update now)
     private static final String VERSION_ENTITY_NAME = "card";
     private static final long CARD_DB_VERSION = 54; // raise this if db structure was changed
-    private static final long CARD_CONTENT_VERSION = 241; // raise this if new cards were added to the server
+    private static final long CARD_CONTENT_VERSION = 242; // raise this if new cards were added to the server
 
     private Dao<CardInfo, Object> cardsDao;
 
