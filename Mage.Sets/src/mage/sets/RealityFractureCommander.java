@@ -25,5 +25,6 @@ public final class RealityFractureCommander extends ExpansionSet {
         cards.add(new SetCardInfo("Niv-Mizzet, Ghost Counsel", 10, Rarity.RARE, mage.cards.n.NivMizzetGhostCounsel.class));
         cards.add(new SetCardInfo("Ob Nixilis, the Ascended", 5, Rarity.RARE, mage.cards.o.ObNixilisTheAscended.class));
         cards.add(new SetCardInfo("Omnath, Locus of the Void", 3, Rarity.RARE, mage.cards.o.OmnathLocusOfTheVoid.class));
+        cards.add(new SetCardInfo("Turbulent Shore", 17, Rarity.RARE, mage.cards.t.TurbulentShore.class));
     }
 }
