@@ -14,7 +14,7 @@ public class EmeritusOfIdeationTest extends CardTestPlayerBase {
     public void entersPreparedAndCastsAncestralRecall() {
         skipInitShuffling();
         addCard(Zone.LIBRARY, playerB, "Darksteel Relic", 3);
-        addCard(Zone.HAND, playerA, "[SOS:45] " + EMERITUS);
+        addCard(Zone.HAND, playerA, "SOS-" + EMERITUS);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 6);
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, EMERITUS);
@@ -33,7 +33,7 @@ public class EmeritusOfIdeationTest extends CardTestPlayerBase {
     public void attackCanExileEightCardsToBecomePreparedAgain() {
         skipInitShuffling();
         addCard(Zone.LIBRARY, playerB, "Darksteel Relic", 6);
-        addCard(Zone.HAND, playerA, "[SOS:45] " + EMERITUS);
+        addCard(Zone.HAND, playerA, "SOS-" + EMERITUS);
         addCard(Zone.BATTLEFIELD, playerA, "Island", 7);
         addCard(Zone.GRAVEYARD, playerA, "Grizzly Bears", 8);
 
