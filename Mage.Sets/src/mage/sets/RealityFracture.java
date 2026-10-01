@@ -37,6 +37,7 @@ public final class RealityFracture extends ExpansionSet {
         cards.add(new SetCardInfo("Avatar of Burgeoning Echoes", 348, Rarity.MYTHIC, mage.cards.a.AvatarOfBurgeoningEchoes.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Bestial Incursion", 98, Rarity.COMMON, mage.cards.b.BestialIncursion.class));
         cards.add(new SetCardInfo("Blazing Crescendo", 75, Rarity.COMMON, mage.cards.b.BlazingCrescendo.class));
+        cards.add(new SetCardInfo("Blossom-Blessed Angel", 3, Rarity.COMMON, mage.cards.b.BlossomBlessedAngel.class));
         cards.add(new SetCardInfo("Bloodline Recollector", 402, Rarity.MYTHIC, mage.cards.b.BloodlineRecollector.class, FULL_ART_USE_VARIOUS));
         cards.add(new SetCardInfo("Bloodline Recollector", 427, Rarity.MYTHIC, mage.cards.b.BloodlineRecollector.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Bloodline Recollector", 49, Rarity.MYTHIC, mage.cards.b.BloodlineRecollector.class, NON_FULL_USE_VARIOUS));
@@ -198,6 +199,8 @@ public final class RealityFracture extends ExpansionSet {
         cards.add(new SetCardInfo("Theorix Charm", 435, Rarity.UNCOMMON, mage.cards.t.TheorixCharm.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Tinybones, Pocket Nuisance", 237, Rarity.UNCOMMON, mage.cards.t.TinybonesPocketNuisance.class));
         cards.add(new SetCardInfo("Titanbones, Towering Heart", 266, Rarity.UNCOMMON, mage.cards.t.TitanbonesToweringHeart.class));
+        cards.add(new SetCardInfo("Variable Chaser", 47, Rarity.RARE, mage.cards.v.VariableChaser.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Variable Chaser", 426, Rarity.RARE, mage.cards.v.VariableChaser.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Vigorbloom Charm", 160, Rarity.UNCOMMON, mage.cards.v.VigorbloomCharm.class));
         cards.add(new SetCardInfo("Vigorbloom Vanguard", 161, Rarity.UNCOMMON, mage.cards.v.VigorbloomVanguard.class));
         cards.add(new SetCardInfo("Vraska's Final Mercy", 343, Rarity.RARE, mage.cards.v.VraskasFinalMercy.class, NON_FULL_USE_VARIOUS));
