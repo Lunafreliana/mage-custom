@@ -72,7 +72,7 @@ jobs:
         $maxAttempts = 3
         for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
           Write-Host "Maven test attempt $attempt of $maxAttempts"
-          & mvn test -B `
+          & mvn --settings "$env:GITHUB_WORKSPACE/.github/maven-settings.xml" test -B `
             "-Dxmage.dataCollectors.printGameLogs=false" `
             "-Dlog4j.configuration=file:$env:GITHUB_WORKSPACE/.travis/log4j.properties"
           $mavenExitCode = $LASTEXITCODE
