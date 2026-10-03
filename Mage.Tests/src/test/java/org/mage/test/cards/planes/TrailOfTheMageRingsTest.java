@@ -26,8 +26,8 @@ public class TrailOfTheMageRingsTest extends CardTestPlayerBase {
         setStopAt(3, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
-        assertLife(playerA, 14);
-        assertLife(playerB, 16);
+        assertLife(playerA, 14); // Lightning Bolt resolved twice for 3 damage each.
+        assertLife(playerB, 14); // Volcanic Hammer resolved twice for 3 damage each.
         assertGraveyardCount(playerA, "Volcanic Hammer", 1);
         assertGraveyardCount(playerB, "Lightning Bolt", 1);
         assertExileCount(playerA, 0);
