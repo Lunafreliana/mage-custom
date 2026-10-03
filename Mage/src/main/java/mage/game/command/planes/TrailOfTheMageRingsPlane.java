@@ -85,15 +85,15 @@ class TrailOfTheMageRingsReboundEffect extends ContinuousEffectImpl {
                 for (Card card : player.getHand().getCards(filter, game)) {
                     addReboundAbility(card, source, game);
                 }
-                for (Iterator<StackObject> iterator = game.getStack().iterator(); iterator.hasNext(); ) {
-                    StackObject stackObject = iterator.next();
-                    if (stackObject instanceof Spell && stackObject.isControlledBy(source.getControllerId())) {
-                        Spell spell = (Spell) stackObject;
-                        Card card = spell.getCard();
-                        if (card != null) {
-                            addReboundAbility(card, source, game);
-                        }
-                    }
+            }
+        }
+        for (Iterator<StackObject> iterator = game.getStack().iterator(); iterator.hasNext(); ) {
+            StackObject stackObject = iterator.next();
+            if (stackObject instanceof Spell) {
+                Spell spell = (Spell) stackObject;
+                Card card = spell.getCard();
+                if (card != null) {
+                    addReboundAbility(card, source, game);
                 }
             }
         }
