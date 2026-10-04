@@ -21,7 +21,6 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         this.blockName = "Mystery Booster Commander Edition";
 
         this.hasBasicLands = false;
-        this.hasBoosters = true;
 
         cards.add(new SetCardInfo("Arzakon", 33, Rarity.RARE, mage.cards.a.Arzakon.class));
         cards.add(new SetCardInfo("Ashaya's Enduring Bond", 34, Rarity.RARE, mage.cards.a.AshayasEnduringBond.class));
@@ -43,6 +42,7 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Exotic Orchard", 79, Rarity.RARE, mage.cards.e.ExoticOrchard.class));
         cards.add(new SetCardInfo("Fellwar Stone", 74, Rarity.UNCOMMON, mage.cards.f.FellwarStone.class));
         cards.add(new SetCardInfo("Feroz, Ulgrotha's Warden", 38, Rarity.RARE, mage.cards.f.FerozUlgrothasWarden.class));
+        cards.add(new SetCardInfo("Flitwing, Lyev Detective", 8, Rarity.RARE, mage.cards.f.FlitwingLyevDetective.class));
         cards.add(new SetCardInfo("Grandmother Goby", 9, Rarity.RARE, mage.cards.g.GrandmotherGoby.class));
         cards.add(new SetCardInfo("Greensleeves", 30, Rarity.RARE, mage.cards.g.Greensleeves.class));
         cards.add(new SetCardInfo("Grizzlegom, Hurloon Hero", 39, Rarity.RARE, mage.cards.g.GrizzlegomHurloonHero.class));
@@ -51,13 +51,11 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Jandor, Fortuned Traveler", 42, Rarity.RARE, mage.cards.j.JandorFortunedTraveler.class));
         cards.add(new SetCardInfo("Jeweled Amulet", 75, Rarity.UNCOMMON, mage.cards.j.JeweledAmulet.class));
         cards.add(new SetCardInfo("Joven and Chandler", 24, Rarity.RARE, mage.cards.j.JovenAndChandler.class));
-        cards.add(new SetCardInfo("Kuroki, Thief of Talents", 15, Rarity.RARE, mage.cards.k.KurokiThiefOfTalents.class));
         cards.add(new SetCardInfo("Lyna, Veil of Vengeance", 43, Rarity.RARE, mage.cards.l.LynaVeilofVengeance.class));
         cards.add(new SetCardInfo("Maular, the Next Evolution", 31, Rarity.RARE, mage.cards.m.MaularTheNextEvolution.class));
-        cards.add(new SetCardInfo("Massimo, the Magician", 45, Rarity.RARE, mage.cards.m.MassimoTheMagician.class));
         cards.add(new SetCardInfo("Meatsqueak, Hoard Lord", 32, Rarity.RARE, mage.cards.m.MeatsqueakHoardLord.class));
         cards.add(new SetCardInfo("Mind Stone", 76, Rarity.UNCOMMON, mage.cards.m.MindStone.class));
-        cards.add(new SetCardInfo("Miss Highwater", 16, Rarity.RARE, mage.cards.m.MissHighwater.class));
+        cards.add(new SetCardInfo("Nephilim Epochal", 47, Rarity.RARE, mage.cards.n.NephilimEpochal.class));
         cards.add(new SetCardInfo("Nivea, Beloved Battlemage", 3, Rarity.RARE, mage.cards.n.NiveaBelovedBattlemage.class));
         cards.add(new SetCardInfo("Olag and Miau, New Friends", 48, Rarity.RARE, mage.cards.o.OlagAndMiauNewFriends.class));
         cards.add(new SetCardInfo("Oracle of the Alpha", 64, Rarity.UNCOMMON, mage.cards.o.OracleOfTheAlpha.class));
@@ -73,7 +71,6 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Tsagan, Raider Warlord", 53, Rarity.RARE, mage.cards.t.TsaganRaiderWarlord.class));
         cards.add(new SetCardInfo("Uugguu, the Omniplasm", 54, Rarity.RARE, mage.cards.u.UugguuTheOmniplasm.class));
         cards.add(new SetCardInfo("Valko Indorian", 60, Rarity.RARE, mage.cards.v.ValkoIndorian.class));
-        cards.add(new SetCardInfo("Venser, Visionary Traveler", 55, Rarity.RARE, mage.cards.v.VenserVisionaryTraveler.class));
         cards.add(new SetCardInfo("Whtz, the Bibliophile", 57, Rarity.RARE, mage.cards.w.WhtzTheBibliophile.class));
         cards.add(new SetCardInfo("Worzel, the Protector", 5, Rarity.RARE, mage.cards.w.WorzelTheProtector.class));
         cards.add(new SetCardInfo("Zagorka, Mother of Sanctum", 58, Rarity.RARE, mage.cards.z.ZagorkaMotherOfSanctum.class));

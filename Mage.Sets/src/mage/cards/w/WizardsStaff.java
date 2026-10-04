@@ -9,27 +9,22 @@ import mage.abilities.keyword.EquipAbility;
 import mage.abilities.keyword.ProwessAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.AttachmentType;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.SubType;
+import mage.constants.*;
 import mage.filter.FilterPermanent;
 import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.game.Game;
 import mage.game.events.GameEvent;
+import mage.game.permanent.Permanent;
 import mage.target.TargetPermanent;
-import mage.util.CardUtil;
 
 import java.util.UUID;
 
 /**
- * @author muz
+ * @author miesma
  */
 public final class WizardsStaff extends CardImpl {
 
-    private static final FilterPermanent filter
-            = new FilterControlledCreaturePermanent(SubType.WIZARD, "Wizard");
+    private static final FilterPermanent filter = new FilterControlledCreaturePermanent(SubType.WIZARD, "Wizard");
 
     public WizardsStaff(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{1}{U}");
@@ -41,15 +36,11 @@ public final class WizardsStaff extends CardImpl {
                 new ProwessAbility(), AttachmentType.EQUIPMENT
         )));
 
-        // If an ability of equipped creature triggers, that ability triggers an additional time.
-        this.addAbility(new SimpleStaticAbility(new GainAbilityAttachedEffect(
-                new SimpleStaticAbility(new WizardsStaffEffect()), AttachmentType.EQUIPMENT
-        )));
+        // If a triggered ability of equipped creature triggers, that ability triggers an additional time.
+        this.addAbility(new SimpleStaticAbility(new WizardsStaffEffect()));
 
         // Equip Wizard {1}
-        this.addAbility(new EquipAbility(
-                Outcome.AddAbility, new GenericManaCost(1), new TargetPermanent(filter), false
-        ));
+        this.addAbility(new EquipAbility(Outcome.AddAbility, new GenericManaCost(1), new TargetPermanent(filter)));
 
         // Equip {3}
         this.addAbility(new EquipAbility(3, false));
@@ -69,7 +60,7 @@ class WizardsStaffEffect extends ReplacementEffectImpl {
 
     WizardsStaffEffect() {
         super(Duration.WhileOnBattlefield, Outcome.Benefit);
-        staticText = "If an ability of this creature triggers, that ability triggers an additional time.";
+        staticText = "if a triggered ability of equipped creature triggers, that ability triggers an additional time";
     }
 
     private WizardsStaffEffect(final WizardsStaffEffect effect) {
@@ -88,12 +79,16 @@ class WizardsStaffEffect extends ReplacementEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        return source.getSourceId().equals(event.getSourceId());
+        Permanent permanent = game.getPermanentOrLKIBattlefield(event.getSourceId());
+        Permanent equipment = game.getPermanentOrLKIBattlefield(source.getSourceId());
+        return permanent != null && equipment != null
+                && permanent.getId().equals(equipment.getAttachedTo());
     }
 
     @Override
     public boolean replaceEvent(GameEvent event, Ability source, Game game) {
-        event.setAmount(CardUtil.overflowInc(event.getAmount(), 1));
+        event.setAmount(event.getAmount() + 1);
         return false;
     }
 }
+

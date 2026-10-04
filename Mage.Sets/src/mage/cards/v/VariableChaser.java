@@ -1,6 +1,12 @@
 package mage.cards.v;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import mage.MageInt;
+import mage.constants.SubType;
+import mage.game.Game;
+import mage.players.Player;
 import mage.abilities.Ability;
 import mage.abilities.common.EntersPreparedAbility;
 import mage.abilities.effects.OneShotEffect;
@@ -10,30 +16,25 @@ import mage.cards.CardSetInfo;
 import mage.cards.PrepareCard;
 import mage.constants.CardType;
 import mage.constants.Outcome;
-import mage.constants.SubType;
-import mage.game.Game;
-import mage.players.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
- * @author TheElk801
+ *
+ * @author muz
  */
 public final class VariableChaser extends PrepareCard {
 
     public VariableChaser(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{U}",
-                "Arc of Fortune", new CardType[]{CardType.SORCERY}, "{2}{U}");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{U}", "Arc of Fortune", new CardType[]{CardType.SORCERY}, "{2}{U}");
 
         this.subtype.add(SubType.HUMAN);
         this.subtype.add(SubType.WIZARD);
         this.power = new MageInt(2);
         this.toughness = new MageInt(3);
 
-        // Flying, prowess
+        // Flying
         this.addAbility(FlyingAbility.getInstance());
+
+        // Prowess
         this.addAbility(new ProwessAbility());
 
         // This creature enters prepared.
@@ -42,7 +43,7 @@ public final class VariableChaser extends PrepareCard {
         // Arc of Fortune
         // Sorcery {2}{U}
         // Each player may discard their hand and draw seven cards.
-        this.getSpellCard().getSpellAbility().addEffect(new VariableChaserEffect());
+        this.getSpellCard().getSpellAbility().addEffect(new ArcOfFortuneEffect());
     }
 
     private VariableChaser(final VariableChaser card) {
@@ -55,35 +56,36 @@ public final class VariableChaser extends PrepareCard {
     }
 }
 
-class VariableChaserEffect extends OneShotEffect {
 
-    VariableChaserEffect() {
+class ArcOfFortuneEffect extends OneShotEffect {
+
+    ArcOfFortuneEffect() {
         super(Outcome.Benefit);
         staticText = "each player may discard their hand and draw seven cards";
     }
 
-    private VariableChaserEffect(final VariableChaserEffect effect) {
+    private ArcOfFortuneEffect(final ArcOfFortuneEffect effect) {
         super(effect);
     }
 
     @Override
-    public VariableChaserEffect copy() {
-        return new VariableChaserEffect(this);
+    public ArcOfFortuneEffect copy() {
+        return new ArcOfFortuneEffect(this);
     }
 
     @Override
     public boolean apply(Game game, Ability source) {
-        List<Player> players = new ArrayList<>();
+        List<Player> wheelers = new ArrayList<>();
         for (UUID playerId : game.getState().getPlayersInRange(source.getControllerId(), game)) {
             Player player = game.getPlayer(playerId);
             if (player != null && player.chooseUse(
                     Outcome.DrawCard, "Discard your hand and draw seven?", source, game
             )) {
                 game.informPlayers(player.getName() + " chooses to discard their hand and draw seven");
-                players.add(player);
+                wheelers.add(player);
             }
         }
-        for (Player player : players) {
+        for (Player player : wheelers) {
             player.discard(player.getHand(), false, source, game);
             player.drawCards(7, source, game);
         }
