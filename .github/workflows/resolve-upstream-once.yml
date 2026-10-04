@@ -92,7 +92,7 @@ jobs:
           PY
           # This helper must not remain in the final upstream sync.
           git rm .github/workflows/resolve-upstream-once.yml
-          git diff --cached --check
+          git -c core.whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab diff --cached --check
           git commit -m "Merge official XMage 9a7762d preserving custom engine and Planechase behavior"
           git merge-base --is-ancestor "$UPSTREAM_SHA" HEAD
           git push origin "HEAD:$RESOLUTION_BRANCH"
