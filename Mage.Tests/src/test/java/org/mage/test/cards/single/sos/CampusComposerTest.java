@@ -30,7 +30,7 @@ public class CampusComposerTest extends CardTestPlayerBase {
 
         assertPermanentCount(playerA, COMPOSER, 1);
         assertPowerToughness(playerA, COMPOSER, 3, 4);
-        assertAbility(playerA, COMPOSER, new WardAbility(new ManaCostsImpl<>("{2}")), true);
+        assertAbility(playerA, COMPOSER, new WardAbility(new ManaCostsImpl<>("{2}"), false), true);
         assertPermanentCount(playerA, "Elemental Token", 1);
         assertPowerToughness(playerA, "Elemental Token", 3, 3);
         assertAbility(playerA, "Elemental Token", FlyingAbility.getInstance(), true);

@@ -1,5 +1,6 @@
 package mage.cards.o;
 
+import java.util.UUID;
 import mage.MageInt;
 import mage.Mana;
 import mage.abilities.Ability;
@@ -7,9 +8,14 @@ import mage.abilities.common.LandfallAbility;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.dynamicvalue.DynamicValue;
 import mage.abilities.effects.ContinuousEffectImpl;
-import mage.abilities.effects.Effect;
 import mage.abilities.effects.common.continuous.BoostSourceEffect;
-import mage.abilities.effects.mana.AddManaToManaPoolSourceControllerEffect;
+import mage.abilities.effects.mana.BasicManaEffect;
+import mage.abilities.hint.Hint;
+import mage.abilities.hint.ValueHint;
+import mage.constants.SubType;
+import mage.constants.SuperType;
+import mage.game.Game;
+import mage.players.Player;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
@@ -17,40 +23,32 @@ import mage.constants.Duration;
 import mage.constants.Layer;
 import mage.constants.Outcome;
 import mage.constants.SubLayer;
-import mage.constants.SubType;
-import mage.constants.SuperType;
-import mage.game.Game;
-import mage.players.Player;
-
-import java.util.UUID;
 
 /**
- * @author TheElk801
+ *
+ * @author muz
  */
 public final class OmnathLocusOfTheVoid extends CardImpl {
 
-    private static final DynamicValue xValue = OmnathLocusOfTheVoidValue.instance;
+    private static final DynamicValue xValue = new TotalUnspentManaCount();
+    private static final Hint hint = new ValueHint("Unspent mana", xValue);
 
     public OmnathLocusOfTheVoid(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{7}");
+
         this.supertype.add(SuperType.LEGENDARY);
         this.subtype.add(SubType.ELEMENTAL);
-
         this.power = new MageInt(6);
         this.toughness = new MageInt(6);
 
         // Omnath gets +1/+1 for each unspent mana you have.
-        this.addAbility(new SimpleStaticAbility(new BoostSourceEffect(
-                xValue, xValue, Duration.WhileOnBattlefield
-        )));
+        this.addAbility(new SimpleStaticAbility(new BoostSourceEffect(xValue, xValue, Duration.WhileOnBattlefield)).addHint(hint));
 
         // If you would lose unspent mana, that mana becomes colorless instead.
-        this.addAbility(new SimpleStaticAbility(new OmnathLocusOfTheVoidManaEffect()));
+        this.addAbility(new SimpleStaticAbility(new OmnathUnspentManaBecomesColorlessEffect()));
 
-        // Landfall — Whenever a land you control enters, add {C}{C}.
-        this.addAbility(new LandfallAbility(new AddManaToManaPoolSourceControllerEffect(
-                Mana.ColorlessMana(2)
-        )));
+        // Landfall -- Whenever a land you control enters, add {C}{C}.
+        this.addAbility(new LandfallAbility(new BasicManaEffect(Mana.ColorlessMana(2))));
     }
 
     private OmnathLocusOfTheVoid(final OmnathLocusOfTheVoid card) {
@@ -63,20 +61,47 @@ public final class OmnathLocusOfTheVoid extends CardImpl {
     }
 }
 
-class OmnathLocusOfTheVoidManaEffect extends ContinuousEffectImpl {
+class TotalUnspentManaCount implements DynamicValue {
 
-    OmnathLocusOfTheVoidManaEffect() {
+    @Override
+    public int calculate(Game game, Ability sourceAbility, mage.abilities.effects.Effect effect) {
+        Player player = game.getPlayer(sourceAbility.getControllerId());
+        if (player == null) {
+            return 0;
+        }
+        return player.getManaPool().getMana().count();
+    }
+
+    @Override
+    public DynamicValue copy() {
+        return this;
+    }
+
+    @Override
+    public String getMessage() {
+        return "unspent mana you have";
+    }
+
+    @Override
+    public String toString() {
+        return "1";
+    }
+}
+
+class OmnathUnspentManaBecomesColorlessEffect extends ContinuousEffectImpl {
+
+    OmnathUnspentManaBecomesColorlessEffect() {
         super(Duration.WhileOnBattlefield, Layer.RulesEffects, SubLayer.NA, Outcome.Benefit);
         staticText = "if you would lose unspent mana, that mana becomes colorless instead";
     }
 
-    private OmnathLocusOfTheVoidManaEffect(final OmnathLocusOfTheVoidManaEffect effect) {
+    private OmnathUnspentManaBecomesColorlessEffect(final OmnathUnspentManaBecomesColorlessEffect effect) {
         super(effect);
     }
 
     @Override
-    public OmnathLocusOfTheVoidManaEffect copy() {
-        return new OmnathLocusOfTheVoidManaEffect(this);
+    public OmnathUnspentManaBecomesColorlessEffect copy() {
+        return new OmnathUnspentManaBecomesColorlessEffect(this);
     }
 
     @Override
@@ -86,25 +111,5 @@ class OmnathLocusOfTheVoidManaEffect extends ContinuousEffectImpl {
             player.getManaPool().setManaBecomesColorless(true);
         }
         return true;
-    }
-}
-
-enum OmnathLocusOfTheVoidValue implements DynamicValue {
-    instance;
-
-    @Override
-    public int calculate(Game game, Ability sourceAbility, Effect effect) {
-        Player player = game.getPlayer(sourceAbility.getControllerId());
-        return player == null ? 0 : player.getManaPool().count();
-    }
-
-    @Override
-    public OmnathLocusOfTheVoidValue copy() {
-        return this;
-    }
-
-    @Override
-    public String getMessage() {
-        return "unspent mana you have";
     }
 }

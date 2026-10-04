@@ -1,7 +1,10 @@
 package mage.cards.o;
 
+import java.util.UUID;
+
 import mage.MageInt;
 import mage.abilities.Ability;
+import mage.abilities.common.EntersBattlefieldTriggeredAbility;
 import mage.abilities.condition.Condition;
 import mage.abilities.condition.common.YouGainedLifeCondition;
 import mage.abilities.dynamicvalue.common.ControllerGainedLifeCount;
@@ -9,7 +12,6 @@ import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.CreateTokenEffect;
 import mage.abilities.keyword.FlyingAbility;
 import mage.abilities.triggers.BeginningOfEndStepTriggeredAbility;
-import mage.abilities.common.EntersBattlefieldTriggeredAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
@@ -17,6 +19,7 @@ import mage.constants.Outcome;
 import mage.constants.SubType;
 import mage.constants.SuperType;
 import mage.constants.TargetController;
+import mage.filter.FilterPermanent;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.permanent.TappedPredicate;
 import mage.game.Game;
@@ -25,10 +28,10 @@ import mage.game.permanent.token.AngelToken;
 import mage.players.Player;
 import mage.watchers.common.PlayerGainedLifeWatcher;
 
-import java.util.UUID;
 
 /**
- * @author JayDi85
+ *
+ * @author muz
  */
 public final class ObNixilisTheAscended extends CardImpl {
 
@@ -50,7 +53,7 @@ public final class ObNixilisTheAscended extends CardImpl {
 
         // At the beginning of each end step, if you gained life this turn, create a 4/4 white Angel creature token with flying.
         this.addAbility(new BeginningOfEndStepTriggeredAbility(
-                TargetController.ANY, new CreateTokenEffect(new AngelToken()), false
+            TargetController.ANY, new CreateTokenEffect(new AngelToken()), false
         ).withInterveningIf(condition).addHint(ControllerGainedLifeCount.getHint()), new PlayerGainedLifeWatcher());
     }
 
@@ -66,8 +69,7 @@ public final class ObNixilisTheAscended extends CardImpl {
 
 class ObNixilisTheAscendedEffect extends OneShotEffect {
 
-    private static final FilterCreaturePermanent filter
-            = new FilterCreaturePermanent("tapped creatures your opponents control");
+    private static final FilterPermanent filter = new FilterCreaturePermanent("tapped creatures your opponents control");
 
     static {
         filter.add(TargetController.OPPONENT.getControllerPredicate());
@@ -76,8 +78,7 @@ class ObNixilisTheAscendedEffect extends OneShotEffect {
 
     ObNixilisTheAscendedEffect() {
         super(Outcome.DestroyPermanent);
-        this.staticText = "destroy all tapped creatures your opponents control. "
-                + "You gain 1 life for each creature destroyed this way";
+        this.staticText = "destroy all tapped creatures your opponents control. You gain 1 life for each creature destroyed this way";
     }
 
     private ObNixilisTheAscendedEffect(final ObNixilisTheAscendedEffect effect) {
@@ -92,19 +93,19 @@ class ObNixilisTheAscendedEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         Player controller = game.getPlayer(source.getControllerId());
-        if (controller == null) {
-            return false;
-        }
-        int destroyed = 0;
-        for (Permanent creature : game.getBattlefield().getActivePermanents(filter, controller.getId(), game)) {
-            if (creature.destroy(source, game, false)) {
-                destroyed++;
+        if (controller != null) {
+            int destroyedCreature = 0;
+            for (Permanent creature : game.getBattlefield().getActivePermanents(filter, controller.getId(), game)) {
+                if (creature.destroy(source, game, false)) {
+                    destroyedCreature++;
+                }
             }
+            if (destroyedCreature > 0) {
+                game.processAction();
+                controller.gainLife(destroyedCreature, game, source);
+            }
+            return true;
         }
-        if (destroyed > 0) {
-            game.processAction();
-            controller.gainLife(destroyed, game, source);
-        }
-        return true;
+        return false;
     }
 }

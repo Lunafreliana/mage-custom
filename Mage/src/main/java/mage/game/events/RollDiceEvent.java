@@ -13,6 +13,7 @@ public class RollDiceEvent extends GameEvent {
 
     private final int sides;
     private int ignoreLowestAmount = 0; // ignore the lowest results
+    private int ignoreAmount = 0; // ignore results chosen by the rolling player
     private final RollDieType rollDieType;
 
     /**
@@ -47,6 +48,14 @@ public class RollDiceEvent extends GameEvent {
 
     public void incIgnoreLowestAmount(int additionalCount) {
         this.ignoreLowestAmount = CardUtil.overflowInc(this.ignoreLowestAmount, additionalCount);
+    }
+
+    public void incIgnoreAmount(int additionalCount) {
+        this.ignoreAmount = CardUtil.overflowInc(this.ignoreAmount, additionalCount);
+    }
+
+    public int getIgnoreAmount() {
+        return ignoreAmount;
     }
 
     public int getIgnoreLowestAmount() {

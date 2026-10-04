@@ -2749,6 +2749,14 @@ public abstract class PlayerImpl implements Player, Serializable {
     }
 
     @Override
+    public void setTechnicalResult(boolean won) {
+        // direct result without game events to stop errored game
+        this.wins = won;
+        this.loses = !won;
+        this.draws = false;
+    }
+
+    @Override
     public void sendPlayerAction(PlayerAction playerAction, Game game, Object data) {
         switch (playerAction) {
             case PASS_PRIORITY_UNTIL_MY_NEXT_TURN: // F9
@@ -2824,10 +2832,12 @@ public abstract class PlayerImpl implements Player, Serializable {
     }
 
     @Override
-    public void lost(Game game) {
+    public boolean lost(Game game) {
         if (canLose(game)) {
             lostForced(game);
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -3530,6 +3540,44 @@ public abstract class PlayerImpl implements Player, Serializable {
             }
             dieRolls.clear();
             dieRolls.addAll(newRolls);
+        } else if (rollDiceEvent.getRollDieType() == RollDieType.PLANAR && rollDiceEvent.getIgnoreAmount() > 0) {
+            // Only ignore rolls when a replacement explicitly instructs us to do so.
+            // Ichor Elixir adds one roll and one ignored result per applicable copy.
+            int resultsToKeep = Math.max(0, dieRolls.size() - rollDiceEvent.getIgnoreAmount());
+            List<RollDieResult> keptRolls = new ArrayList<>();
+            for (int i = 0; i < resultsToKeep; i++) {
+                Set<PlanarDieRollResult> choices = dieRolls.stream()
+                        .map(result -> result.planarResult)
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                PlanarDieRollResult selected = choices.iterator().next();
+                if (choices.size() > 1) {
+                    if (this.isComputer()) {
+                        selected = choices.stream()
+                                .max(Comparator.comparingInt(PlanarDieRollResult::getAIPriority))
+                                .orElse(selected);
+                    } else {
+                        Choice choice = new ChoiceImpl(true);
+                        choice.setMessage("Choose which die roll result to keep (the rest will be ignored)");
+                        choice.setChoices(choices.stream().map(Object::toString).collect(Collectors.toSet()));
+                        this.choose(Outcome.Neutral, choice, game);
+                        selected = choices.stream()
+                                .filter(result -> result.toString().equals(choice.getChoice()))
+                                .findFirst()
+                                .orElse(selected);
+                    }
+                }
+                for (int j = 0; j < dieRolls.size(); j++) {
+                    if (dieRolls.get(j).planarResult == selected) {
+                        keptRolls.add(dieRolls.remove(j));
+                        break;
+                    }
+                }
+            }
+            dieRolls.clear();
+            dieRolls.addAll(keptRolls);
+            dieResults.clear();
+            dieRolls.forEach(result -> dieResults.add(result.planarResult));
+            ignoreMessage = "";
         } else {
             ignoreMessage = "";
         }
@@ -5667,26 +5715,29 @@ public abstract class PlayerImpl implements Player, Serializable {
         game.informPlayers(getLogName() + " surveils " + event.getAmount() + CardUtil.getSourceLogName(game, source));
         Cards cards = new CardsImpl();
         cards.addAllCards(getLibrary().getTopCards(game, event.getAmount()));
-        int totalCount = cards.size();
+        Cards cardsPutInGraveyard = new CardsImpl();
+        Cards cardsPutOnTop = new CardsImpl();
         if (!cards.isEmpty()) {
             TargetCard target = new TargetCard(0, cards.size(), Zone.LIBRARY,
                     new FilterCard("card" + (cards.size() == 1 ? "" : "s")
                             + " to PUT into your GRAVEYARD (Surveil)"));
             chooseTarget(Outcome.Benefit, cards, target, source, game);
-            Cards cardsToGraveyard = new CardsImpl(target.getTargets());
-            moveCards(cardsToGraveyard, Zone.GRAVEYARD, source, game);
-            cardsToGraveyard
-                    .getCards(game)
-                    .stream()
-                    .filter(card -> game.getState().getZone(card.getId()) == Zone.GRAVEYARD)
-                    .forEach(card -> game.fireEvent(GameEvent.getEvent(
-                            GameEvent.EventType.SURVEILLED_CARD, card.getId(), source, getId()
-                    )));
+            Cards cardsToMove = new CardsImpl(target.getTargets());
+            if (!cardsToMove.isEmpty()) {
+                Set<Card> movedCards = moveCardsToGraveyardWithInfo(cardsToMove.getCards(game), source, game, Zone.LIBRARY);
+                cardsPutInGraveyard.addAllCards(movedCards);
+                movedCards.stream()
+                        .filter(card -> game.getState().getZone(card.getId()) == Zone.GRAVEYARD)
+                        .forEach(card -> game.fireEvent(GameEvent.getEvent(
+                                GameEvent.EventType.SURVEILLED_CARD, card.getId(), source, getId()
+                        )));
+            }
             cards.removeIf(target.getTargets()::contains);
             putCardsOnTopOfLibrary(cards, game, source, true);
+            cardsPutOnTop.addAll(cards);
         }
         game.fireEvent(new GameEvent(GameEvent.EventType.SURVEILED, getId(), source, getId(), event.getAmount(), true));
-        return SurveilResult.surveil(totalCount - cards.size(), cards.size());
+        return SurveilResult.surveil(cardsPutInGraveyard, cardsPutOnTop);
     }
 
     @Override

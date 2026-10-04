@@ -42,7 +42,7 @@ public final class AsmoranomardicadaistinaculdacarsKitchenPlane extends Plane {
 
         // Whenever you gain life, target opponent loses that much life.
         Ability ability = new GainLifeControllerTriggeredAbility(
-                Zone.COMMAND, new LoseLifeTargetEffect(SavedGainedLifeValue.MUCH), false, false
+                Zone.COMMAND, new LoseLifeTargetEffect(SavedGainedLifeValue.MUCH), false, false, false
         );
         ability.addTarget(new TargetOpponent());
         this.getAbilities().add(ability);
