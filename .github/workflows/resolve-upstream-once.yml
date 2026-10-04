@@ -1,0 +1,101 @@
+name: Resolve approved upstream merge once
+
+on:
+  pull_request:
+    branches: [custom]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: resolve-approved-upstream-382
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'automation/upstream-conflict-prep-20261004'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Merge the pinned upstream with the approved resolutions
+        shell: bash
+        run: |
+          set -euo pipefail
+          RESOLUTION_SHA="$(git rev-parse HEAD)"
+          CUSTOM_SHA=466aa270d86203de95c75a83b16cc5267124f13a
+          UPSTREAM_SHA=9a7762ddd225da40d353ff52a7f97a7e8289b0dc
+          RESOLUTION_BRANCH=automation/upstream-conflict-prep-20261004
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin custom "$RESOLUTION_BRANCH"
+          test "$(git rev-parse origin/custom)" = "$CUSTOM_SHA"
+          test "$(git rev-parse "origin/$RESOLUTION_BRANCH")" = "$RESOLUTION_SHA"
+          git remote add upstream https://github.com/magefree/mage.git
+          git fetch upstream "$UPSTREAM_SHA"
+          git merge-base --is-ancestor "$CUSTOM_SHA" HEAD
+          if ! git merge --no-commit --no-ff "$UPSTREAM_SHA"; then
+            test -f "$(git rev-parse --git-path MERGE_HEAD)"
+          fi
+          RESOLVED_PATHS=(
+            "Mage.Sets/src/mage/cards/a/AvacynAngelOfHorror.java"
+            "Mage.Sets/src/mage/cards/b/BlossomBlessedAngel.java"
+            "Mage.Sets/src/mage/cards/f/FlickeringHound.java"
+            "Mage.Sets/src/mage/cards/k/KindredJudgment.java"
+            "Mage.Sets/src/mage/cards/n/NivMizzetGhostCounsel.java"
+            "Mage.Sets/src/mage/cards/o/ObNixilisTheAscended.java"
+            "Mage.Sets/src/mage/cards/o/OmnathLocusOfTheVoid.java"
+            "Mage.Sets/src/mage/cards/p/ProctorOfPotential.java"
+            "Mage.Sets/src/mage/cards/v/VariableChaser.java"
+            "Mage.Sets/src/mage/cards/v/VigorbloomCharm.java"
+            "Mage.Sets/src/mage/cards/w/WizardsStaff.java"
+            "Mage.Sets/src/mage/cards/y/YoshimaruBelovedCompanion.java"
+            "Mage.Sets/src/mage/cards/z/ZagorkaMotherOfSanctum.java"
+            "Mage.Sets/src/mage/sets/MarchOfTheMachineCommander.java"
+            "Mage.Sets/src/mage/sets/MysteryBoosterCommanderEdition.java"
+            "Mage.Sets/src/mage/sets/RealityFracture.java"
+            "Mage.Sets/src/mage/sets/RealityFractureCommander.java"
+            "Mage.Tests/src/test/java/org/mage/test/cards/single/hob/WizardsStaffTest.java"
+            "Mage.Tests/src/test/java/org/mage/test/cards/single/pc2/FracturedPowerstoneTest.java"
+            "Mage/src/main/java/mage/game/permanent/token/SanctumToken.java"
+            "Mage/src/main/java/mage/MageIdentifier.java"
+            "Mage/src/main/java/mage/players/PlayerImpl.java"
+          )
+          while IFS= read -r -d '' conflict; do
+            if ! printf '%s\n' "${RESOLVED_PATHS[@]}" | grep -Fxq -- "$conflict"; then
+              echo "::error::Unreviewed conflict: $conflict"
+              exit 1
+            fi
+          done < <(git diff --name-only --diff-filter=U -z)
+          git restore --source="$RESOLUTION_SHA" --staged --worktree -- "${RESOLVED_PATHS[@]}"
+          test -z "$(git diff --name-only --diff-filter=U)"
+          python3 - <<'PY'
+          import pathlib
+          import subprocess
+          path = "Mage/src/main/java/mage/players/PlayerImpl.java"
+          original = subprocess.check_output(["git", "show", "466aa270d86203de95c75a83b16cc5267124f13a:" + path], text=True)
+          merged = pathlib.Path(path).read_text()
+          start = "    private static final class RollDieResult"
+          end = "    public PlanarDieRollResult rollPlanarDie"
+          def dice(text):
+              return text[text.index(start):text.index(end, text.index(start))]
+          assert dice(original) == dice(merged), "Custom dice implementation changed"
+          for name in ["HAND_REVEALED", "HAND_LOOKED_AT", "ChaoticAetherWatcher", "getMinModes(game, option)", "SURVEILLED_CARD", "setTechnicalResult", "public boolean lost(Game game)"]:
+              assert name in merged, name
+          identifiers = pathlib.Path("Mage/src/main/java/mage/MageIdentifier.java").read_text()
+          for name in ["TheMatrixOfTimeWatcher", "EyeOfDuskmantleAlternateCast", "VisionSpectralSynthezoidWatcher", "InsideInformationAlternateCast"]:
+              assert name in identifiers, name
+          PY
+          # This helper must not remain in the final upstream sync.
+          git rm .github/workflows/resolve-upstream-once.yml
+          git diff --cached --check
+          git commit -m "Merge official XMage 9a7762d preserving custom engine and Planechase behavior"
+          git merge-base --is-ancestor "$UPSTREAM_SHA" HEAD
+          git push origin "HEAD:$RESOLUTION_BRANCH"
+          echo "## Approved upstream merge prepared" >> "$GITHUB_STEP_SUMMARY"
+          echo "Merge commit: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          echo "Custom dice logic is unchanged. Run the normal Maven CI before merging PR #382." >> "$GITHUB_STEP_SUMMARY"
