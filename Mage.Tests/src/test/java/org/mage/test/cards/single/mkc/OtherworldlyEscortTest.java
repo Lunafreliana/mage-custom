@@ -46,4 +46,27 @@ public class OtherworldlyEscortTest extends CardTestPlayerBase {
         assertGraveyardCount(playerA, "Otherworldly Escort", 1);
     }
 
+
+    @Test
+    public void testBlinkResetsReturnedCreatureTypes() {
+        addCard(Zone.BATTLEFIELD, playerA, "Otherworldly Escort");
+        addCard(Zone.BATTLEFIELD, playerA, "Ashnod's Altar");
+        addCard(Zone.BATTLEFIELD, playerA, "Plains");
+        addCard(Zone.HAND, playerA, "Cloudshift");
+
+        activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Sacrifice");
+        setChoice(playerA, "Otherworldly Escort");
+        waitStackResolved(1, PhaseStep.PRECOMBAT_MAIN);
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Cloudshift", "Otherworldly Escort");
+
+        setStrictChooseMode(true);
+        setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
+        execute();
+
+        assertPermanentCount(playerA, "Otherworldly Escort", 1);
+        assertSubtype("Otherworldly Escort", SubType.HUMAN);
+        assertSubtype("Otherworldly Escort", SubType.DETECTIVE);
+        assertNotSubtype("Otherworldly Escort", SubType.SPIRIT);
+        assertCounterCount("Otherworldly Escort", CounterType.CHARGE, 0);
+    }
 }

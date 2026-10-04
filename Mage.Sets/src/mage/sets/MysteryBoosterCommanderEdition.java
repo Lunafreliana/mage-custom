@@ -51,10 +51,13 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Jandor, Fortuned Traveler", 42, Rarity.RARE, mage.cards.j.JandorFortunedTraveler.class));
         cards.add(new SetCardInfo("Jeweled Amulet", 75, Rarity.UNCOMMON, mage.cards.j.JeweledAmulet.class));
         cards.add(new SetCardInfo("Joven and Chandler", 24, Rarity.RARE, mage.cards.j.JovenAndChandler.class));
+        cards.add(new SetCardInfo("Kuroki, Thief of Talents", 15, Rarity.RARE, mage.cards.k.KurokiThiefOfTalents.class));
         cards.add(new SetCardInfo("Lyna, Veil of Vengeance", 43, Rarity.RARE, mage.cards.l.LynaVeilofVengeance.class));
+        cards.add(new SetCardInfo("Massimo, the Magician", 45, Rarity.RARE, mage.cards.m.MassimoTheMagician.class));
         cards.add(new SetCardInfo("Maular, the Next Evolution", 31, Rarity.RARE, mage.cards.m.MaularTheNextEvolution.class));
         cards.add(new SetCardInfo("Meatsqueak, Hoard Lord", 32, Rarity.RARE, mage.cards.m.MeatsqueakHoardLord.class));
         cards.add(new SetCardInfo("Mind Stone", 76, Rarity.UNCOMMON, mage.cards.m.MindStone.class));
+        cards.add(new SetCardInfo("Miss Highwater", 16, Rarity.RARE, mage.cards.m.MissHighwater.class));
         cards.add(new SetCardInfo("Nephilim Epochal", 47, Rarity.RARE, mage.cards.n.NephilimEpochal.class));
         cards.add(new SetCardInfo("Nivea, Beloved Battlemage", 3, Rarity.RARE, mage.cards.n.NiveaBelovedBattlemage.class));
         cards.add(new SetCardInfo("Olag and Miau, New Friends", 48, Rarity.RARE, mage.cards.o.OlagAndMiauNewFriends.class));
@@ -71,6 +74,7 @@ public final class MysteryBoosterCommanderEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Tsagan, Raider Warlord", 53, Rarity.RARE, mage.cards.t.TsaganRaiderWarlord.class));
         cards.add(new SetCardInfo("Uugguu, the Omniplasm", 54, Rarity.RARE, mage.cards.u.UugguuTheOmniplasm.class));
         cards.add(new SetCardInfo("Valko Indorian", 60, Rarity.RARE, mage.cards.v.ValkoIndorian.class));
+        cards.add(new SetCardInfo("Venser, Visionary Traveler", 55, Rarity.RARE, mage.cards.v.VenserVisionaryTraveler.class));
         cards.add(new SetCardInfo("Whtz, the Bibliophile", 57, Rarity.RARE, mage.cards.w.WhtzTheBibliophile.class));
         cards.add(new SetCardInfo("Worzel, the Protector", 5, Rarity.RARE, mage.cards.w.WorzelTheProtector.class));
         cards.add(new SetCardInfo("Zagorka, Mother of Sanctum", 58, Rarity.RARE, mage.cards.z.ZagorkaMotherOfSanctum.class));

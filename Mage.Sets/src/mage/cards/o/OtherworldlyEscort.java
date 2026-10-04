@@ -1,7 +1,6 @@
 package mage.cards.o;
 
 import mage.MageInt;
-import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.common.DiesSourceTriggeredAbility;
 import mage.abilities.common.SimpleActivatedAbility;
@@ -12,7 +11,7 @@ import mage.abilities.costs.common.TapSourceCost;
 import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.common.DestroyTargetEffect;
 import mage.abilities.effects.common.ReturnToBattlefieldUnderOwnerControlSourceEffect;
-import mage.abilities.effects.common.continuous.BecomesSubtypeAllEffect;
+import mage.abilities.effects.common.continuous.BecomesCreatureTypeTargetEffect;
 import mage.abilities.keyword.FlashAbility;
 import mage.cards.Card;
 import mage.cards.CardImpl;
@@ -25,12 +24,11 @@ import mage.counters.Counters;
 import mage.counters.CounterType;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.other.DamagedPlayerThisTurnPredicate;
-import mage.filter.predicate.permanent.PermanentReferenceInCollectionPredicate;
 import mage.game.Game;
 import mage.target.TargetPermanent;
+import mage.target.targetpointer.FixedTarget;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.UUID;
 
 public final class OtherworldlyEscort extends CardImpl {
@@ -96,9 +94,11 @@ class OtherworldlyEscortReturnEffect extends ReturnToBattlefieldUnderOwnerContro
         if (card == null) {
             return false;
         }
-        final FilterCreaturePermanent filter = new FilterCreaturePermanent();
-        filter.add(new PermanentReferenceInCollectionPredicate(Collections.singletonList(new MageObjectReference(card, game, 1))));
-        game.addEffect(new BecomesSubtypeAllEffect(Duration.WhileOnBattlefield, Arrays.asList(SubType.SPIRIT, SubType.DETECTIVE), filter, true), source);
+        // Apply to the new battlefield object as it enters (CR 611.2e).
+        // A group effect would snapshot the battlefield before this card returns.
+        game.addEffect(new BecomesCreatureTypeTargetEffect(
+                Duration.WhileOnBattlefield, Arrays.asList(SubType.SPIRIT, SubType.DETECTIVE), true
+        ).setTargetPointer(new FixedTarget(card.getId(), card.getZoneChangeCounter(game) + 1)), source);
         game.setEnterWithCounters(card.getId(), new Counters(CounterType.CHARGE.createInstance(4)));
         return super.apply(game, source);
     }

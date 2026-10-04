@@ -54,6 +54,7 @@ class IchorElixirEffect extends ReplacementEffectImpl {
     @Override
     public boolean replaceEvent(GameEvent event, Ability source, Game game) {
         ((RollDiceEvent) event).incAmount(1);
+        ((RollDiceEvent) event).incIgnoreAmount(1);
         return false;
     }
 

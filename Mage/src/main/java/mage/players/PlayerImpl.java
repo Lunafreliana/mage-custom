@@ -3540,6 +3540,44 @@ public abstract class PlayerImpl implements Player, Serializable {
             }
             dieRolls.clear();
             dieRolls.addAll(newRolls);
+        } else if (rollDiceEvent.getRollDieType() == RollDieType.PLANAR && rollDiceEvent.getIgnoreAmount() > 0) {
+            // Only ignore rolls when a replacement explicitly instructs us to do so.
+            // Ichor Elixir adds one roll and one ignored result per applicable copy.
+            int resultsToKeep = Math.max(0, dieRolls.size() - rollDiceEvent.getIgnoreAmount());
+            List<RollDieResult> keptRolls = new ArrayList<>();
+            for (int i = 0; i < resultsToKeep; i++) {
+                Set<PlanarDieRollResult> choices = dieRolls.stream()
+                        .map(result -> result.planarResult)
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                PlanarDieRollResult selected = choices.iterator().next();
+                if (choices.size() > 1) {
+                    if (this.isComputer()) {
+                        selected = choices.stream()
+                                .max(Comparator.comparingInt(PlanarDieRollResult::getAIPriority))
+                                .orElse(selected);
+                    } else {
+                        Choice choice = new ChoiceImpl(true);
+                        choice.setMessage("Choose which die roll result to keep (the rest will be ignored)");
+                        choice.setChoices(choices.stream().map(Object::toString).collect(Collectors.toSet()));
+                        this.choose(Outcome.Neutral, choice, game);
+                        selected = choices.stream()
+                                .filter(result -> result.toString().equals(choice.getChoice()))
+                                .findFirst()
+                                .orElse(selected);
+                    }
+                }
+                for (int j = 0; j < dieRolls.size(); j++) {
+                    if (dieRolls.get(j).planarResult == selected) {
+                        keptRolls.add(dieRolls.remove(j));
+                        break;
+                    }
+                }
+            }
+            dieRolls.clear();
+            dieRolls.addAll(keptRolls);
+            dieResults.clear();
+            dieRolls.forEach(result -> dieResults.add(result.planarResult));
+            ignoreMessage = "";
         } else {
             ignoreMessage = "";
         }
